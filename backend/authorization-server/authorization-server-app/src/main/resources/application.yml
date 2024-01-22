@@ -1,0 +1,68 @@
+app:
+  security:
+    enable-front-back-seperated: true
+    namespace-prefix: AuthorizationServer
+
+    # 非Ajax方式登录成功后，默认重定向到由前端提供的后台功能页面
+    default-login-success-target-url: http://localhost:7080/admin
+
+    oauth2:
+      client:
+        # 是否开启OAuth2客户端登录
+        enable: false
+
+logging:
+  pattern:
+    console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
+  level:
+    org.springframework.security: trace
+
+server:
+  port: 9000
+  shutdown: graceful
+
+spring:
+  # DataSource
+  datasource:
+    username: root
+    password: ''
+    url: jdbc:mysql://localhost/authorization_server?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    hikari:
+      minimum-idle: 50
+      maximum-pool-size: 150
+      connection-test-query: SELECT 1
+
+  # JPA
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  data:
+    # Redis
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      password: ''
+      lettuce:
+        pool:
+          max-active: 300
+          max-idle: 200
+          min-idle: 50
+          max-wait: 5000ms
+      timeout: 3000ms
+
+  # springboot启用虚拟线程
+  threads:
+    virtual:
+      enabled: true
+  # 启用虚拟线程后，由于虚拟线程都是守护线程，为防止JVM因没有非守护线程而自动退出，需要设置此值为true
+  #（参考：https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.spring-application.virtual-threads）
+  main:
+    keep-alive: true
+
+  # 优雅停机的宽限期
+  lifecycle:
+    timeout-per-shutdown-phase: 120s

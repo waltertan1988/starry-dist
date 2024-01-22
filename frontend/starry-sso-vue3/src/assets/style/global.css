@@ -1,0 +1,25 @@
+@charset "UTF-8";
+:root{
+    --starry-header-height: 30px;
+    --starry-aside-width: 200px;
+    --starry-main-height: calc(100vh - var(--starry-header-height) - var(--starry-footer-height));
+    --starry-footer-height: 25px;
+}
+
+div .blank5{
+    height: 5px;
+    clear: both;
+    background: var(--el-bg-color);
+}
+
+div .blank10{
+    height: 10px;
+    clear: both;
+    background: var(--el-bg-color);
+}
+
+div .blank20{
+    height: 20px;
+    clear: both;
+    background: var(--el-bg-color);
+}
