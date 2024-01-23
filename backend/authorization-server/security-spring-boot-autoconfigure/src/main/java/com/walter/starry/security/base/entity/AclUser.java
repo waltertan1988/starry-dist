@@ -27,8 +27,8 @@ public class AclUser implements Serializable {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "oauth2_registration_id")
-    private String oauth2RegistrationId;
+    @Column(name = "oidc_registration_id")
+    private String oidcRegistrationId;
 
     @Column(name = "open_id")
     private String openId;

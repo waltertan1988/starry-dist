@@ -72,7 +72,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         aclUser.setUsername(aclUserBo.getUsername());
         aclUser.setNickname(aclUserBo.getNickname());
         aclUser.setPassword(aclUserBo.getPassword());
-        aclUser.setOauth2RegistrationId(null);
+        aclUser.setOidcRegistrationId(null);
         aclUser.setOpenId(null);
         aclUser.setEnabled(aclUserBo.isEnabled());
         aclUser.setAccountLocked(!aclUserBo.isAccountNonLocked());
@@ -118,7 +118,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         Example<? extends AclUser> example = Example.of(probe);
         return aclUserRepository.findAll(example).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
-                u.getOauth2RegistrationId(), u.getOpenId(),
+                u.getOidcRegistrationId(), u.getOpenId(),
                 !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(),
                 u.getEnabled(), AuthorityUtils.NO_AUTHORITIES)).toList();
     }
@@ -126,11 +126,11 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
     @Override
     public UserDetails loadUserByRegistrationIdAndOpenId(String registrationId, String openId) throws UsernameNotFoundException {
         AclUser probe = new AclUser();
-        probe.setOauth2RegistrationId(registrationId);
+        probe.setOidcRegistrationId(registrationId);
         probe.setOpenId(openId);
         Optional<UserDetails> userDetailsOptional = aclUserRepository.findAll(Example.of(probe)).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
-                        u.getOauth2RegistrationId(), u.getOpenId(),
+                        u.getOidcRegistrationId(), u.getOpenId(),
                         !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(),
                         u.getEnabled(), AuthorityUtils.NO_AUTHORITIES)).findFirst();
 

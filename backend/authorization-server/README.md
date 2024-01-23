@@ -32,12 +32,12 @@ CREATE TABLE `users` (
     `account_expired` BIT(1) NOT NULL COMMENT '账号是否已过期',
     `account_locked` BIT(1) NOT NULL COMMENT '账号是否已被锁',
     `credentials_expired` BIT(1) NOT NULL COMMENT '密码是否已过期',
-    `oauth2_registration_id` varchar(255) DEFAULT NULL COMMENT 'OAuth2授权服务器的在本应用内的注册ID',
+    `oidc_registration_id` varchar(255) DEFAULT NULL COMMENT 'OAuth2授权服务器的在本应用内的OIDC注册ID',
     `open_id` varchar(128) DEFAULT NULL COMMENT '用户在OAuth2授权服务器中的开放账号',
     `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`username`),
-    KEY `idx_oauth2RegistrationId_openId` (`oauth2_registration_id`,`open_id`)
+    KEY `idx_oidcRegistrationId_openId` (`oidc_registration_id`,`open_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户配置表';
 
 CREATE TABLE `authorities` (

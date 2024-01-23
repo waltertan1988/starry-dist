@@ -14,7 +14,7 @@ public class UserResponse {
 
     private String password;
 
-    private String oauth2RegistrationId;
+    private String oidcRegistrationId;
 
     private String openId;
 
