@@ -14,6 +14,10 @@ public class UserResponse {
 
     private String password;
 
+    private String oauth2RegistrationId;
+
+    private String openId;
+
     private Boolean accountExpired;
 
     private Boolean accountLocked;

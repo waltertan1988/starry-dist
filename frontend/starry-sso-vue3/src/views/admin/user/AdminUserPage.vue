@@ -61,6 +61,8 @@
         <el-table-column prop="accountExpired" label="已过期" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="accountLocked" label="已锁定" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="credentialsExpired" label="密码过期" width="85" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
+        <el-table-column prop="oauth2RegistrationId" label="OAuth2注册ID" width="120"/>
+        <el-table-column prop="openId" label="OpenId" width="120"/>
         <el-table-column prop="createTime" label="创建时间" width="160" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)"/>
         <el-table-column prop="updateTime" label="修改时间" width="160" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)"/>
         <el-table-column label="操作" width="80" fixed="right">
