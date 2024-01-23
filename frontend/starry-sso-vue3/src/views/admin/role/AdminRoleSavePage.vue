@@ -6,7 +6,7 @@
       </el-col>
       <el-col :span="12">
         <el-form-item prop="code">
-          <el-input name="code" v-model="ruleForm.code" style="width: 300px;" placeholder="请输入角色编码" clearable/>
+          <el-input name="code" v-model="ruleForm.code" style="width: 300px;" placeholder="请输入角色编码，以ROLE_开头" clearable/>
         </el-form-item>
       </el-col>
     </el-row>
