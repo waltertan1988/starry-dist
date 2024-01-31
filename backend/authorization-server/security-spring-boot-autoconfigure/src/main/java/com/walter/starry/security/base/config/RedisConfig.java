@@ -2,6 +2,9 @@ package com.walter.starry.security.base.config;
 
 import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,9 +16,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: walter.tan
@@ -56,5 +62,34 @@ public class RedisConfig {
         }
 
         return container;
+    }
+
+    /**
+     * Redisson相关配置
+     */
+    @Slf4j
+    @Configuration(proxyBeanMethods = false)
+    public static class RedissonConfiguration implements AutoCloseable {
+        private static final String CONFIG_FILE = "redisson.yml";
+
+        private final RedissonClient redissonClient;
+
+        public RedissonConfiguration() throws IOException {
+            URL resource = RedissonConfiguration.class.getClassLoader().getResource(CONFIG_FILE);
+            log.info("Reading redisson config file:{}", resource);
+            Config config = Config.fromYAML(resource);
+            redissonClient = Redisson.create(config);
+        }
+
+        @Bean
+        public RedissonClient redissonClient() {
+            return redissonClient;
+        }
+
+        @Override
+        public void close() {
+            this.redissonClient.shutdown(0, 60, TimeUnit.SECONDS);
+            log.info("Shutdown redissonClient successfully.");
+        }
     }
 }
