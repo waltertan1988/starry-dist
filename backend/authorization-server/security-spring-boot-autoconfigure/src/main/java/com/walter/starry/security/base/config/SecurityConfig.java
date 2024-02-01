@@ -118,7 +118,7 @@ public class SecurityConfig {
             http.oauth2Login(oauth2 -> {
                 if(appSecurityProperties.isEnableFrontBackSeperated()){
                     // 支持Ajax与非Ajax登录失败的处理器
-//                    oauth2.failureHandler(this.getAjaxSupportedAuthenticationFailureHandler(http));
+                    oauth2.failureHandler(this.getAjaxSupportedAuthenticationFailureHandler(http));
                     // 支持Ajax与非Ajax登录成功的处理器
                     oauth2.successHandler(this.getAjaxSupportedSavedRequestAwareAuthenticationSuccessHandler(http));
                 }
