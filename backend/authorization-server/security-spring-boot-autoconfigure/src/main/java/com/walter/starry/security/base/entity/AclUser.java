@@ -45,6 +45,9 @@ public class AclUser implements Serializable {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 
+    @Column(name="session_clear_time")
+    private Date sessionClearTime;
+
     @Column(name="create_time", nullable = false)
     private Date createTime;
 

@@ -38,12 +38,21 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     private boolean enabled;
 
+    private Long sessionClearTime;
+
+    private Long createTime;
+
+    private Long updateTime;
+
     private Collection<GrantedAuthority> authorities;
 
     public AclUserBo(){
     }
 
-    public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, Collection<GrantedAuthority> authorities) {
+    public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
+                     boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
+                     Long sessionClearTime, Long createTime, Long updateTime,
+                     Collection<GrantedAuthority> authorities) {
         this.username = username;
         this.nickname = nickname;
         this.password = password;
@@ -53,6 +62,9 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
+        this.sessionClearTime = sessionClearTime;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
     }
 
@@ -103,6 +115,18 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         return this.credentialsNonExpired;
     }
 
+    public Long getSessionClearTime() {
+        return sessionClearTime;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -133,6 +157,18 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void setSessionClearTime(Long sessionClearTime) {
+        this.sessionClearTime = sessionClearTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override

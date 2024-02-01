@@ -78,8 +78,9 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         aclUser.setAccountLocked(!aclUserBo.isAccountNonLocked());
         aclUser.setAccountExpired(!aclUserBo.isAccountNonExpired());
         aclUser.setCredentialsExpired(!aclUserBo.isCredentialsNonExpired());
-        aclUser.setCreateTime(now);
-        aclUser.setUpdateTime(now);
+        aclUser.setSessionClearTime(new Date(aclUserBo.getSessionClearTime()));
+        aclUser.setCreateTime(new Date(aclUserBo.getCreateTime()));
+        aclUser.setUpdateTime(new Date(aclUserBo.getUpdateTime()));
         aclUserRepository.save(aclUser);
 
         if (getEnableAuthorities()) {
@@ -117,10 +118,10 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         probe.setUsername(username);
         Example<? extends AclUser> example = Example.of(probe);
         return aclUserRepository.findAll(example).stream().map(u ->
-                (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
-                u.getOidcRegistrationId(), u.getOpenId(),
-                !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(),
-                u.getEnabled(), AuthorityUtils.NO_AUTHORITIES)).toList();
+                (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
+                !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
+                u.getSessionClearTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
+                AuthorityUtils.NO_AUTHORITIES)).toList();
     }
 
     @Override
@@ -131,23 +132,25 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         Optional<UserDetails> userDetailsOptional = aclUserRepository.findAll(Example.of(probe)).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
                         u.getOidcRegistrationId(), u.getOpenId(),
-                        !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(),
-                        u.getEnabled(), AuthorityUtils.NO_AUTHORITIES)).findFirst();
+                        !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
+                        u.getSessionClearTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
+                        AuthorityUtils.NO_AUTHORITIES)).findFirst();
 
         return userDetailsOptional.map(userDetails -> this.loadUserByUsername(userDetails.getUsername())).orElse(null);
     }
 
     @Override
     protected UserDetails createUserDetails(String username, UserDetails userFromUserQuery, List<GrantedAuthority> combinedAuthorities) {
-        String returnUsername = userFromUserQuery.getUsername();
+        AclUserBo user = (AclUserBo) userFromUserQuery;
+
+        String returnUsername = user.getUsername();
         if (!this.isUsernameBasedPrimaryKey()) {
             returnUsername = username;
         }
 
-        return new AclUserBo(returnUsername, ((AclUserBo) userFromUserQuery).getNickname(), userFromUserQuery.getPassword(),
-                ((AclUserBo) userFromUserQuery).getOauth2RegistrationId(), ((AclUserBo) userFromUserQuery).getOpenId(),
-                userFromUserQuery.isAccountNonExpired(), userFromUserQuery.isAccountNonLocked(), userFromUserQuery.isCredentialsNonExpired(), userFromUserQuery.isEnabled(),
-                combinedAuthorities);
+        return new AclUserBo(returnUsername, user.getNickname(), user.getPassword(), user.getOauth2RegistrationId(), user.getOpenId(),
+                user.isAccountNonExpired(), user.isAccountNonLocked(), user.isCredentialsNonExpired(), user.isEnabled(),
+                user.getSessionClearTime(), user.getCreateTime(), user.getUpdateTime(), combinedAuthorities);
     }
 
     @Override

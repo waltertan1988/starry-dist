@@ -81,6 +81,7 @@ public class UserController extends AbstractBaseController {
         List<UserResponse> list = page.getContent().stream().map(u -> {
             UserResponse userResponse = new UserResponse();
             BeanUtils.copyProperties(u, userResponse);
+            userResponse.setSessionClearTime(u.getSessionClearTime().getTime());
             userResponse.setCreateTime(u.getCreateTime().getTime());
             userResponse.setUpdateTime(u.getUpdateTime().getTime());
             userResponse.setPassword(null);
@@ -99,11 +100,13 @@ public class UserController extends AbstractBaseController {
     @PostMapping("/save")
     public ApiResponse<Void> save(@Validated @RequestBody SaveUserRequest req, BindingResult bindingResult){
         return super.apiCall("save", bindingResult, () -> {
+            Long now = System.currentTimeMillis();
             if(StringUtils.isBlank(req.getUsername())){
                 // 新增
                 String username = UUID.randomUUID().toString().replaceAll("-", "");
                 AclUserBo aclUserBo = new AclUserBo(username, req.getNickname(), null, null, null,
-                        true, true, true, req.getEnabled(), new HashSet<>());
+                        true, true, true, req.getEnabled(),
+                        now, now, now, new HashSet<>());
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{
                 // 修改
