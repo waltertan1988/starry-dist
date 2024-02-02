@@ -26,7 +26,7 @@ public class UserResponse {
 
     private Boolean enabled;
 
-    private Long sessionClearTime;
+    private Long expiredSessionsCleanTime;
 
     private Long createTime;
 

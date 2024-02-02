@@ -34,13 +34,13 @@ CREATE TABLE `users` (
     `credentials_expired` BIT(1) NOT NULL COMMENT '密码是否已过期',
     `oidc_registration_id` varchar(255) DEFAULT NULL COMMENT 'OAuth2授权服务器的在本应用内的OIDC注册ID',
     `open_id` varchar(128) DEFAULT NULL COMMENT '用户在OAuth2授权服务器中的开放账号',
-    `session_clear_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '清理会话时间',
+    `expired_sessions_clean_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '清理失效会话集时间',
     `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`username`),
     KEY `idx_oidcRegistrationId_openId` (`oidc_registration_id`,`open_id`),
-    KEY `idx_sessionClearTime` (`session_clear_time`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户配置表';
+    KEY `idx_expiredSessionsCleanTime` (`expired_sessions_clean_time`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户表';
 
 CREATE TABLE `authorities` (
    `id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',

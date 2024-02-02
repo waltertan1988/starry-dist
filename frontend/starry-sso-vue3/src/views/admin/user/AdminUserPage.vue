@@ -54,15 +54,16 @@
       <!-- 通过给组件绑定并更新:key属性值，可实现触发重新渲染组件（包括执行相应的生命周期函数，计算属性，watch等） -->
       <PaginationTable ref="userPaginationTableRef" :page="userDataPageRef" :key="userDataPageRef.componentKey" :loading="userDataLoadingRef"
                        :doSearch="searchUserList" :on-selection-change="onTableSelectionChange">
-        <el-table-column type="selection" width="40"/>
-        <el-table-column prop="username" label="账号" width="280"/>
-        <el-table-column prop="nickname" label="昵称" width="180"/>
+        <el-table-column type="selection" width="40" fixed/>
+        <el-table-column prop="username" label="账号" width="280" fixed/>
+        <el-table-column prop="nickname" label="昵称" width="180" fixed/>
         <el-table-column prop="enabled" label="启用" width="60" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="accountExpired" label="已过期" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="accountLocked" label="已锁定" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="credentialsExpired" label="密码过期" width="85" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="oidcRegistrationId" label="OIDC客户端注册ID" width="150"/>
         <el-table-column prop="openId" label="OpenID" width="120"/>
+        <el-table-column prop="expiredSessionsCleanTime" label="清理失效会话集时间" width="160" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)"/>
         <el-table-column prop="createTime" label="创建时间" width="160" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)"/>
         <el-table-column prop="updateTime" label="修改时间" width="160" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)"/>
         <el-table-column label="操作" width="80" fixed="right">

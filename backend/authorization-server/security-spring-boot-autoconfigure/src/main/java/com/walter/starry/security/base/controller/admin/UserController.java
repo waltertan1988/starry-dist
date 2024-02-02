@@ -81,7 +81,7 @@ public class UserController extends AbstractBaseController {
         List<UserResponse> list = page.getContent().stream().map(u -> {
             UserResponse userResponse = new UserResponse();
             BeanUtils.copyProperties(u, userResponse);
-            userResponse.setSessionClearTime(u.getSessionClearTime().getTime());
+            userResponse.setExpiredSessionsCleanTime(u.getExpiredSessionsCleanTime().getTime());
             userResponse.setCreateTime(u.getCreateTime().getTime());
             userResponse.setUpdateTime(u.getUpdateTime().getTime());
             userResponse.setPassword(null);

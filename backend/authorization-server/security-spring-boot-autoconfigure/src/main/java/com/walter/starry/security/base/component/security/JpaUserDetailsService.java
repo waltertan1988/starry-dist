@@ -78,7 +78,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         aclUser.setAccountLocked(!aclUserBo.isAccountNonLocked());
         aclUser.setAccountExpired(!aclUserBo.isAccountNonExpired());
         aclUser.setCredentialsExpired(!aclUserBo.isCredentialsNonExpired());
-        aclUser.setSessionClearTime(new Date(aclUserBo.getSessionClearTime()));
+        aclUser.setExpiredSessionsCleanTime(new Date(aclUserBo.getExpiredSessionsCleanTime()));
         aclUser.setCreateTime(new Date(aclUserBo.getCreateTime()));
         aclUser.setUpdateTime(new Date(aclUserBo.getUpdateTime()));
         aclUserRepository.save(aclUser);
@@ -120,7 +120,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         return aclUserRepository.findAll(example).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
                 !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
-                u.getSessionClearTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
+                u.getExpiredSessionsCleanTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
                 AuthorityUtils.NO_AUTHORITIES)).toList();
     }
 
@@ -133,7 +133,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
                         u.getOidcRegistrationId(), u.getOpenId(),
                         !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
-                        u.getSessionClearTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
+                        u.getExpiredSessionsCleanTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
                         AuthorityUtils.NO_AUTHORITIES)).findFirst();
 
         return userDetailsOptional.map(userDetails -> this.loadUserByUsername(userDetails.getUsername())).orElse(null);
@@ -150,7 +150,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
         return new AclUserBo(returnUsername, user.getNickname(), user.getPassword(), user.getOauth2RegistrationId(), user.getOpenId(),
                 user.isAccountNonExpired(), user.isAccountNonLocked(), user.isCredentialsNonExpired(), user.isEnabled(),
-                user.getSessionClearTime(), user.getCreateTime(), user.getUpdateTime(), combinedAuthorities);
+                user.getExpiredSessionsCleanTime(), user.getCreateTime(), user.getUpdateTime(), combinedAuthorities);
     }
 
     @Override

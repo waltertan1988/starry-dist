@@ -38,7 +38,7 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     private boolean enabled;
 
-    private Long sessionClearTime;
+    private Long expiredSessionsCleanTime;
 
     private Long createTime;
 
@@ -51,7 +51,7 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
-                     Long sessionClearTime, Long createTime, Long updateTime,
+                     Long expiredSessionsCleanTime, Long createTime, Long updateTime,
                      Collection<GrantedAuthority> authorities) {
         this.username = username;
         this.nickname = nickname;
@@ -62,7 +62,7 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
-        this.sessionClearTime = sessionClearTime;
+        this.expiredSessionsCleanTime = expiredSessionsCleanTime;
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
@@ -115,8 +115,8 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         return this.credentialsNonExpired;
     }
 
-    public Long getSessionClearTime() {
-        return sessionClearTime;
+    public Long getExpiredSessionsCleanTime() {
+        return expiredSessionsCleanTime;
     }
 
     public Long getCreateTime() {
@@ -159,8 +159,8 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.enabled = enabled;
     }
 
-    public void setSessionClearTime(Long sessionClearTime) {
-        this.sessionClearTime = sessionClearTime;
+    public void setExpiredSessionsCleanTime(Long expiredSessionsCleanTime) {
+        this.expiredSessionsCleanTime = expiredSessionsCleanTime;
     }
 
     public void setCreateTime(Long createTime) {
