@@ -1,6 +1,8 @@
 package com.walter.starry.security.base.component.scheduling;
 
+import com.walter.starry.security.base.config.properties.AppSchedulingClearUserExpiredSessionsProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,14 +14,16 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@Async("unboundedVirtualThreadTaskExecutor")
 public class SessionScheduler {
+    @Autowired
+    private AppSchedulingClearUserExpiredSessionsProperties properties;
 
     /**
      * 清理用户已失效的会话集
      */
-    @Async("unboundedVirtualThreadTaskExecutor")
-    @Scheduled(cron = "${app.scheduling.clear-user-expired-sessions}")
+    @Scheduled(cron = "${app.scheduling.clear-user-expired-sessions.cron:-}")
     public void clearUserExpiredSessions() {
-        log.info("clearUserExpiredSessions executed");
+        log.info("clearUserExpiredSessions for {}", properties.getRunDuration().toMinutes());
     }
 }
