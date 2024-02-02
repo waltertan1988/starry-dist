@@ -120,7 +120,6 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         return aclUserRepository.findAll(example).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
                 !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
-                u.getExpiredSessionsCleanTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
                 AuthorityUtils.NO_AUTHORITIES)).toList();
     }
 
@@ -129,14 +128,9 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         AclUser probe = new AclUser();
         probe.setOidcRegistrationId(registrationId);
         probe.setOpenId(openId);
-        Optional<UserDetails> userDetailsOptional = aclUserRepository.findAll(Example.of(probe)).stream().map(u ->
-                (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(),
-                        u.getOidcRegistrationId(), u.getOpenId(),
-                        !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
-                        u.getExpiredSessionsCleanTime().getTime(), u.getCreateTime().getTime(), u.getUpdateTime().getTime(),
-                        AuthorityUtils.NO_AUTHORITIES)).findFirst();
-
-        return userDetailsOptional.map(userDetails -> this.loadUserByUsername(userDetails.getUsername())).orElse(null);
+        return aclUserRepository.findOne(Example.of(probe))
+                .map(user -> this.loadUserByUsername(user.getUsername()))
+                .orElse(null);
     }
 
     @Override

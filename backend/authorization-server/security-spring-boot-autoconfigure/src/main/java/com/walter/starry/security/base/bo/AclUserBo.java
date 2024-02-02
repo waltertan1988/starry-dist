@@ -38,11 +38,11 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     private boolean enabled;
 
-    private Long expiredSessionsCleanTime;
+    private Date expiredSessionsCleanTime;
 
-    private Long createTime;
+    private Date createTime;
 
-    private Long updateTime;
+    private Date updateTime;
 
     private Collection<GrantedAuthority> authorities;
 
@@ -59,7 +59,7 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
-                     Long expiredSessionsCleanTime, Long createTime, Long updateTime,
+                     Date expiredSessionsCleanTime, Date createTime, Date updateTime,
                      Collection<GrantedAuthority> authorities) {
         this.username = username;
         this.nickname = nickname;
@@ -123,15 +123,15 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         return this.credentialsNonExpired;
     }
 
-    public Long getExpiredSessionsCleanTime() {
+    public Date getExpiredSessionsCleanTime() {
         return expiredSessionsCleanTime;
     }
 
-    public Long getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public Long getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
@@ -167,15 +167,15 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.enabled = enabled;
     }
 
-    public void setExpiredSessionsCleanTime(Long expiredSessionsCleanTime) {
+    public void setExpiredSessionsCleanTime(Date expiredSessionsCleanTime) {
         this.expiredSessionsCleanTime = expiredSessionsCleanTime;
     }
 
-    public void setCreateTime(Long createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public void setUpdateTime(Long updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
