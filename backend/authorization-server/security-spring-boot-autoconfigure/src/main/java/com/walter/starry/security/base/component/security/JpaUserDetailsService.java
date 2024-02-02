@@ -152,7 +152,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
     public void deleteUser(String username) {
         if (getEnableAuthorities()) {
             // 删除用户权限关系
-            deleteUserAuthorities(username);
+            aclAuthorityRepository.deleteByUsername(username);
         }
 
         // 删除数据库
@@ -243,9 +243,5 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
                 findByIndexNameSessionRepository.deleteById(sessionIdToDelete);
             }
         }
-    }
-
-    private void deleteUserAuthorities(String username) {
-        aclAuthorityRepository.deleteByUsername(username);
     }
 }
