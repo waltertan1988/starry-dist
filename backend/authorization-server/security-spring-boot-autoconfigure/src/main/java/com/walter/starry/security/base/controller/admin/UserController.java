@@ -105,8 +105,7 @@ public class UserController extends AbstractBaseController {
                 // 新增
                 String username = UUID.randomUUID().toString().replaceAll("-", "");
                 AclUserBo aclUserBo = new AclUserBo(username, req.getNickname(), null, null, null,
-                        true, true, true, req.getEnabled(),
-                        now, now, now, new HashSet<>());
+                        true, true, true, req.getEnabled(), new HashSet<>());
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{
                 // 修改

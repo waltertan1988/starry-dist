@@ -19,7 +19,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -59,7 +58,7 @@ class AuthorizationServerApplicationTests {
 			String nickname = "普通用户" + RandomStringUtils.randomAlphanumeric(6);
 			AclUserBo aclUserBo = new AclUserBo(userDetails.getUsername(), nickname, userDetails.getPassword(), null, null,
 				userDetails.isAccountNonExpired(), userDetails.isAccountNonLocked(), userDetails.isCredentialsNonExpired(), userDetails.isEnabled(),
-				now, now, now, new HashSet<>(userDetails.getAuthorities())
+				new HashSet<>(userDetails.getAuthorities())
 			);
 			jpaUserDetailsService.createUser(aclUserBo);
 
@@ -78,7 +77,7 @@ class AuthorizationServerApplicationTests {
 			String adminNickname = "系统管理员" + RandomStringUtils.randomAlphanumeric(6);
 			AclUserBo aclAdminUser = new AclUserBo(adminUserDetails.getUsername(), adminNickname, adminUserDetails.getPassword(), null, null,
 				adminUserDetails.isAccountNonExpired(), adminUserDetails.isAccountNonLocked(), adminUserDetails.isCredentialsNonExpired(), adminUserDetails.isEnabled(),
-				now, now, now, new HashSet<>(adminUserDetails.getAuthorities())
+				new HashSet<>(adminUserDetails.getAuthorities())
 			);
 			jpaUserDetailsService.createUser(aclAdminUser);
 		}

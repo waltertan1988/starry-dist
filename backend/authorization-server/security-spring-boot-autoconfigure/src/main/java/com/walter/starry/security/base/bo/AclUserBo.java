@@ -51,6 +51,14 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
+                     Collection<GrantedAuthority> authorities) {
+        this(username, nickname, password, oauth2RegistrationId, openId,
+                accountNonExpired, accountNonLocked, credentialsNonExpired, enabled,
+                null, null, null, authorities);
+    }
+
+    public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
+                     boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                      Long expiredSessionsCleanTime, Long createTime, Long updateTime,
                      Collection<GrantedAuthority> authorities) {
         this.username = username;

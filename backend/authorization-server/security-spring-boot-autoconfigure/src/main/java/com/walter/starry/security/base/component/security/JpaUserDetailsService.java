@@ -78,9 +78,9 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         aclUser.setAccountLocked(!aclUserBo.isAccountNonLocked());
         aclUser.setAccountExpired(!aclUserBo.isAccountNonExpired());
         aclUser.setCredentialsExpired(!aclUserBo.isCredentialsNonExpired());
-        aclUser.setExpiredSessionsCleanTime(new Date(aclUserBo.getExpiredSessionsCleanTime()));
-        aclUser.setCreateTime(new Date(aclUserBo.getCreateTime()));
-        aclUser.setUpdateTime(new Date(aclUserBo.getUpdateTime()));
+        aclUser.setExpiredSessionsCleanTime(now);
+        aclUser.setCreateTime(now);
+        aclUser.setUpdateTime(now);
         aclUserRepository.save(aclUser);
 
         if (getEnableAuthorities()) {
