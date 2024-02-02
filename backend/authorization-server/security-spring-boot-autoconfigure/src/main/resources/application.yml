@@ -1,4 +1,7 @@
 app:
+  scheduling:
+    clear-user-expired-sessions: 0/1 * * * * *
+
   security:
     enable-front-back-seperated: true
     namespace-prefix: SpringSecurityDemoApp
