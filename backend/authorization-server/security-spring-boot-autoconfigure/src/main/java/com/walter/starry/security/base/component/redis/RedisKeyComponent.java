@@ -22,4 +22,12 @@ public class RedisKeyComponent {
     public String getResourceItemAuthoritiesKey(String resItemCode) {
         return String.format("%s:resource:item:authorities:%s", appSecurityProperties.getNamespacePrefix(), resItemCode);
     }
+
+    /**
+     * 清理用户已失效会话集的分布式锁
+     * @return
+     */
+    public String getLockKeyForCleanUserExpiredSessions(){
+        return String.format("%s:lock:cleanUserExpiredSessions", appSecurityProperties.getNamespacePrefix());
+    }
 }

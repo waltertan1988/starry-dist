@@ -1,8 +1,9 @@
 app:
   scheduling:
-    clear-user-expired-sessions:
+    clean-user-expired-sessions:
       cron: 0 0 3 * * *
       run-duration: 2h
+      clean-from-days-before: 30
 
   security:
     enable-front-back-seperated: true
