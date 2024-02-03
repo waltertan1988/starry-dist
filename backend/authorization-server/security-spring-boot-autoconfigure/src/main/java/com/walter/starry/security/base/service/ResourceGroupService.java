@@ -12,7 +12,7 @@ import com.walter.starry.security.base.repository.AclResourceGroupRepository;
 import com.walter.starry.security.base.repository.AclResourceItemRepository;
 import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
-import com.walter.starry.security.base.component.redis.RedisKeyComponent;
+import com.walter.starry.security.base.component.redis.InfraRedisKeys;
 import com.walter.starry.security.base.common.enums.RedisTopicEnum;
 import com.walter.starry.security.base.common.exception.BizException;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
@@ -50,7 +50,7 @@ public class ResourceGroupService {
     @Resource(name = "adminCommonVirtualThreadTaskExecutor")
     private ExtendedVirtualThreadExecutorService adminCommonVirtualThreadTaskExecutor;
     @Autowired
-    private RedisKeyComponent redisKeyComponent;
+    private InfraRedisKeys infraRedisKeys;
     @Autowired
     private MessageService messageService;
     @Autowired
@@ -350,7 +350,7 @@ public class ResourceGroupService {
 
                 // 修改资源编码，需要剔除Redis缓存
                 if(!Objects.equals(item.getCode(), oldItem.getCode())){
-                    stringRedisTemplate.delete(redisKeyComponent.getResourceItemAuthoritiesKey(oldItem.getCode()));
+                    stringRedisTemplate.delete(infraRedisKeys.getResourceItemAuthoritiesKey(oldItem.getCode()));
                 }
             });
         }
@@ -462,7 +462,7 @@ public class ResourceGroupService {
 
                 // 剔除Redis缓存
                 for (String itemCode : itemCodes) {
-                    stringRedisTemplate.delete(redisKeyComponent.getResourceItemAuthoritiesKey(itemCode));
+                    stringRedisTemplate.delete(infraRedisKeys.getResourceItemAuthoritiesKey(itemCode));
                 }
             });
         }
@@ -510,7 +510,7 @@ public class ResourceGroupService {
             messageService.publish(RedisTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
 
             // 剔除Redis缓存
-            stringRedisTemplate.delete(redisKeyComponent.getResourceItemAuthoritiesKey(resourceItemCode));
+            stringRedisTemplate.delete(infraRedisKeys.getResourceItemAuthoritiesKey(resourceItemCode));
         });
     }
 
@@ -527,7 +527,7 @@ public class ResourceGroupService {
         // 优先查找缓存（并发）
         List<String> notCachedResourceItemCodeList = new ArrayList<>();
         List<CompletableFuture<Void>> completableFutureList = resourceItemCodeList.stream().map(resItemCode -> CompletableFuture.runAsync(() -> {
-            String key = redisKeyComponent.getResourceItemAuthoritiesKey(resItemCode);
+            String key = infraRedisKeys.getResourceItemAuthoritiesKey(resItemCode);
             String authorityArrayJson = stringRedisTemplate.opsForValue().get(key);
 
             if(StringUtils.isBlank(authorityArrayJson)){
@@ -562,7 +562,7 @@ public class ResourceGroupService {
                 List<String> authorityList = notCachedResourceItemCodeMap.getOrDefault(notCachedResourceItemCode, new ArrayList<>())
                         .stream().map(AclAuthorityResource::getAuthorityItemCode).toList();
 
-                String key = redisKeyComponent.getResourceItemAuthoritiesKey(notCachedResourceItemCode);
+                String key = infraRedisKeys.getResourceItemAuthoritiesKey(notCachedResourceItemCode);
                 stringRedisTemplate.opsForValue().set(key, Objects.requireNonNull(JsonUtil.toJson(authorityList)), 1, TimeUnit.HOURS);
             }, adminCommonVirtualThreadTaskExecutor)).toList();
             CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[0])).join();

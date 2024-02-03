@@ -18,10 +18,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
+import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -41,7 +43,8 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
     public JpaUserDetailsService(){
     }
 
-    public JpaUserDetailsService(DataSource dataSource, AclUserRepository aclUserRepository, AclAuthorityRepository aclAuthorityRepository, FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
+    public JpaUserDetailsService(DataSource dataSource, AclUserRepository aclUserRepository, AclAuthorityRepository aclAuthorityRepository,
+                                 FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
         super.setDataSource(dataSource);
         this.aclUserRepository = aclUserRepository;
         this.aclAuthorityRepository = aclAuthorityRepository;
@@ -243,5 +246,31 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
                 findByIndexNameSessionRepository.deleteById(sessionIdToDelete);
             }
         }
+    }
+
+    /**
+     * 清理用户已失效的Session会话集
+     * @param username
+     */
+    public void cleanUserExpiredSessions(String username) {
+        // TODO tyx 清理用户已失效的Session会话集
+    }
+
+    private String getPrincipalKey(String principalName) throws Exception {
+        if(findByIndexNameSessionRepository instanceof RedisIndexedSessionRepository redisIndexedSessionRepository){
+            Method method = RedisIndexedSessionRepository.class.getDeclaredMethod("getPrincipalKey", String.class);
+            method.setAccessible(true);
+            return method.invoke(redisIndexedSessionRepository, principalName).toString();
+        }
+        throw new UnsupportedOperationException("findByIndexNameSessionRepository should be type of RedisIndexedSessionRepository");
+    }
+
+    private String getSessionKey(String sessionId) throws Exception {
+        if(findByIndexNameSessionRepository instanceof RedisIndexedSessionRepository redisIndexedSessionRepository){
+            Method method = RedisIndexedSessionRepository.class.getDeclaredMethod("getSessionKey", String.class);
+            method.setAccessible(true);
+            return method.invoke(redisIndexedSessionRepository, sessionId).toString();
+        }
+        throw new UnsupportedOperationException("findByIndexNameSessionRepository should be type of RedisIndexedSessionRepository");
     }
 }

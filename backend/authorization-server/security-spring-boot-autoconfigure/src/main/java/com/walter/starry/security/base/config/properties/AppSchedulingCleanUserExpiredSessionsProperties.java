@@ -28,4 +28,8 @@ public class AppSchedulingCleanUserExpiredSessionsProperties {
      * 对同一用户执行清理的最小间隔天数，默认30天
      */
     private int cleanFromDaysBefore = 30;
+    /**
+     * 执行清理时是否排除已禁用的用户，默认true
+     */
+    private boolean excludeDisabledUser = true;
 }
