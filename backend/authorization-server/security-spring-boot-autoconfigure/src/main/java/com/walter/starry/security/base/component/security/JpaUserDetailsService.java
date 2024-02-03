@@ -7,8 +7,10 @@ import com.walter.starry.security.base.entity.AclUser;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.repository.AclUserRepository;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -38,16 +40,19 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
     private AclAuthorityRepository aclAuthorityRepository;
 
+    private StringRedisTemplate stringRedisTemplate;
+
     private FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository;
 
     public JpaUserDetailsService(){
     }
 
     public JpaUserDetailsService(DataSource dataSource, AclUserRepository aclUserRepository, AclAuthorityRepository aclAuthorityRepository,
-                                 FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
+                                 StringRedisTemplate stringRedisTemplate, FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
         super.setDataSource(dataSource);
         this.aclUserRepository = aclUserRepository;
         this.aclAuthorityRepository = aclAuthorityRepository;
+        this.stringRedisTemplate = stringRedisTemplate;
         this.findByIndexNameSessionRepository = findByIndexNameSessionRepository;
     }
 
@@ -252,8 +257,27 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
      * 清理用户已失效的Session会话集
      * @param username
      */
-    public void cleanUserExpiredSessions(String username) {
-        // TODO tyx 清理用户已失效的Session会话集
+    public void cleanUserExpiredSessions(String username) throws Exception {
+        String principalKey = this.getPrincipalKey(username);
+
+        Set<String> userSessionIds = stringRedisTemplate.opsForSet().members(principalKey);
+        if(CollectionUtils.isEmpty(userSessionIds)){
+            return;
+        }
+
+        Set<String> removeSessionIds = new HashSet<>();
+        for (String sessionId : userSessionIds) {
+            if(BooleanUtils.toBoolean(stringRedisTemplate.hasKey(this.getSessionKey(sessionId)))){
+                continue;
+            }
+            removeSessionIds.add(sessionId);
+        }
+
+        if(CollectionUtils.isEmpty(removeSessionIds)){
+            return;
+        }
+
+        stringRedisTemplate.opsForSet().remove(principalKey, removeSessionIds);
     }
 
     private String getPrincipalKey(String principalName) throws Exception {
