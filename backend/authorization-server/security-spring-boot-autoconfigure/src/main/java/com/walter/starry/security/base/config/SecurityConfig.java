@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -215,9 +214,8 @@ public class SecurityConfig {
     public JpaUserDetailsService userDetailsService(DataSource dataSource,
                                                     AclUserRepository aclUserRepository,
                                                     AclAuthorityRepository aclAuthorityRepository,
-                                                    StringRedisTemplate stringRedisTemplate,
                                                     FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
-        return new JpaUserDetailsService(dataSource, aclUserRepository, aclAuthorityRepository, stringRedisTemplate, findByIndexNameSessionRepository);
+        return new JpaUserDetailsService(dataSource, aclUserRepository, aclAuthorityRepository, findByIndexNameSessionRepository);
     }
 
     private AjaxSupportedAuthenticationFailureHandler getAjaxSupportedAuthenticationFailureHandler(HttpSecurity http){
