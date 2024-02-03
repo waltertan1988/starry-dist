@@ -66,6 +66,7 @@ public class SessionScheduler {
                 Date runStartTime = new Date();
                 final long expectedRunEndTimestamp = runStartTime.getTime() + props.getRunDuration().toMillis();
                 final Date cleanEndDate = DateUtils.addDays(runStartTime, -props.getCleanFromDaysBefore());
+                log.info("cleanUserExpiredSessions start. runStartTime:{}, expectedRunEndTime:{}, cleanEndDate:{}", runStartTime, new Date(expectedRunEndTimestamp), cleanEndDate);
 
                 Pageable pageable = PageRequest.of(0, 100);
                 Specification<AclUser> spec = (root, query, builder) -> {
@@ -99,6 +100,8 @@ public class SessionScheduler {
                     }
                     userList = aclUserRepository.findAll(spec, pageable).getContent();
                 }
+
+                log.info("cleanUserExpiredSessions finish");
 
                 return null;
             });
