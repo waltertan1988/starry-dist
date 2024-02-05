@@ -71,7 +71,7 @@ public class SessionScheduler {
                 Pageable pageable = PageRequest.of(0, 100);
                 Specification<AclUser> spec = (root, query, builder) -> {
                     List<Predicate> andPredicates = new ArrayList<>();
-                    andPredicates.add(builder.lessThanOrEqualTo(root.get("expiredSessionsCleanTime").as(Date.class), cleanEndDate));
+                    andPredicates.add(builder.lessThan(root.get("expiredSessionsCleanTime").as(Date.class), cleanEndDate));
                     if(props.isExcludeDisabledUser()){
                         andPredicates.add(builder.equal(root.get("enabled").as(Boolean.class), true));
                     }
@@ -86,7 +86,7 @@ public class SessionScheduler {
                             jpaUserDetailsService.cleanUserExpiredSessions(aclUser.getUsername());
                             usernames.add(aclUser.getUsername());
                         }catch (Exception ex){
-                            log.error("cleanUserExpiredSessions fail for username:{}", aclUser.getUsername());
+                            log.error("cleanUserExpiredSessions fail for username:{}", aclUser.getUsername(), ex);
                         }
                     }
 
