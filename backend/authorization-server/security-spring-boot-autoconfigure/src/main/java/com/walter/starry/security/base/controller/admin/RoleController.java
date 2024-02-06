@@ -60,17 +60,17 @@ public class RoleController extends AbstractBaseController {
             Specification<AclAuthorityItem> spec = (root, query, builder) -> {
                 List<Predicate> andPredicates = new ArrayList<>();
                 if(StringUtils.isNotBlank(req.getCode())){
-                    andPredicates.add(builder.like(root.get("code").as(String.class), "%" + req.getCode() + "%"));
+                    andPredicates.add(builder.like(root.get("code"), "%" + req.getCode() + "%"));
                 }
                 if(StringUtils.isNotBlank(req.getName())){
-                    andPredicates.add(builder.like(root.get("name").as(String.class), "%" + req.getName() + "%"));
+                    andPredicates.add(builder.like(root.get("name"), "%" + req.getName() + "%"));
                 }
                 if(Objects.nonNull(req.getSystemAuthority())){
-                    andPredicates.add(builder.equal(root.get("systemAuthority").as(Boolean.class), req.getSystemAuthority()));
+                    andPredicates.add(builder.equal(root.get("systemAuthority"), req.getSystemAuthority()));
                 }
                 if(!userReachableAuthorityCodes.contains(SystemRoleEnum.ROLE_ADMIN.name())){
                     // 非系统管理员，不允许看到系统角色
-                    andPredicates.add(builder.equal(root.get("systemAuthority").as(Boolean.class), false));
+                    andPredicates.add(builder.equal(root.get("systemAuthority"), false));
                 }
 
                 return builder.and(andPredicates.toArray(new Predicate[0]));

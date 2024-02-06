@@ -58,19 +58,19 @@ public class UserController extends AbstractBaseController {
         Specification<AclUser> spec = (root, query, builder) -> {
             List<Predicate> andPredicates = new ArrayList<>();
             if(StringUtils.isNotBlank(req.getUsername())){
-                andPredicates.add(builder.equal(root.get("username").as(String.class), req.getUsername()));
+                andPredicates.add(builder.equal(root.get("username"), req.getUsername()));
             }
             if(StringUtils.isNotBlank(req.getNickname())){
-                andPredicates.add(builder.like(root.get("nickname").as(String.class), "%" + req.getNickname() + "%"));
+                andPredicates.add(builder.like(root.get("nickname"), "%" + req.getNickname() + "%"));
             }
             if(Objects.nonNull(req.getEnabled())){
-                andPredicates.add(builder.equal(root.get("enabled").as(Boolean.class), req.getEnabled()));
+                andPredicates.add(builder.equal(root.get("enabled"), req.getEnabled()));
             }
             if(Objects.nonNull(req.getCreateTimeBegin())){
-                andPredicates.add(builder.greaterThanOrEqualTo(root.get("createTime").as(Date.class), req.getCreateTimeBegin()));
+                andPredicates.add(builder.greaterThanOrEqualTo(root.get("createTime"), req.getCreateTimeBegin()));
             }
             if(Objects.nonNull(req.getCreateTimeEnd())){
-                andPredicates.add(builder.lessThanOrEqualTo(root.get("createTime").as(Date.class), req.getCreateTimeEnd()));
+                andPredicates.add(builder.lessThanOrEqualTo(root.get("createTime"), req.getCreateTimeEnd()));
             }
             return builder.and(andPredicates.toArray(new Predicate[0]));
         };

@@ -111,12 +111,12 @@ public class MenuController extends AbstractBaseController {
                 Specification<AclResourceGroup> spec = (root, query, builder) -> {
                     List<Predicate> andPredicates = new ArrayList<>();
                     if(StringUtils.isNotBlank(req.getCode())){
-                        andPredicates.add(builder.like(root.get("code").as(String.class), "%" + req.getCode() + "%"));
+                        andPredicates.add(builder.like(root.get("code"), "%" + req.getCode() + "%"));
                     }
                     if(StringUtils.isNotBlank(req.getName())){
-                        andPredicates.add(builder.like(root.get("name").as(String.class), "%" + req.getName() + "%"));
+                        andPredicates.add(builder.like(root.get("name"), "%" + req.getName() + "%"));
                     }
-                    andPredicates.add(builder.equal(root.get("type").as(Integer.class), AclResourceGroup.TypeEnum.MENU.getCode()));
+                    andPredicates.add(builder.equal(root.get("type"), AclResourceGroup.TypeEnum.MENU.getCode()));
 
                     return builder.and(andPredicates.toArray(new Predicate[0]));
                 };
@@ -151,10 +151,10 @@ public class MenuController extends AbstractBaseController {
                     Specification<AclResourceItem> spec = (root, query, builder) -> {
                         List<Predicate> andPredicates = new ArrayList<>();
                         if(StringUtils.isNotBlank(req.getCode())){
-                            andPredicates.add(builder.like(root.get("code").as(String.class), "%" + req.getCode() + "%"));
+                            andPredicates.add(builder.like(root.get("code"), "%" + req.getCode() + "%"));
                         }
                         if(StringUtils.isNotBlank(req.getName())){
-                            andPredicates.add(builder.like(root.get("name").as(String.class), "%" + req.getName() + "%"));
+                            andPredicates.add(builder.like(root.get("name"), "%" + req.getName() + "%"));
                         }
                         andPredicates.add(builder.in(root.get("parentGroupCode")).value(menuGroupCodes));
 

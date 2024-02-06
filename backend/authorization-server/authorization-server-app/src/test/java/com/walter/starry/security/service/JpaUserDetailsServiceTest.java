@@ -13,21 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @SpringBootTest(classes = AuthorizationServerApplication.class)
 public class JpaUserDetailsServiceTest {
-
     @Autowired
     private JpaUserDetailsService jpaUserDetailsService;
-    @Autowired
-    private SessionScheduler sessionScheduler;
 
     @Test
     void cleanUserExpiredSessions() throws Exception {
         jpaUserDetailsService.cleanUserExpiredSessions("admin");
-    }
-
-    @Test
-    void test() throws InterruptedException {
-        sessionScheduler.cleanUserExpiredSessions();
-
-        Thread.sleep(1000 * 3600);
     }
 }
