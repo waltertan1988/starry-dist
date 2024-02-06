@@ -26,8 +26,10 @@ public class AclAuthority implements Serializable {
     private String authority;
 
     @Column(name="create_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     @Column(name="update_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 }

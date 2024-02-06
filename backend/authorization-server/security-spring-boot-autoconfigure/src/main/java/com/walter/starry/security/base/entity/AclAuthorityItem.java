@@ -35,8 +35,10 @@ public class AclAuthorityItem implements Serializable {
     private Boolean systemAuthority;
 
     @Column(name="create_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     @Column(name="update_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 }

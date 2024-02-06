@@ -42,9 +42,11 @@ public class AclResourceGroup implements AclHierarchyResource, Serializable {
     private String config;
 
     @Column(name="create_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     @Column(name="update_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
     @Getter

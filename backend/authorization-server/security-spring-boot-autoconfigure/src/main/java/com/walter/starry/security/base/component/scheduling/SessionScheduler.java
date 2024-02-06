@@ -71,9 +71,9 @@ public class SessionScheduler {
                 Pageable pageable = PageRequest.of(0, 100);
                 Specification<AclUser> spec = (root, query, builder) -> {
                     List<Predicate> andPredicates = new ArrayList<>();
-                    andPredicates.add(builder.lessThan(root.get("expiredSessionsCleanTime").as(Date.class), cleanEndDate));
+                    andPredicates.add(builder.lessThan(root.get("expiredSessionsCleanTime"), cleanEndDate));
                     if(props.isExcludeDisabledUser()){
-                        andPredicates.add(builder.equal(root.get("enabled").as(Boolean.class), true));
+                        andPredicates.add(builder.equal(root.get("enabled"), true));
                     }
                     return builder.and(andPredicates.toArray(new Predicate[0]));
                 };

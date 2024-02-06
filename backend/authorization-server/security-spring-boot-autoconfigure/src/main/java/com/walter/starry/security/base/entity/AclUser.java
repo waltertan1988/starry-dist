@@ -1,9 +1,6 @@
 package com.walter.starry.security.base.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -46,11 +43,14 @@ public class AclUser implements Serializable {
     private Boolean enabled;
 
     @Column(name="expired_sessions_clean_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date expiredSessionsCleanTime;
 
     @Column(name="create_time", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     @Column(name="update_time", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 }
