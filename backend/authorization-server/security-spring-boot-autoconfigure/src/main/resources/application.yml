@@ -93,6 +93,10 @@ spring:
           max-wait: 5000ms
       timeout: 3000ms
 
+  # ES
+  elasticsearch:
+    uris: http://127.0.0.1:9203, http://127.0.0.1:9204, http://127.0.0.1:9205
+
   # springboot启用虚拟线程
   threads:
     virtual:
