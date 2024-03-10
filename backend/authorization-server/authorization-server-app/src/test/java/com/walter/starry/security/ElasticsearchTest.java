@@ -2,6 +2,7 @@ package com.walter.starry.security;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
@@ -129,14 +130,28 @@ public class ElasticsearchTest {
         }
 
         /**
+         * 统计数量
+         */
+        @Test
+        public void count() throws IOException {
+            CountResponse countResponse = elasticsearchClient.count(c -> c
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("nickname").value("管理")))
+            );
+
+            System.out.println(">>>>>> Count:" + countResponse.count());
+        }
+
+        /**
          * 查询用户信息
          */
         @Test
         void searchEsUser() throws IOException {
             SearchResponse<EsUser> search = elasticsearchClient.search(s -> s
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .source(src -> src.filter(f -> f.includes("username", "nickname", "enabled","authorities" ,"update_time")))
+                .source(src -> src.filter(f -> f.includes("username", "nickname", "enabled", "authorities", "update_time")))
                 .from(0).size(5)
+                .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
                 .query(q0 -> q0
                     .bool(b -> b
                         .filter(
@@ -155,9 +170,11 @@ public class ElasticsearchTest {
                                     .lt(JsonData.of("2024-02-06 09:58:00.000"))
                                 )
                             ),
-                            Query.of(q1 -> q1.nested(n -> n
-                                .path("authorities")
-                                .query(q2 -> q2.term(t -> t.field("authorities.authority").value("ROLE_USER"))))
+                            Query.of(q1 -> q1
+                                .nested(n -> n
+                                    .path("authorities")
+                                    .query(q2 -> q2.term(t -> t.field("authorities.authority").value("ROLE_USER")))
+                                )
                             )
                         ))),
                     EsUser.class);
@@ -181,6 +198,8 @@ public class ElasticsearchTest {
                         .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
                         .body(b -> b
                             .source(src -> src.filter(f -> f.includes("username", "nickname", "update_time")))
+                            .from(0).size(5)
+                            .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
                             .query(q -> q.match(m -> m.field("nickname").query("管理")))
                         )
                     ),
