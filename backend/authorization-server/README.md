@@ -3,9 +3,12 @@
 
 ## 开始使用
 ### 依赖中间件
+#### 必须中间件
 * JDK21
 * MySql
 * Redis
+#### 可选中间件
+* Elasticsearch(v8.12.1) + IK分词器插件
 
 ### 模块说明
 * security-spring-boot-autoconfigure  
@@ -359,6 +362,93 @@ WHERE ar.`resource_item_code` = ri.`code`
 AND ri.`parent_group_code` = rg.`code`
 AND rg.`type` = 1 # 1-菜单，2-功能
 ORDER BY ar.id;
+```
+
+### Elasticsearch初始化数据（可选）
+#### 创建索引
+##### 用户信息索引
+```text
+PUT /authorization_server.user.v1
+{
+    "aliases": {
+        "authorization_server.user": {}
+    },
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 1
+    },
+    "mappings": {
+        "properties": {
+            "username": {
+                "type": "keyword",
+                "ignore_above": 128
+            },
+            "nickname": {
+                "type": "text",
+                "analyzer": "ik_max_word",
+                "search_analyzer": "ik_smart",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 255
+                    }
+                }
+            },
+            "enabled": {
+                "type": "boolean"
+            },
+            "account_expired": {
+                "type": "boolean"
+            },
+            "account_locked": {
+                "type": "boolean"
+            },
+            "credentials_expired": {
+                "type": "boolean"
+            },
+            "oidc_registration_id": {
+                "type": "keyword",
+                "ignore_above": 255
+            },
+            "open_id": {
+                "type": "keyword",
+                "ignore_above": 128
+            },
+            "expired_sessions_clean_time": {
+                "type": "date",
+                "format": "date_optional_time"
+            },
+            "create_time": {
+                "type": "date",
+                "format": "date_optional_time"
+            },
+            "update_time": {
+                "type": "date",
+                "format": "date_optional_time"
+            },
+            "authorities": {
+                "type": "nested",
+                "properties": {
+                    "id": {
+                        "type": "long"
+                    },
+                    "authority": {
+                        "type": "keyword",
+                        "ignore_above": 128
+                    },
+                    "create_time": {
+                        "type": "date",
+                        "format": "date_optional_time"
+                    },
+                    "update_time": {
+                        "type": "date",
+                        "format": "date_optional_time"
+                    }
+                }
+            }
+        }
+    }
+}
 ```
 
 ### 如何访问
