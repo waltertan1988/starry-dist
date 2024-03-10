@@ -3,11 +3,10 @@ package com.walter.starry.security;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.InfoResponse;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
+import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.google.common.collect.Lists;
@@ -166,8 +165,46 @@ public class ElasticsearchTest {
             System.out.println(">>>>>> Total:" + search.hits().total());
 
             for (Hit<EsUser> hit: search.hits().hits()) {
-                Object esUser = hit.source();
+                EsUser esUser = hit.source();
                 System.out.println(">>>>>>:" + JsonUtil.toJson(esUser));
+            }
+        }
+
+        /**
+         * 批量请求查询用户信息
+         */
+        @Test
+        void msearch() throws IOException {
+            MsearchResponse<EsUser> msearchResponse = elasticsearchClient.msearch(s -> s
+                .searches(Lists.newArrayList(
+                    RequestItem.of(r -> r
+                        .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
+                        .body(b -> b
+                            .source(src -> src.filter(f -> f.includes("username", "nickname", "update_time")))
+                            .query(q -> q.match(m -> m.field("nickname").query("管理")))
+                        )
+                    ),
+                    RequestItem.of(r -> r
+                        .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
+                        .body(b -> b
+                            .source(src -> src.filter(f -> f.includes("username", "nickname", "authorities")))
+                            .query(q -> q.match(m -> m.field("nickname").query("普通")))
+                        )
+                    )
+                )), EsUser.class);
+
+            for (MultiSearchResponseItem<EsUser> responseItem : msearchResponse.responses()) {
+                if(responseItem.isFailure()){
+                    logger.error("msearch found error. {}", responseItem.failure());
+                    continue;
+                }
+
+                System.out.println(">>>>>> Total:" + responseItem.result().hits().total());
+                for (Hit<EsUser> hit : responseItem.result().hits().hits()) {
+                    EsUser esUser = hit.source();
+                    System.out.println(">>>>>>:" + JsonUtil.toJson(esUser));
+                }
+                System.out.println();
             }
         }
     }
