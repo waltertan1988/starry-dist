@@ -364,7 +364,7 @@ AND rg.`type` = 1 # 1-菜单，2-功能
 ORDER BY ar.id;
 ```
 
-### Elasticsearch初始化数据（可选）
+### Elasticsearch（可选）
 #### 创建索引
 ##### 用户信息索引
 ```text
@@ -378,6 +378,7 @@ PUT /authorization_server.user.v1
         "number_of_replicas": 1
     },
     "mappings": {
+        "dynamic": "strict",
         "properties": {
             "username": {
                 "type": "keyword",
@@ -449,6 +450,15 @@ PUT /authorization_server.user.v1
         }
     }
 }
+```
+
+##### 索引用户信息
+```text
+// 为用户文档添加索引
+com.walter.starry.security.ElasticsearchTest.DocumentTest.bulkIndex
+
+// 搜索用户文档
+com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ```
 
 ### 如何访问
