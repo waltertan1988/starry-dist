@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -67,6 +68,35 @@ public class ElasticsearchTest {
 
     @Nested
     class DocumentTest {
+        /**
+         * 索引单个用户文档
+         * @throws IOException
+         */
+        @Test
+        void index() throws IOException {
+            AclUser aclUserExample = new AclUser();
+            aclUserExample.setUsername("director");
+            AclUser aclUser = aclUserRepository.findOne(Example.of(aclUserExample)).orElseThrow();
+            EsUser esUser = new EsUser();
+            BeanUtils.copyProperties(aclUser, esUser);
+
+            AclAuthority aclAuthorityExample = new AclAuthority();
+            List<EsUser.EsUserAuthority> esUserAuthorityList = aclAuthorityRepository.findAll(Example.of(aclAuthorityExample)).stream().map(po -> {
+                EsUser.EsUserAuthority res = new EsUser.EsUserAuthority();
+                BeanUtils.copyProperties(po, res);
+                return res;
+            }).toList();
+            esUser.setAuthorities(esUserAuthorityList);
+
+            System.out.println(JsonUtil.toJson(esUser));
+
+            IndexResponse response = elasticsearchClient.index(i -> i
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .document(esUser)
+            );
+            logger.info("Indexed with version " + response.version());
+        }
+
         /**
          * 批量索引用户信息
          */
