@@ -1,8 +1,8 @@
 # Authorization-Server
 一个基于Spring-Authorization-Server、MySQL、Redis的授权服务器。
 
-## 开始使用
-### 依赖中间件
+## 1. 开始使用
+### 1.1 依赖中间件
 #### 必须中间件
 * JDK21
 * MySql
@@ -10,7 +10,7 @@
 #### 可选中间件
 * Elasticsearch(v8.12.1) + IK分词器插件
 
-### 模块说明
+### 1.2 模块说明
 * security-spring-boot-autoconfigure  
 提供用户、角色、Spring的Security认证与授权功能。
 
@@ -23,7 +23,7 @@
 * authorization-client-app  
 完整的可执行的OAuth2资源服务器应用
 
-### mysql初始化数据
+### 1.3 mysql初始化数据
 #### DDL
 ##### Spring Security认证与授权相关
 ```mysql
@@ -364,7 +364,7 @@ AND rg.`type` = 1 # 1-菜单，2-功能
 ORDER BY ar.id;
 ```
 
-### Elasticsearch（可选）
+### 1.4 Elasticsearch（可选）
 #### 创建索引
 ##### 用户信息索引
 ```text
@@ -461,7 +461,7 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.bulkIndex
 com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ```
 
-### 如何访问
+### 1.5 如何访问
 * Step1: 用户未登录，客户端请求获取授权码
 > 浏览器地址栏输入：  
 > http://127.0.0.1:8080/oauth2/authorize?client_id=oidc-client&response_type=code&scope=openid+profile+email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client

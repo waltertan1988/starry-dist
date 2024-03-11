@@ -191,7 +191,7 @@ public class ElasticsearchTest {
          * 批量请求查询用户信息
          */
         @Test
-        void msearch() throws IOException {
+        void msearchEsUser() throws IOException {
             MsearchResponse<EsUser> msearchResponse = elasticsearchClient.msearch(s -> s
                 .searches(Lists.newArrayList(
                     RequestItem.of(r -> r
@@ -214,7 +214,7 @@ public class ElasticsearchTest {
 
             for (MultiSearchResponseItem<EsUser> responseItem : msearchResponse.responses()) {
                 if(responseItem.isFailure()){
-                    logger.error("msearch found error. {}", responseItem.failure());
+                    logger.error("msearchEsUser found error. {}", responseItem.failure());
                     continue;
                 }
 
