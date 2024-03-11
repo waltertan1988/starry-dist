@@ -22,6 +22,7 @@ import com.walter.starry.security.base.util.JsonUtil;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -159,6 +161,16 @@ public class ElasticsearchTest {
             }
         }
 
+        @Test
+        void deleteByQuery() throws IOException {
+            DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(d -> d
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("username").value("member")))
+            );
+
+            logger.info("delete total: {}", response.total());
+        }
+
         /**
          * 统计数量
          */
@@ -255,6 +267,82 @@ public class ElasticsearchTest {
                 }
                 System.out.println();
             }
+        }
+
+        /**
+         * 使用SearchAfter分页查询
+         * @throws IOException
+         */
+        @Test
+        void searchAfter() throws IOException {
+            // 开启PIT
+            String pitId = elasticsearchClient.openPointInTime(pit -> pit
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .keepAlive(k -> k.time("1m"))
+            ).id();
+
+            // SearchAfter分页查询
+            int n = 0;
+            SearchResponse<EsUser> response = elasticsearchClient.search(s -> s
+                .pit(p -> p.id(pitId).keepAlive(k -> k.time("1m")))
+                .size(3)
+                .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc))), EsUser.class
+            );
+            while (CollectionUtils.isNotEmpty(response.hits().hits())){
+                for (Hit<EsUser> hit : response.hits().hits()) {
+                    System.out.printf("%s:\t%s%n", ++n, JsonUtil.toJson(hit.source()));
+                }
+
+                List<FieldValue> searchAfterSortList = response.hits().hits().getLast().sort();
+                response = elasticsearchClient.search(s -> s
+                    .pit(p -> p.id(pitId).keepAlive(k -> k.time("1m")))
+                    .size(3)
+                    .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
+                    .searchAfter(searchAfterSortList), EsUser.class
+                );
+            }
+
+            // 关闭PIT
+            elasticsearchClient.closePointInTime(pit -> pit.id(pitId));
+        }
+    }
+
+    @Nested
+    class PointInTimeTest {
+        @Test
+        void pointInTime() throws IOException, InterruptedException {
+            // 初始化14条数据
+            long count1 = elasticsearchClient.count(c -> c.index(ElasticsearchIndexAliasEnum.USER.getAlias())).count();
+            System.out.println(">>>>>> count1: " + count1);
+
+            // 开启PIT
+            String pitId = elasticsearchClient.openPointInTime(pit -> pit
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .keepAlive(k -> k.time("1m"))
+            ).id();
+
+            // 删除1条数据
+            elasticsearchClient.deleteByQuery(d -> d
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("username").value("admin")))
+            );
+
+            // 等待ES刷新磁盘
+            TimeUnit.SECONDS.sleep(5);
+
+            // 剩余13条数据
+            long count2 = elasticsearchClient.count(c -> c.index(ElasticsearchIndexAliasEnum.USER.getAlias())).count();
+            System.out.println(">>>>>> count2: " + count2);
+
+            // 使用PIT检索到14条数据
+            SearchResponse<EsUser> searchResponse = elasticsearchClient.search(s -> s.pit(p -> p.id(pitId)), EsUser.class);
+            System.out.println(">>>>>> count3: " + searchResponse.hits().total());
+
+            // 关闭PIT
+            elasticsearchClient.closePointInTime(pit -> pit.id(pitId));
+
+            // 使用已关闭的PIT会报错
+            Assertions.assertThrows(Exception.class, () -> elasticsearchClient.search(s -> s.pit(p -> p.id(pitId)), EsUser.class));
         }
     }
 }
