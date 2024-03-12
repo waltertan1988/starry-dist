@@ -2,6 +2,7 @@ package com.walter.starry.security;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
@@ -10,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.ObjectBuilder;
 import com.google.common.collect.Lists;
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
 import com.walter.starry.security.base.bo.elasticsearch.EsUser;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +75,6 @@ public class ElasticsearchTest {
     class DocumentTest {
         /**
          * 索引单个用户文档
-         * @throws IOException
          */
         @Test
         void index() throws IOException {
@@ -161,6 +163,9 @@ public class ElasticsearchTest {
             }
         }
 
+        /**
+         * 按搜索条件删除文档
+         */
         @Test
         void deleteByQuery() throws IOException {
             DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(d -> d
@@ -270,34 +275,39 @@ public class ElasticsearchTest {
         }
 
         /**
-         * 使用SearchAfter分页查询
-         * @throws IOException
+         * 使用SearchAfter+PIT进行滚动分页查询
          */
         @Test
-        void searchAfter() throws IOException {
+        void searchAfterWithPit() throws IOException {
+            final String pitKeepAlive = "5s";
+            final int pageSize = 3;
+            final Function<SortOptions.Builder, ObjectBuilder<SortOptions>> sortFunc = s -> s
+                .field(f -> f.field("username").order(SortOrder.Desc));
+
             // 开启PIT
             String pitId = elasticsearchClient.openPointInTime(pit -> pit
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .keepAlive(k -> k.time("1m"))
+                .keepAlive(k -> k.time(pitKeepAlive))
             ).id();
 
-            // SearchAfter分页查询
+            // 滚动分页查询
             int n = 0;
             SearchResponse<EsUser> response = elasticsearchClient.search(s -> s
-                .pit(p -> p.id(pitId).keepAlive(k -> k.time("1m")))
-                .size(3)
-                .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc))), EsUser.class
+                .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
+                .size(pageSize)
+                .sort(sortFunc), EsUser.class
             );
             while (CollectionUtils.isNotEmpty(response.hits().hits())){
                 for (Hit<EsUser> hit : response.hits().hits()) {
                     System.out.printf("%s:\t%s%n", ++n, JsonUtil.toJson(hit.source()));
                 }
 
+                System.out.println();
                 List<FieldValue> searchAfterSortList = response.hits().hits().getLast().sort();
                 response = elasticsearchClient.search(s -> s
-                    .pit(p -> p.id(pitId).keepAlive(k -> k.time("1m")))
-                    .size(3)
-                    .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
+                    .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
+                    .size(pageSize)
+                    .sort(sortFunc)
                     .searchAfter(searchAfterSortList), EsUser.class
                 );
             }
