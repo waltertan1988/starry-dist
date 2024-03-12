@@ -2,6 +2,7 @@ package com.walter.starry.security;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.ScriptLanguage;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
@@ -166,6 +167,23 @@ public class ElasticsearchTest {
         }
 
         /**
+         * 更新单个文档
+         */
+        @Test
+        void update() throws IOException {
+            UpdateResponse<EsUser> updateResponse = elasticsearchClient.update(u -> u
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .id("IOVLLo4BfDUutqvEIdxM")
+                .script(s -> s.inline(i -> i
+                    .lang(ScriptLanguage.Painless)
+                    .source("ctx._source.nickname = params.nickname")
+                    .params("nickname", JsonData.of("孙悟空")))
+                ), EsUser.class);
+
+            System.out.println("version: " + updateResponse.version());
+        }
+
+        /**
          * 按搜索条件删除文档
          */
         @Test
@@ -189,6 +207,19 @@ public class ElasticsearchTest {
             );
 
             System.out.println(">>>>>> Count:" + countResponse.count());
+        }
+
+        /**
+         * 根据文档id查询一个文档
+         */
+        @Test
+        void get() throws IOException {
+            GetResponse<EsUser> getResponse = elasticsearchClient.get(g -> g
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .id("KOVLLo4BfDUutqvEIdxM"), EsUser.class);
+
+            EsUser esUser = getResponse.source();
+            System.out.println(JsonUtil.toJson(esUser));
         }
 
         /**
