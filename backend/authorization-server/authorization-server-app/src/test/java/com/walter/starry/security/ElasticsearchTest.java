@@ -344,13 +344,33 @@ public class ElasticsearchTest {
         void min() throws IOException {
             final String key = "min(create_time)";
             SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
-                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                    .query(q -> q.term(t -> t.field("enabled").value(false)))
-                    .aggregations(key, a -> a.min(vc -> vc.field("create_time")))
-                    .size(0), Void.class);
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("enabled").value(false)))
+                .aggregations(key, a -> a.min(vc -> vc.field("create_time")))
+                .size(0), Void.class);
 
             Aggregate aggregate = searchResponse.aggregations().get(key);
             System.out.printf("%s: %s%n", key, aggregate.min().valueAsString());
+        }
+
+        /**
+         * 嵌套统计最大值
+         */
+        @Test
+        void nestedMax() throws IOException {
+            final String key1 = "nested(authorities)";
+            final String key2 = "max(create_time)";
+            SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("enabled").value(true)))
+                .aggregations(key1, a -> a
+                    .nested(n -> n.path("authorities"))
+                    .aggregations(key2, agg -> agg.max(m -> m.field("authorities.create_time")))
+                )
+                .size(0), Void.class);
+
+            Aggregate aggregate = searchResponse.aggregations().get(key1).nested().aggregations().get(key2);
+            System.out.printf("%s.%s: %s%n", key1, key2, aggregate.max().valueAsString());
         }
     }
 
