@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
@@ -94,6 +95,7 @@ public class ElasticsearchTest {
 
             System.out.println(JsonUtil.toJson(esUser));
 
+            // 添加索引
             IndexResponse response = elasticsearchClient.index(i -> i
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
                 .document(esUser)
@@ -314,6 +316,41 @@ public class ElasticsearchTest {
 
             // 关闭PIT
             elasticsearchClient.closePointInTime(pit -> pit.id(pitId));
+        }
+    }
+
+    @Nested
+    class AggregationTest {
+        /**
+         * 值数量统计
+         */
+        @Test
+        void valueCount() throws IOException {
+            final String key = "value_count(openId)";
+            SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("enabled").value(true)))
+                .aggregations(key, a -> a.valueCount(vc -> vc.field("open_id")))
+                .size(0), Void.class);
+
+            Aggregate aggregate = searchResponse.aggregations().get(key);
+            System.out.printf("%s: %s%n", key, aggregate.valueCount().value());
+        }
+
+        /**
+         * 最小值统计
+         */
+        @Test
+        void min() throws IOException {
+            final String key = "min(create_time)";
+            SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("enabled").value(false)))
+                    .aggregations(key, a -> a.min(vc -> vc.field("create_time")))
+                    .size(0), Void.class);
+
+            Aggregate aggregate = searchResponse.aggregations().get(key);
+            System.out.printf("%s: %s%n", key, aggregate.min().valueAsString());
         }
     }
 
