@@ -248,6 +248,18 @@ public class ElasticsearchTest {
                                     .format("yyyy-MM-dd HH:mm:ss.SSS")
                                     .gte(JsonData.of("2024-02-06 09:57:00.000"))
                                     .lt(JsonData.of("2024-02-06 09:58:00.000"))
+
+//                                    .timeZone("+08:00")
+//                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
+//                                    .gte(JsonData.of("2023-10-17 17:23:00.000"))
+//                                    .lt(JsonData.of("2023-10-17 17:24:00.000"))
+//
+//                                    .format("yyyy-MM-dd HH:mm:ss.SSSZ")
+//                                    .gte(JsonData.of("2023-10-17 17:23:00.000+0800"))
+//                                    .lt(JsonData.of("2023-10-17 17:24:00.000+0800"))
+//
+//                                    .gte(JsonData.of("2023-10-17T09:23:00.000Z"))
+//                                    .lt(JsonData.of("2023-10-17T09:24:00.000Z"))
                                 )
                             ),
                             Query.of(q1 -> q1
