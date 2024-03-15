@@ -216,9 +216,13 @@ public class ElasticsearchTest {
         void get() throws IOException {
             GetResponse<EsUser> getResponse = elasticsearchClient.get(g -> g
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .id("KOVLLo4BfDUutqvEIdxM"), EsUser.class);
+                .sourceIncludes("update_time")
+                .id("_arqP44Bm44TtKoc4lLn"), EsUser.class);
 
             EsUser esUser = getResponse.source();
+            System.out.println(esUser.getUpdateTime());
+            System.out.println(esUser.getUpdateTime().getTime());
+            System.out.println(esUser.getUpdateTime().getHours());
             System.out.println(JsonUtil.toJson(esUser));
         }
 
@@ -249,7 +253,7 @@ public class ElasticsearchTest {
                                     .gte(JsonData.of("2024-02-06 09:57:00.000"))
                                     .lt(JsonData.of("2024-02-06 09:58:00.000"))
 
-//                                    .timeZone("+08:00")
+//                                    .timeZone(TimeZone.getDefault().getID())
 //                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
 //                                    .gte(JsonData.of("2023-10-17 17:23:00.000"))
 //                                    .lt(JsonData.of("2023-10-17 17:24:00.000"))
