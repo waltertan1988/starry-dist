@@ -9,6 +9,7 @@ import com.walter.starry.security.base.entity.AclUser;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.repository.AclUserRepository;
 import com.walter.starry.security.base.service.AuthorityItemService;
+import com.walter.starry.security.base.util.IdUtil;
 import com.walter.starry.security.base.vo.request.user.*;
 import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.vo.response.user.UserAvailableAuthorityResponse;
@@ -100,11 +101,10 @@ public class UserController extends AbstractBaseController {
     @PostMapping("/save")
     public ApiResponse<Void> save(@Validated @RequestBody SaveUserRequest req, BindingResult bindingResult){
         return super.apiCall("save", bindingResult, () -> {
-            Long now = System.currentTimeMillis();
             if(StringUtils.isBlank(req.getUsername())){
                 // 新增
                 String username = UUID.randomUUID().toString().replaceAll("-", "");
-                AclUserBo aclUserBo = new AclUserBo(null, username, req.getNickname(), null, null, null,
+                AclUserBo aclUserBo = new AclUserBo(IdUtil.genNextGlobalId(), username, req.getNickname(), null, null, null,
                         true, true, true, req.getEnabled(), new HashSet<>());
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{

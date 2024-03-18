@@ -3,6 +3,7 @@ package com.walter.starry.security;
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
 import com.walter.starry.security.base.bo.AclUserBo;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
+import com.walter.starry.security.base.util.IdUtil;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Disabled;
@@ -40,8 +41,7 @@ class AuthorizationServerApplicationTests {
 		private JpaUserDetailsService jpaUserDetailsService;
 
 		@Test
-		void createUser() {
-			Long now = System.currentTimeMillis();
+		void createUser() throws Exception {
 
 			// 创建普通登录用户
 			UserDetails userDetails = User.builder()
@@ -56,7 +56,7 @@ class AuthorizationServerApplicationTests {
 					.build();
 
 			String nickname = "普通用户" + RandomStringUtils.randomAlphanumeric(6);
-			AclUserBo aclUserBo = new AclUserBo(null, userDetails.getUsername(), nickname, userDetails.getPassword(), null, null,
+			AclUserBo aclUserBo = new AclUserBo(IdUtil.genNextGlobalId(), userDetails.getUsername(), nickname, userDetails.getPassword(), null, null,
 				userDetails.isAccountNonExpired(), userDetails.isAccountNonLocked(), userDetails.isCredentialsNonExpired(), userDetails.isEnabled(),
 				new HashSet<>(userDetails.getAuthorities())
 			);
@@ -75,7 +75,7 @@ class AuthorizationServerApplicationTests {
 					.build();
 
 			String adminNickname = "系统管理员" + RandomStringUtils.randomAlphanumeric(6);
-			AclUserBo aclAdminUser = new AclUserBo(null, adminUserDetails.getUsername(), adminNickname, adminUserDetails.getPassword(), null, null,
+			AclUserBo aclAdminUser = new AclUserBo(IdUtil.genNextGlobalId(), adminUserDetails.getUsername(), adminNickname, adminUserDetails.getPassword(), null, null,
 				adminUserDetails.isAccountNonExpired(), adminUserDetails.isAccountNonLocked(), adminUserDetails.isCredentialsNonExpired(), adminUserDetails.isEnabled(),
 				new HashSet<>(adminUserDetails.getAuthorities())
 			);
