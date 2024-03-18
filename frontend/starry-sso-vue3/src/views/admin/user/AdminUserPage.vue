@@ -55,6 +55,7 @@
       <PaginationTable ref="userPaginationTableRef" :page="userDataPageRef" :key="userDataPageRef.componentKey" :loading="userDataLoadingRef"
                        :doSearch="searchUserList" :on-selection-change="onTableSelectionChange">
         <el-table-column type="selection" width="40" fixed/>
+        <el-table-column prop="id" label="ID" width="80" fixed/>
         <el-table-column prop="username" label="账号" width="280" fixed/>
         <el-table-column prop="nickname" label="昵称" width="180" fixed/>
         <el-table-column prop="enabled" label="启用" width="60" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
@@ -69,12 +70,12 @@
         <el-table-column label="操作" width="80" fixed="right">
           <template v-slot="scope"><!--定义作用域插槽scope，用于访问子组件的数据属性-->
             <el-dropdown>
-            <span class="el-dropdown-link">
-              更多
-              <el-icon class="el-icon--right">
-                <MoreFilled />
-              </el-icon>
-            </span>
+              <span class="el-dropdown-link">
+                更多
+                <el-icon class="el-icon--right">
+                  <MoreFilled />
+                </el-icon>
+              </span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item :icon="Edit" @click="openOpDialog('update', scope.row)">修改</el-dropdown-item>

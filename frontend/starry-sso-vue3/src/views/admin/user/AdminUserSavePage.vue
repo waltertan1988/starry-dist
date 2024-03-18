@@ -2,6 +2,17 @@
   <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" status-icon>
     <el-row v-if="selectedRowRef">
       <el-col :offset="4" :span="2">
+        <el-text tag="b">ID：</el-text>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item>
+          <el-input name="id" v-model="selectedRowRef.id" style="width: 300px;" disabled clearable/>
+        </el-form-item>
+      </el-col>
+    </el-row>
+
+    <el-row v-if="selectedRowRef">
+      <el-col :offset="4" :span="2">
         <el-text tag="b">账号：</el-text>
       </el-col>
       <el-col :span="12">

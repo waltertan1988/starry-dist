@@ -20,4 +20,9 @@ public interface AclUserRepository extends JpaRepository<AclUser, String>, JpaSp
     @Transactional(rollbackFor = Exception.class)
     @Query("UPDATE AclUser u SET u.expiredSessionsCleanTime = ?2 WHERE u.username IN ?1")
     void updateExpiredSessionsCleanTime(List<String> usernames, Date expiredSessionsCleanTime);
+
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query("DELETE FROM AclUser u WHERE u.username = ?1")
+    void deleteByUsername(String username);
 }

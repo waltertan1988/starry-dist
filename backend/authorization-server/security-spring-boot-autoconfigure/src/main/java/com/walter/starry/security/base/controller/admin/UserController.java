@@ -109,7 +109,9 @@ public class UserController extends AbstractBaseController {
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{
                 // 修改
-                Optional<AclUser> userOptional = aclUserRepository.findById(req.getUsername());
+                AclUser example = new AclUser();
+                example.setUsername(req.getUsername());
+                Optional<AclUser> userOptional = aclUserRepository.findOne(Example.of(example));
                 userOptional.ifPresent(user -> {
                     user.setNickname(req.getNickname());
                     user.setEnabled(req.getEnabled());

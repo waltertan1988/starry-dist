@@ -162,7 +162,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         }
 
         // 删除数据库
-        aclUserRepository.deleteById(username);
+        aclUserRepository.deleteByUsername(username);
 
         // 删除用户Session
         this.removeSession(username);

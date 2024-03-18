@@ -41,7 +41,7 @@ class AuthorizationServerApplicationTests {
 		private JpaUserDetailsService jpaUserDetailsService;
 
 		@Test
-		void createUser() throws Exception {
+		void createUser() {
 
 			// 创建普通登录用户
 			UserDetails userDetails = User.builder()
