@@ -74,6 +74,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         // 保存用户
         Date now = new Date();
         AclUser aclUser = new AclUser();
+        aclUser.setId(aclUserBo.getId());
         aclUser.setUsername(aclUserBo.getUsername());
         aclUser.setNickname(aclUserBo.getNickname());
         aclUser.setPassword(aclUserBo.getPassword());
@@ -123,7 +124,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         probe.setUsername(username);
         Example<? extends AclUser> example = Example.of(probe);
         return aclUserRepository.findAll(example).stream().map(u ->
-                (UserDetails) new AclUserBo(u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
+                (UserDetails) new AclUserBo(u.getId(), u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
                 !u.getAccountExpired(), !u.getCredentialsExpired(), !u.getAccountLocked(), u.getEnabled(),
                 AuthorityUtils.NO_AUTHORITIES)).toList();
     }
@@ -147,7 +148,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
             returnUsername = username;
         }
 
-        return new AclUserBo(returnUsername, user.getNickname(), user.getPassword(), user.getOauth2RegistrationId(), user.getOpenId(),
+        return new AclUserBo(user.getId(), returnUsername, user.getNickname(), user.getPassword(), user.getOauth2RegistrationId(), user.getOpenId(),
                 user.isAccountNonExpired(), user.isAccountNonLocked(), user.isCredentialsNonExpired(), user.isEnabled(),
                 user.getExpiredSessionsCleanTime(), user.getCreateTime(), user.getUpdateTime(), combinedAuthorities);
     }

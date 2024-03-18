@@ -56,7 +56,7 @@ class AuthorizationServerApplicationTests {
 					.build();
 
 			String nickname = "普通用户" + RandomStringUtils.randomAlphanumeric(6);
-			AclUserBo aclUserBo = new AclUserBo(userDetails.getUsername(), nickname, userDetails.getPassword(), null, null,
+			AclUserBo aclUserBo = new AclUserBo(null, userDetails.getUsername(), nickname, userDetails.getPassword(), null, null,
 				userDetails.isAccountNonExpired(), userDetails.isAccountNonLocked(), userDetails.isCredentialsNonExpired(), userDetails.isEnabled(),
 				new HashSet<>(userDetails.getAuthorities())
 			);
@@ -75,7 +75,7 @@ class AuthorizationServerApplicationTests {
 					.build();
 
 			String adminNickname = "系统管理员" + RandomStringUtils.randomAlphanumeric(6);
-			AclUserBo aclAdminUser = new AclUserBo(adminUserDetails.getUsername(), adminNickname, adminUserDetails.getPassword(), null, null,
+			AclUserBo aclAdminUser = new AclUserBo(null, adminUserDetails.getUsername(), adminNickname, adminUserDetails.getPassword(), null, null,
 				adminUserDetails.isAccountNonExpired(), adminUserDetails.isAccountNonLocked(), adminUserDetails.isCredentialsNonExpired(), adminUserDetails.isEnabled(),
 				new HashSet<>(adminUserDetails.getAuthorities())
 			);

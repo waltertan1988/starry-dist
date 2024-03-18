@@ -20,6 +20,8 @@ import java.util.*;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public class AclUserBo implements UserDetails, CredentialsContainer {
 
+    private Long id;
+
     private String username;
 
     private String nickname;
@@ -49,18 +51,19 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
     public AclUserBo(){
     }
 
-    public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
+    public AclUserBo(Long id, String username, String nickname, String password, String oauth2RegistrationId, String openId,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                      Collection<GrantedAuthority> authorities) {
-        this(username, nickname, password, oauth2RegistrationId, openId,
+        this(id, username, nickname, password, oauth2RegistrationId, openId,
                 accountNonExpired, accountNonLocked, credentialsNonExpired, enabled,
                 null, null, null, authorities);
     }
 
-    public AclUserBo(String username, String nickname, String password, String oauth2RegistrationId, String openId,
+    public AclUserBo(Long id, String username, String nickname, String password, String oauth2RegistrationId, String openId,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                      Date expiredSessionsCleanTime, Date createTime, Date updateTime,
                      Collection<GrantedAuthority> authorities) {
+        this.id = id;
         this.username = username;
         this.nickname = nickname;
         this.password = password;
@@ -74,6 +77,10 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -133,6 +140,10 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public Date getUpdateTime() {
         return updateTime;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {

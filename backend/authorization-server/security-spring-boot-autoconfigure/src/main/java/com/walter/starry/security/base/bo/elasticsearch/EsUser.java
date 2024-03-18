@@ -16,6 +16,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EsUser {
 
+    private Integer id;
+
     private String username;
 
     private String nickname;

@@ -14,7 +14,11 @@ import java.util.Date;
 @Entity
 @Table(name = "users")
 public class AclUser implements Serializable {
+
     @Id
+    @Column(name = "id", unique = true, nullable = false)
+    private Long id;
+
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
