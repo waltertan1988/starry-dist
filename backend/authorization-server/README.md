@@ -381,6 +381,9 @@ PUT /authorization_server.user.v1
     "mappings": {
         "dynamic": "strict",
         "properties": {
+            "id": {
+                "type": "long"
+            },
             "username": {
                 "type": "keyword",
                 "ignore_above": 128

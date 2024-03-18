@@ -99,6 +99,7 @@ public class ElasticsearchTest {
             // 添加索引
             IndexResponse response = elasticsearchClient.index(i -> i
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .id(String.valueOf(esUser.getId()))
                 .document(esUser)
             );
             logger.info("Indexed with version " + response.version());
@@ -146,6 +147,7 @@ public class ElasticsearchTest {
                     br.operations(op -> op
                         .index(idx -> idx
                             .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                            .id(String.valueOf(esUser.getId()))
                             .document(esUser)
                         )
                     );
@@ -173,7 +175,7 @@ public class ElasticsearchTest {
         void update() throws IOException {
             UpdateResponse<EsUser> updateResponse = elasticsearchClient.update(u -> u
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .id("IOVLLo4BfDUutqvEIdxM")
+                .id("1")
                 .script(s -> s.inline(i -> i
                     .lang(ScriptLanguage.Painless)
                     .source("ctx._source.nickname = params.nickname")
@@ -217,7 +219,7 @@ public class ElasticsearchTest {
             GetResponse<EsUser> getResponse = elasticsearchClient.get(g -> g
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
                 .sourceIncludes("update_time")
-                .id("_arqP44Bm44TtKoc4lLn"), EsUser.class);
+                .id("1"), EsUser.class);
 
             EsUser esUser = getResponse.source();
             System.out.println(esUser.getUpdateTime());
