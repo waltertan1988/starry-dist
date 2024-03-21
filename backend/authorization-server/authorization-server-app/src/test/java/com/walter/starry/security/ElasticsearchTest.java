@@ -346,7 +346,9 @@ public class ElasticsearchTest {
             SearchResponse<EsUser> response = elasticsearchClient.search(s -> s
                 .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
                 .size(pageSize)
-                .sort(sortFunc), EsUser.class
+                .sort(sortFunc)
+                .trackTotalHits(t -> t.enabled(false) // 禁用totalHits以加速分页
+                ), EsUser.class
             );
             while (CollectionUtils.isNotEmpty(response.hits().hits())){
                 for (Hit<EsUser> hit : response.hits().hits()) {
@@ -359,7 +361,8 @@ public class ElasticsearchTest {
                     .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
                     .size(pageSize)
                     .sort(sortFunc)
-                    .searchAfter(searchAfterSortList), EsUser.class
+                    .searchAfter(searchAfterSortList)
+                    .trackTotalHits(t -> t.enabled(false)), EsUser.class
                 );
             }
 
