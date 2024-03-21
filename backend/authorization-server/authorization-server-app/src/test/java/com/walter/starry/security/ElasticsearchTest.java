@@ -340,11 +340,12 @@ public class ElasticsearchTest {
                 .index(ElasticsearchIndexAliasEnum.USER.getAlias())
                 .keepAlive(k -> k.time(pitKeepAlive))
             ).id();
+            AtomicReference<String> pitIdRef = new AtomicReference<>(pitId);
 
             // 滚动分页查询
             int n = 0;
             SearchResponse<EsUser> response = elasticsearchClient.search(s -> s
-                .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
+                .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
                 .size(pageSize)
                 .sort(sortFunc)
                 .trackTotalHits(t -> t.enabled(false) // 禁用totalHits以加速分页
@@ -356,9 +357,10 @@ public class ElasticsearchTest {
                 }
 
                 System.out.println();
+                pitIdRef.set(response.pitId());// 使用响应体中的最新的pitId
                 List<FieldValue> searchAfterSortList = response.hits().hits().getLast().sort();
                 response = elasticsearchClient.search(s -> s
-                    .pit(p -> p.id(pitId).keepAlive(k -> k.time(pitKeepAlive)))
+                    .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
                     .size(pageSize)
                     .sort(sortFunc)
                     .searchAfter(searchAfterSortList)
@@ -367,7 +369,7 @@ public class ElasticsearchTest {
             }
 
             // 关闭PIT
-            elasticsearchClient.closePointInTime(pit -> pit.id(pitId));
+            elasticsearchClient.closePointInTime(pit -> pit.id(pitIdRef.get()));
         }
     }
 
