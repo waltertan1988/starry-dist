@@ -41,9 +41,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -204,8 +202,8 @@ public class ElasticsearchTest {
         @Test
         public void count() throws IOException {
             CountResponse countResponse = elasticsearchClient.count(c -> c
-                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                    .query(q -> q.term(t -> t.field("nickname").value("管理")))
+                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                .query(q -> q.term(t -> t.field("nickname").value("管理")))
             );
 
             System.out.println(">>>>>> Count:" + countResponse.count());
@@ -464,6 +462,27 @@ public class ElasticsearchTest {
 
             // 使用已关闭的PIT会报错
             Assertions.assertThrows(Exception.class, () -> elasticsearchClient.search(s -> s.pit(p -> p.id(pitId)), EsUser.class));
+        }
+
+        @Test
+        public void pointInTimeLimit() throws IOException {
+            final String pitKeepAlive = "5m";
+            Set<String> pitIdSet = new HashSet<>();
+
+            for (int i = 0; i < 100000; i++) {
+                String pitId = elasticsearchClient.openPointInTime(pit -> pit
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .keepAlive(k -> k.time(pitKeepAlive))
+                ).id();
+
+                pitIdSet.add(pitId);
+            }
+
+            System.out.println(">>>>>> size=" + pitIdSet.size());
+
+            for (String pitId : pitIdSet) {
+                elasticsearchClient.closePointInTime(pit -> pit.id(pitId));
+            }
         }
     }
 }
