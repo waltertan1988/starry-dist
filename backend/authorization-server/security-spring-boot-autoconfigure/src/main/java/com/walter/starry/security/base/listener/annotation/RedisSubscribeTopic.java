@@ -1,6 +1,6 @@
 package com.walter.starry.security.base.listener.annotation;
 
-import com.walter.starry.security.base.common.enums.RedisTopicEnum;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 
 import java.lang.annotation.*;
 
@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RedisSubscribeTopic {
 
-    RedisTopicEnum value();
+    MessageTopicEnum value();
 }

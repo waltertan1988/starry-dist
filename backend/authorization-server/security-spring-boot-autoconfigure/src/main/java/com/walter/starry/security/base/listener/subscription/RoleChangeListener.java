@@ -2,7 +2,7 @@ package com.walter.starry.security.base.listener.subscription;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
-import com.walter.starry.security.base.common.enums.RedisTopicEnum;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
 import com.walter.starry.security.base.util.JsonUtil;
@@ -23,7 +23,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@RedisSubscribeTopic(RedisTopicEnum.ROLE_CHANGE_BROADCAST)
+@RedisSubscribeTopic(MessageTopicEnum.ROLE_CHANGE_BROADCAST)
 public class RoleChangeListener implements MessageListener {
     @Autowired
     private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;

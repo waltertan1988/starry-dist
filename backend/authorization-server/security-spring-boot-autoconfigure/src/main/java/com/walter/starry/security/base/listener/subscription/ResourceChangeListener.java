@@ -3,7 +3,7 @@ package com.walter.starry.security.base.listener.subscription;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
-import com.walter.starry.security.base.common.enums.RedisTopicEnum;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
 import com.walter.starry.security.base.util.JsonUtil;
@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@RedisSubscribeTopic(RedisTopicEnum.RESOURCE_CHANGE_BROADCAST)
+@RedisSubscribeTopic(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST)
 public class ResourceChangeListener implements MessageListener {
     @Autowired
     private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;

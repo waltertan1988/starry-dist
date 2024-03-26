@@ -1,6 +1,6 @@
 package com.walter.starry.security.base.service;
 
-import com.walter.starry.security.base.common.enums.RedisTopicEnum;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +26,7 @@ public class MessageService {
      * @param redisTopicEnum
      * @param message
      */
-    public void publish(RedisTopicEnum redisTopicEnum, String message){
+    public void publish(MessageTopicEnum redisTopicEnum, String message){
         stringRedisTemplate.convertAndSend(redisTopicEnum.name(), Objects.requireNonNull(message));
     }
 }
