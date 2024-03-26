@@ -1,5 +1,5 @@
 # Authorization-Server
-一个基于Spring-Authorization-Server、MySQL、Redis的授权服务器。
+一个基于Spring-Authorization-Server、MySQL、Redis、Pulsar的授权服务器。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
@@ -595,9 +595,10 @@ curl \
 -H 'Content-Type: application/json' \
 -X PUT http://dashboard:7750/pulsar-manager/users/superuser \
 -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
-```
-> 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
 
+# 注：登录账密设置的说明参看：https://github.com/apache/pulsar-manager
+```
+> 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
 
 ### 2.2 如何访问
 * Step1: 用户未登录，客户端请求获取授权码
