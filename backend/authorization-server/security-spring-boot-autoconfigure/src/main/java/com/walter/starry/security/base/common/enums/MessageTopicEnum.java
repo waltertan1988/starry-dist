@@ -12,12 +12,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MessageTopicEnum {
     /** 角色变更 广播 */
-    ROLE_CHANGE_BROADCAST("persistent://my-tenant/my-namespace/role-change-broadcast", 0),
+    ROLE_CHANGE_BROADCAST("persistent://%s/%s/role-change-broadcast", 0),
     /**资源变更 广播*/
-    RESOURCE_CHANGE_BROADCAST("persistent://my-tenant/my-namespace/resource-change-broadcast", 0)
+    RESOURCE_CHANGE_BROADCAST("persistent://%s/%s/resource-change-broadcast", 0)
     ;
 
-    private final String pulsarTopicString;
+    private final String pulsarTopic;
 
     private final Integer pulsarTopicPartitionNum;
 }

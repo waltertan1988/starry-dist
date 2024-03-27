@@ -5,6 +5,9 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
+  pulsar:
+    tenant: starry
+
   security:
     enable-front-back-seperated: true
     namespace-prefix: AuthorizationServer
@@ -66,9 +69,9 @@ spring:
   # Pulsar配置
   pulsar:
     client:
-      service-url: pulsar://10.12.73.51:6650
+      service-url: pulsar://192.168.10.235:6650
     admin:
-      service-url: http://10.12.73.51:8080
+      service-url: http://192.168.10.235:8080
 
   # ES
   elasticsearch:
