@@ -28,6 +28,9 @@ server:
   shutdown: graceful
 
 spring:
+  application:
+    name: authorization-server-app
+
   # DataSource
   datasource:
     username: root
@@ -59,6 +62,13 @@ spring:
           min-idle: 50
           max-wait: 5000ms
       timeout: 3000ms
+
+  # Pulsar配置
+  pulsar:
+    client:
+      service-url: pulsar://10.12.73.51:6650
+    admin:
+      service-url: http://10.12.73.51:8080
 
   # ES
   elasticsearch:

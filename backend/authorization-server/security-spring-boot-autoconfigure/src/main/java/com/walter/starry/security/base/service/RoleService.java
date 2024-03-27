@@ -1,48 +1,27 @@
-package com.walter.starry.security.base.listener.subscription;
+package com.walter.starry.security.base.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
-import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
-import com.walter.starry.security.base.util.JsonUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
 /**
- * 角色变更的广播消息订阅
  * @Author: walter.tan
- * @DateTime: 2023-10-14 13:43:50
+ * @DateTime: 2024-03-27 15:44:29
  */
-@Slf4j
-@Component
-@RedisSubscribeTopic(MessageTopicEnum.ROLE_CHANGE_BROADCAST)
-public class RoleChangeListener implements MessageListener {
+@Service
+public class RoleService {
     @Autowired
     private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;
 
-    @Override
-    public void onMessage(Message message, byte[] pattern) {
-        String body = new String(message.getBody());
-        log.info("RoleChangeMessage body: {}", body);
-        List<RoleChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
-
-        if(CollectionUtils.isEmpty(messageList)){
-            return;
-        }
-
-        // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
-        this.tryRefreshLocalCaches(messageList);
-    }
-
-    private void tryRefreshLocalCaches(List<RoleChangeMessage> messageList) {
+    /**
+     * 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
+     * @param messageList
+     */
+    public void tryRefreshLocalCaches(List<RoleChangeMessage> messageList) {
         boolean needRefreshRoleHierarchy = false;
         boolean needRefreshRequestMatcherEntryHolder = false;
 
@@ -77,6 +56,7 @@ public class RoleChangeListener implements MessageListener {
         if(needRefreshRoleHierarchy){
             openPolicyAgentAuthorizationManager.refreshRoleHierarchy();
         }
+        
         if(needRefreshRequestMatcherEntryHolder){
             openPolicyAgentAuthorizationManager.refreshRequestMatcherEntryHolder();
         }

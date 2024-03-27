@@ -12,12 +12,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MessageTopicEnum {
     /** 角色变更 广播 */
-    ROLE_CHANGE_BROADCAST,
+    ROLE_CHANGE_BROADCAST("persistent://my-tenant/my-namespace/role-change-broadcast", 0),
     /**资源变更 广播*/
-    RESOURCE_CHANGE_BROADCAST
+    RESOURCE_CHANGE_BROADCAST("persistent://my-tenant/my-namespace/resource-change-broadcast", 0)
     ;
 
-    public String toHyphenLowerCase(){
-        return this.name().toLowerCase().replace('_', '-');
-    }
+    private final String pulsarTopicString;
+
+    private final Integer pulsarTopicPartitionNum;
 }

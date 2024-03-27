@@ -54,6 +54,8 @@ public class ResourceGroupService {
     @Autowired
     private MessageService messageService;
     @Autowired
+    private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;
+    @Autowired
     private AclResourceGroupRepository aclResourceGroupRepository;
     @Autowired
     private AclResourceItemRepository aclResourceItemRepository;
@@ -571,5 +573,63 @@ public class ResourceGroupService {
         }
 
         return resultMap;
+    }
+
+    /**
+     * 检查并尝试刷新本地缓存（资源与权限的关联关系）
+     * @param messageList
+     */
+    public void tryRefreshLocalCaches(List<ResourceChangeMessage> messageList) {
+        boolean needRefreshRequestMatcherEntryHolder = false;
+
+        for (ResourceChangeMessage changeMessage : messageList) {
+            if(Objects.nonNull(changeMessage.getChangeAuthorityData())){
+                // 资源权限变更
+                needRefreshRequestMatcherEntryHolder = true;
+                break;
+            }else if(Objects.nonNull(changeMessage.getBefore()) && Objects.nonNull(changeMessage.getAfter())){
+                // 修改资源
+
+                if(!Objects.equals(changeMessage.getAfter().getCode(), changeMessage.getBefore().getCode())){
+                    // 修改资源编码
+                    needRefreshRequestMatcherEntryHolder = true;
+                    break;
+                }
+
+                if(!Objects.equals(changeMessage.getAfter().getPattern(), changeMessage.getBefore().getPattern())){
+                    // 修改路径模式
+                    needRefreshRequestMatcherEntryHolder = true;
+                    break;
+                }
+
+                if(StringUtils.isNotBlank(changeMessage.getAfter().getHttpMethodList()) && StringUtils.isNotBlank(changeMessage.getBefore().getHttpMethodList())){
+                    Collection<String> beforeHttpMethods = Lists.newArrayList(changeMessage.getBefore().getHttpMethodList().split(OpenPolicyAgentAuthorizationManager.HTTP_METHOD_LIST_DELIMITER));
+                    Collection<String> afterHttpMethods = Lists.newArrayList(changeMessage.getAfter().getHttpMethodList().split(OpenPolicyAgentAuthorizationManager.HTTP_METHOD_LIST_DELIMITER));
+                    if(!CollectionUtils.isEqualCollection(beforeHttpMethods, afterHttpMethods)){
+                        // 修改http请求方法类型
+                        needRefreshRequestMatcherEntryHolder = true;
+                        break;
+                    }
+                }
+
+                if(!Objects.equals(changeMessage.getAfter().getSeq(), changeMessage.getBefore().getSeq())){
+                    // 修改顺序
+                    needRefreshRequestMatcherEntryHolder = true;
+                    break;
+                }
+            }else if(Objects.isNull(changeMessage.getBefore())){
+                // 新增资源
+                needRefreshRequestMatcherEntryHolder = true;
+                break;
+            }else {
+                // 删除资源
+                needRefreshRequestMatcherEntryHolder = true;
+                break;
+            }
+        }
+
+        if(needRefreshRequestMatcherEntryHolder){
+            openPolicyAgentAuthorizationManager.refreshRequestMatcherEntryHolder();
+        }
     }
 }
