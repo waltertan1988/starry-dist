@@ -78,10 +78,13 @@ spring:
   threads:
     virtual:
       enabled: true
-  # 启用虚拟线程后，由于虚拟线程都是守护线程，为防止JVM因没有非守护线程而自动退出，需要设置此值为true
-  #（参考：https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.spring-application.virtual-threads）
+
   main:
+    # 启用虚拟线程后，由于虚拟线程都是守护线程，为防止JVM因没有非守护线程而自动退出，需要设置此值为true
+    #（参考：https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.spring-application.virtual-threads）
     keep-alive: true
+    # 允许Spring循环依赖
+    allow-circular-references: true
 
   # 优雅停机的宽限期
   lifecycle:

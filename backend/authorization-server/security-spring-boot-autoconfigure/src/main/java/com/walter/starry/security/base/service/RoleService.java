@@ -56,7 +56,7 @@ public class RoleService {
         if(needRefreshRoleHierarchy){
             openPolicyAgentAuthorizationManager.refreshRoleHierarchy();
         }
-        
+
         if(needRefreshRequestMatcherEntryHolder){
             openPolicyAgentAuthorizationManager.refreshRequestMatcherEntryHolder();
         }
