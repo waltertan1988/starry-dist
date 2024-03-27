@@ -587,6 +587,8 @@ services:
 ```
 ```shell
 # Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
+docker exec -it <PulsarManager容器ID> /bin/bash
+
 CSRF_TOKEN=$(curl http://dashboard:7750/pulsar-manager/csrf-token)
 
 curl \
