@@ -556,7 +556,7 @@ services:
       - managedLedgerDefaultWriteQuorum=1
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
-      - advertisedListeners=external:pulsar://127.0.0.1:6650
+      - advertisedListeners=external:pulsar://192.168.10.235:6650
       - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
     depends_on:
       zookeeper:
@@ -585,6 +585,8 @@ services:
     networks:
       - pulsar
 ```
+> 注意broker中的advertisedListeners指向客户端可访问的地址（如宿主机192.168.10.235）
+
 ```shell
 # Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
 docker exec -it <PulsarManager容器ID> /bin/bash
