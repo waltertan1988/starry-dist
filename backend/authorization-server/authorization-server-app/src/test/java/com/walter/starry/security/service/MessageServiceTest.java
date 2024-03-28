@@ -28,7 +28,7 @@ public class MessageServiceTest {
         void publishToPulsar() throws PulsarClientException {
             String tenant = appPulsarProperties.getBaseReg().getTenant();
             String namespace = appPulsarProperties.getBaseReg().getNamespace();
-            String messageId = messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, tenant, namespace, "Hello Walter");
+            String messageId = messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, tenant, namespace, "Hello Pulsar!");
             System.out.println(">>>>>>messageId: " + messageId);
         }
     }

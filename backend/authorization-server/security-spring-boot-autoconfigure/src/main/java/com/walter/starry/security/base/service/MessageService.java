@@ -2,8 +2,7 @@ package com.walter.starry.security.base.service;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pulsar.client.api.MessageId;
-import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,6 +47,6 @@ public class MessageService {
     public String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, String message) throws PulsarClientException {
         String topic = String.format(messageTopicEnum.getPulsarTopic(), tenant, namespace);
         MessageId messageId = stringPulsarTemplate.newMessage(message).withTopic(topic).send();
-        return new String(messageId.toByteArray());
+        return messageId.toString();
     }
 }
