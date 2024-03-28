@@ -5,11 +5,13 @@ import com.walter.starry.security.base.config.properties.AppPulsarProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.pulsar.core.PulsarTopic;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+import java.util.Objects;
 
 /**
  * Pulsar Topic自动生成（配置在消息生产者方）
@@ -25,25 +27,25 @@ public class PulsarTopicConfig implements InitializingBean {
     @Autowired
     private AppPulsarProperties appPulsarProperties;
 
-    @Value("${spring.application.name}")
-    private String namespace;
-
     @Bean
-    public PulsarTopic roleChangeBroadcastPulsarTopic() {
-        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getTenant(), namespace);
+    public PulsarTopic roleChangeBroadcastBasePulsarTopic() {
+        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return PulsarTopic.builder(topic).build();
     }
 
     @Bean
-    public PulsarTopic resourceChangeBroadcastPulsarTopic() {
-        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getTenant(), namespace);
+    public PulsarTopic resourceChangeBroadcastBasePulsarTopic() {
+        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return PulsarTopic.builder(topic).build();
     }
 
     @Override
     public void afterPropertiesSet() {
-        Assert.hasText(namespace, "properties [spring.application.name] cannot be blank");
+        boolean flag = Objects.nonNull(appPulsarProperties.getBaseReg())
+                && StringUtils.hasText(appPulsarProperties.getBaseReg().getTenant())
+                && StringUtils.hasText(appPulsarProperties.getBaseReg().getNamespace());
+        Assert.isTrue(flag, "properties [app.pulsar.base-reg.tenant] and [app.pulsar.base-reg.namespace] should be setup");
     }
 }

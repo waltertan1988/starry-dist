@@ -6,7 +6,10 @@ app:
       clean-from-days-before: 30
 
   pulsar:
-    tenant: starry
+    # 本应用所需的pulsar注册信息
+    base-reg:
+      tenant: starry
+      namespace: ${spring.application.name}
 
   security:
     enable-front-back-seperated: true

@@ -4,6 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 应用的Pulsar配置
  * @Author: walter.tan
@@ -14,7 +17,24 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("app.pulsar")
 public class AppPulsarProperties {
     /**
-     * pulsar租户
+     * 本应用所需的pulsar注册信息
      */
-    private String tenant = "starry";
+    private Reg baseReg;
+
+    /**
+     * 其他应用的pulsar注册信息
+     */
+    private final Map<String, Reg> regs = new HashMap<>();
+
+    @Data
+    public static class Reg {
+        /**
+         * pulsar租户
+         */
+        private String tenant;
+        /**
+         * pulsar命名空间
+         */
+        private String namespace;
+    }
 }
