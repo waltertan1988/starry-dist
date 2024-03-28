@@ -164,7 +164,7 @@ public class AuthorityItemService {
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage message = RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now));
-            messageService.publish(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
         });
     }
 
@@ -201,7 +201,7 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(oldAclAuthorityItem.getCode(), oldAclAuthorityItem.getName(), oldAclAuthorityItem.getParentCode(), now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now);
-            messageService.publish(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
 
             // 踢出受角色编码变更影响的用户的session
             if(!Objects.equals(req.getCode(), oldAclAuthorityItem.getCode())){
@@ -236,7 +236,7 @@ public class AuthorityItemService {
             List<RoleChangeMessage> messageList = codeList.stream()
                     .map(code -> RoleChangeMessage.ofDelete(new RoleChangeMessage.RoleData(code, null, null, now)))
                     .toList();
-            messageService.publish(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
 
             // 踢出待删角色对应用户的session
             jpaUserDetailsService.removeSession(codeList);
@@ -267,7 +267,7 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(req.getCode(), null, oldParentCode, now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), null, req.getMoveToCode(), now);
-            messageService.publish(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
         });
     }
 

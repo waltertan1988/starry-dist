@@ -105,9 +105,9 @@ spring:
   # Pulsar配置
   pulsar:
     client:
-      service-url: pulsar://192.168.10.235:6650
+      service-url: pulsar://10.12.73.57:6650
     admin:
-      service-url: http://192.168.10.235:8080
+      service-url: http://10.12.73.57:8080
 
   # ES
   elasticsearch:

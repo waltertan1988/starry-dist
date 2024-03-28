@@ -24,6 +24,6 @@ public class RoleChangePulsarListener {
         subscriptionType = SubscriptionType.Exclusive
     )
     public void listen(String message){
-        System.out.println(">>>>>>" + message);
+        log.info("RoleChangeMessage message: {}", message);
     }
 }

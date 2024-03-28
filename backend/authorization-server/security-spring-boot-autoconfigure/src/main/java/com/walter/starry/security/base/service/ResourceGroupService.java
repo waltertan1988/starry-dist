@@ -313,7 +313,7 @@ public class ResourceGroupService {
             // 新增的资源项，其顺序值可能会影响本地缓存里的排序
             ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(req.getCode(), req.getName(), req.getHttpMethodList(), req.getPattern(), req.getSeq(), now);
             ResourceChangeMessage message = ResourceChangeMessage.ofCreate(after);
-            messageService.publish(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
         });
     }
 
@@ -348,7 +348,7 @@ public class ResourceGroupService {
                 ResourceChangeMessage.ResourceData before = new ResourceChangeMessage.ResourceData(oldItem.getCode(), oldItem.getName(), oldItem.getHttpMethodList(), oldItem.getPattern(), oldItem.getSeq(), now);
                 ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(item.getCode(), item.getName(), item.getHttpMethodList(), item.getPattern(), item.getSeq(), now);
                 ResourceChangeMessage message = ResourceChangeMessage.ofUpdate(before, after);
-                messageService.publish(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+                messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
 
                 // 修改资源编码，需要剔除Redis缓存
                 if(!Objects.equals(item.getCode(), oldItem.getCode())){
@@ -460,7 +460,7 @@ public class ResourceGroupService {
                     .map(code -> ResourceChangeMessage.ofDelete(
                         new ResourceChangeMessage.ResourceData(code, null, null, null, null, now)
                     )).toList();
-                messageService.publish(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
+                messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
 
                 // 剔除Redis缓存
                 for (String itemCode : itemCodes) {
@@ -509,7 +509,7 @@ public class ResourceGroupService {
             ResourceChangeMessage.ChangeAuthorityData changeAuthorityData = new ResourceChangeMessage.ChangeAuthorityData(
                     resourceItemCode, newRoleCodeList, removeRoleCodeList);
             ResourceChangeMessage message = ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData);
-            messageService.publish(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
 
             // 剔除Redis缓存
             stringRedisTemplate.delete(infraRedisKeys.getResourceItemAuthoritiesKey(resourceItemCode));
