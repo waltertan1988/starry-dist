@@ -1,11 +1,17 @@
 package com.walter.starry.security.base.listener.pulsar;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.service.RoleService;
+import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.pulsar.annotation.PulsarListener;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 角色变更的广播消息订阅
@@ -24,6 +30,15 @@ public class RoleChangePulsarListener {
         subscriptionType = SubscriptionType.Exclusive
     )
     public void listen(String message){
-        log.info("RoleChangeMessage message: {}", message);
+        log.info("Pulsar RoleChangeMessage message: {}", message);
+
+        List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+
+        if(CollectionUtils.isEmpty(messageList)){
+            return;
+        }
+
+        // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
+        roleService.tryRefreshLocalCaches(messageList);
     }
 }

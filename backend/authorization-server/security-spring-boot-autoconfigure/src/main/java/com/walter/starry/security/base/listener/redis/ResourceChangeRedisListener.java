@@ -11,17 +11,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * 资源变更的广播消息订阅
+ * 资源变更的广播消息订阅（已废弃，由Pulsar代替）
  * @Author: walter.tan
  * @DateTime: 2023-10-14 13:43:50
  */
 @Slf4j
-@Component
+@Deprecated
+//@Component
 @RedisSubscribeTopic(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST)
 public class ResourceChangeRedisListener implements MessageListener {
     @Autowired
