@@ -585,7 +585,9 @@ services:
     networks:
       - pulsar
 ```
-> 注意broker中的advertisedListeners指向客户端可访问的地址（如宿主机192.168.10.235）
+> 注意：
+> * broker中的advertisedListeners指向客户端可访问的地址（如宿主机192.168.10.235）
+> * 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 
 ```shell
 # Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
