@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -312,8 +313,12 @@ public class ResourceGroupService {
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 新增的资源项，其顺序值可能会影响本地缓存里的排序
             ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(req.getCode(), req.getName(), req.getHttpMethodList(), req.getPattern(), req.getSeq(), now);
-            ResourceChangeMessage message = ResourceChangeMessage.ofCreate(after);
-            messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofCreate(after)));
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+            }
         });
     }
 
@@ -347,8 +352,12 @@ public class ResourceGroupService {
                 // 资源项编码、模式路径、请求方法类型或顺序发生变化，刷新本地缓存
                 ResourceChangeMessage.ResourceData before = new ResourceChangeMessage.ResourceData(oldItem.getCode(), oldItem.getName(), oldItem.getHttpMethodList(), oldItem.getPattern(), oldItem.getSeq(), now);
                 ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(item.getCode(), item.getName(), item.getHttpMethodList(), item.getPattern(), item.getSeq(), now);
-                ResourceChangeMessage message = ResourceChangeMessage.ofUpdate(before, after);
-                messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+                String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after)));
+                try {
+                    messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                } catch (PulsarClientException ex) {
+                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                }
 
                 // 修改资源编码，需要剔除Redis缓存
                 if(!Objects.equals(item.getCode(), oldItem.getCode())){
@@ -460,7 +469,12 @@ public class ResourceGroupService {
                     .map(code -> ResourceChangeMessage.ofDelete(
                         new ResourceChangeMessage.ResourceData(code, null, null, null, null, now)
                     )).toList();
-                messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
+                String message = JsonUtil.toJson(messageList);
+                try {
+                    messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                } catch (PulsarClientException ex) {
+                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                }
 
                 // 剔除Redis缓存
                 for (String itemCode : itemCodes) {
@@ -508,8 +522,12 @@ public class ResourceGroupService {
             // 刷新本地缓存
             ResourceChangeMessage.ChangeAuthorityData changeAuthorityData = new ResourceChangeMessage.ChangeAuthorityData(
                     resourceItemCode, newRoleCodeList, removeRoleCodeList);
-            ResourceChangeMessage message = ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData);
-            messageService.publishBroadcastToRedis(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData)));
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+            }
 
             // 剔除Redis缓存
             stringRedisTemplate.delete(infraRedisKeys.getResourceItemAuthoritiesKey(resourceItemCode));

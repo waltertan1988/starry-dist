@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -163,8 +164,12 @@ public class AuthorityItemService {
 
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
-            RoleChangeMessage message = RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now));
-            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(message)));
+            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now))));
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+            }
         });
     }
 
@@ -201,7 +206,12 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(oldAclAuthorityItem.getCode(), oldAclAuthorityItem.getName(), oldAclAuthorityItem.getParentCode(), now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now);
-            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
+            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+            }
 
             // 踢出受角色编码变更影响的用户的session
             if(!Objects.equals(req.getCode(), oldAclAuthorityItem.getCode())){
@@ -236,7 +246,12 @@ public class AuthorityItemService {
             List<RoleChangeMessage> messageList = codeList.stream()
                     .map(code -> RoleChangeMessage.ofDelete(new RoleChangeMessage.RoleData(code, null, null, now)))
                     .toList();
-            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(messageList));
+            String message = JsonUtil.toJson(messageList);
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+            }
 
             // 踢出待删角色对应用户的session
             jpaUserDetailsService.removeSession(codeList);
@@ -267,7 +282,12 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(req.getCode(), null, oldParentCode, now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), null, req.getMoveToCode(), now);
-            messageService.publishBroadcastToRedis(MessageTopicEnum.ROLE_CHANGE_BROADCAST, JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after))));
+            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
+            try {
+                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+            } catch (PulsarClientException ex) {
+                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+            }
         });
     }
 
