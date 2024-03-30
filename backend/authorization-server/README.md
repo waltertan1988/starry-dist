@@ -9,7 +9,7 @@
 * Redis
 * Pulsar
 #### 可选中间件
-* Docker Compose（部署pulsar）
+* Docker Compose
 * Elasticsearch(v8.12.1) + IK分词器插件
 
 ### 1.2 模块说明
@@ -467,130 +467,30 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.bulkIndex
 com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ```
 
-## 2. 启动服务（如Pulsar相关服务）
-### 2.1 Docker Compose启动中间件
-```yaml
-version: '3'
-networks:
-  pulsar:
-    driver: bridge
-services:
-  # Start zookeeper
-  zookeeper:
-    image: apachepulsar/pulsar:3.2.1
-    container_name: zookeeper
-    restart: on-failure
-    networks:
-      - pulsar
-    volumes:
-      - ./data/zookeeper:/pulsar/data/zookeeper
-    environment:
-      - metadataStoreUrl=zk:zookeeper:2181
-      - PULSAR_MEM=-Xms256m -Xmx256m -XX:MaxDirectMemorySize=256m
-    command: >
-      bash -c "bin/apply-config-from-env.py conf/zookeeper.conf && \
-             bin/generate-zookeeper-config.sh conf/zookeeper.conf && \
-             exec bin/pulsar zookeeper"
-    healthcheck:
-      test: ["CMD", "bin/pulsar-zookeeper-ruok.sh"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
+## 2. 启动服务
+### 2.1 启动Mysql和Elasticsearch
+在本示例中，MySQL和Elasticsearch分别独立部署
 
-  # Init cluster metadata
-  pulsar-init:
-    container_name: pulsar-init
-    hostname: pulsar-init
-    image: apachepulsar/pulsar:3.2.1
-    networks:
-      - pulsar
-    command: >
-      bin/pulsar initialize-cluster-metadata \
-               --cluster cluster-a \
-               --zookeeper zookeeper:2181 \
-               --configuration-store zookeeper:2181 \
-               --web-service-url http://broker:8080 \
-               --broker-service-url pulsar://broker:6650
-    depends_on:
-      zookeeper:
-        condition: service_healthy
+### 2.2 Docker Compose启动其他中间件（如：Pulsar、Redis-Stack等）
+docker compose的主文件为compose.yml
 
-  # Start bookie
-  bookie:
-    image: apachepulsar/pulsar:3.2.1
-    container_name: bookie
-    restart: on-failure
-    networks:
-      - pulsar
-    environment:
-      - clusterName=cluster-a
-      - zkServers=zookeeper:2181
-      - metadataServiceUri=metadata-store:zk:zookeeper:2181
-      # otherwise every time we run docker compose uo or down we fail to start due to Cookie
-      # See: https://github.com/apache/bookkeeper/blob/405e72acf42bb1104296447ea8840d805094c787/bookkeeper-server/src/main/java/org/apache/bookkeeper/bookie/Cookie.java#L57-68
-      - advertisedAddress=bookie
-      - BOOKIE_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-      pulsar-init:
-        condition: service_completed_successfully
-    # Map the local directory to the container to avoid bookie startup failure due to insufficient container disks.
-    volumes:
-      - ./data/bookkeeper:/pulsar/data/bookkeeper
-    command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf && exec bin/pulsar bookie"
-
-  # Start broker
-  broker:
-    image: apachepulsar/pulsar:3.2.1
-    container_name: broker
-    hostname: broker
-    restart: on-failure
-    networks:
-      - pulsar
-    environment:
-      - metadataStoreUrl=zk:zookeeper:2181
-      - zookeeperServers=zookeeper:2181
-      - clusterName=cluster-a
-      - managedLedgerDefaultEnsembleSize=1
-      - managedLedgerDefaultWriteQuorum=1
-      - managedLedgerDefaultAckQuorum=1
-      - advertisedAddress=broker
-      - advertisedListeners=external:pulsar://192.168.10.235:6650
-      - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
-    depends_on:
-      zookeeper:
-        condition: service_healthy
-      bookie:
-        condition: service_started
-    ports:
-      - "6650:6650"
-      - "8080:8080"
-    command: bash -c "bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker"
-  
-  # Start pulsar-manager
-  dashboard:
-    image: apachepulsar/pulsar-manager:v0.4.0
-    container_name: dashboard
-    hostname: dashboard
-    ports:
-      - "9527:9527"
-      - "7750:7750"
-    depends_on:
-      - broker
-    links:
-      - broker
-    environment:
-      SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties
-    networks:
-      - pulsar
-```
-> 注意：
-> * broker中的advertisedListeners指向客户端可访问的地址（如宿主机192.168.10.235）
-> * 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
-
+#### 2.2.1 宿主机上准备待挂载的目录并启动
+参考：
+* https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
+* https://redis.io/docs/install/install-stack/docker/
 ```shell
-# Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
+sudo mkdir -p ./data/zookeeper ./data/bookkeeper ./data/redis
+# this step might not be necessary on other than Linux platforms
+sudo chown 10000 -R data
+# 启动
+docker compose up -d
+# 停止
+#docker compose down
+```
+
+#### 2.2.2 为Pulsar Manager添加管理登录账号
+Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
+```shell
 docker exec -it <PulsarManager容器ID> /bin/bash
 
 CSRF_TOKEN=$(curl http://dashboard:7750/pulsar-manager/csrf-token)
@@ -606,7 +506,13 @@ curl \
 ```
 > 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
 
-### 2.2 如何访问
+### 2.3 启动Java应用
+```shell
+# 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
+java -jar --add-opens java.base/sun.net=ALL-UNNAMED xxx-app.jar
+```
+
+### 2.4 如何访问
 * Step1: 用户未登录，客户端请求获取授权码
 > 浏览器地址栏输入：  
 > http://127.0.0.1:8080/oauth2/authorize?client_id=oidc-client&response_type=code&scope=openid+profile+email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client

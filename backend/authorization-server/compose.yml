@@ -1,0 +1,9 @@
+version: '3.x'
+
+networks:
+  starry:
+    driver: bridge
+
+include:
+  - compose-pulsar.yml
+  - compose-redis.yml
