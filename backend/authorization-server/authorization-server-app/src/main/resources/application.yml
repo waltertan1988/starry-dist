@@ -1,4 +1,7 @@
 app:
+  # 中间件所在主机（仅用于集中管理本配置文件上下文的配置，非必须）
+  middleware-host: 192.168.10.235
+
   scheduling:
     clean-user-expired-sessions:
       cron: 0 0 3 * * ?
@@ -56,7 +59,7 @@ spring:
   data:
     # Redis
     redis:
-      host: localhost
+      host: ${app.middleware-host}
       port: 6379
       database: 0
       password: ''
@@ -71,9 +74,9 @@ spring:
   # Pulsar配置
   pulsar:
     client:
-      service-url: pulsar://192.168.10.235:6650
+      service-url: pulsar://${app.middleware-host}:6650
     admin:
-      service-url: http://192.168.10.235:8080
+      service-url: http://${app.middleware-host}:8080
 
   # ES
   elasticsearch:
