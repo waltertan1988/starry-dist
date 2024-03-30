@@ -488,9 +488,11 @@ docker compose up -d
 #docker compose down
 ```
 
-#### 2.2.2 为Pulsar Manager添加管理登录账号
-Pulsar启动完毕后，执行以下操作生成Pulsar Manager的登录账密：
+#### 2.2.2 Pulsar配置
+（1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
 ```shell
+# 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
+
 docker exec -it <PulsarManager容器ID> /bin/bash
 
 CSRF_TOKEN=$(curl http://dashboard:7750/pulsar-manager/csrf-token)
@@ -501,10 +503,12 @@ curl \
 -H 'Content-Type: application/json' \
 -X PUT http://dashboard:7750/pulsar-manager/users/superuser \
 -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
-
-# 注：登录账密设置的说明参看：https://github.com/apache/pulsar-manager
 ```
 > 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
+
+（2）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
+* 租户：${app.pulsar.base-reg.tenant}
+* 命名空间：${app.pulsar.base-reg.namespace}
 
 ### 2.3 启动Java应用
 ```shell
