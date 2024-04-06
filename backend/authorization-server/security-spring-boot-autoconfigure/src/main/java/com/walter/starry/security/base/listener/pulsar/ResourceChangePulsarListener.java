@@ -32,13 +32,17 @@ public class ResourceChangePulsarListener{
     public void listen(String message){
         log.info("Pulsar ResourceChangeMessage message: {}", message);
 
-        List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+        try{
+            List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
-        if(CollectionUtils.isEmpty(messageList)){
-            return;
+            if(CollectionUtils.isEmpty(messageList)){
+                return;
+            }
+
+            // 检查并尝试刷新本地缓存（资源与权限的关联关系）
+            resourceGroupService.tryRefreshLocalCaches(messageList);
+        }catch (Exception ex){
+            log.error("Pulsar ResourceChangeMessage fail", ex);
         }
-
-        // 检查并尝试刷新本地缓存（资源与权限的关联关系）
-        resourceGroupService.tryRefreshLocalCaches(messageList);
     }
 }

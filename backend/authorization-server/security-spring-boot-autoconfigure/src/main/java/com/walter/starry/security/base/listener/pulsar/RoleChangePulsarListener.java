@@ -32,13 +32,17 @@ public class RoleChangePulsarListener {
     public void listen(String message){
         log.info("Pulsar RoleChangeMessage message: {}", message);
 
-        List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+        try{
+            List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
-        if(CollectionUtils.isEmpty(messageList)){
-            return;
+            if(CollectionUtils.isEmpty(messageList)){
+                return;
+            }
+
+            // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
+            roleService.tryRefreshLocalCaches(messageList);
+        }catch (Exception ex){
+            log.error("Pulsar RoleChangeMessage fail", ex);
         }
-
-        // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
-        roleService.tryRefreshLocalCaches(messageList);
     }
 }
