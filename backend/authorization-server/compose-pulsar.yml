@@ -81,6 +81,8 @@ services:
       - managedLedgerDefaultEnsembleSize=1
       - managedLedgerDefaultWriteQuorum=1
       - managedLedgerDefaultAckQuorum=1
+      - subscriptionExpirationTimeMinutes=2
+      - subscriptionExpiryCheckIntervalInMinutes=1
       - advertisedAddress=broker
       # advertisedListeners指向客户端可访问的地址（如宿主机192.168.10.235）
       - advertisedListeners=external:pulsar://192.168.10.235:6650
