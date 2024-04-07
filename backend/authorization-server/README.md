@@ -483,9 +483,9 @@ sudo mkdir -p ./data/zookeeper ./data/bookkeeper ./data/redis
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 # 启动
-docker compose up -d
+sudo docker compose up -d
 # 停止
-#docker compose down
+#sudo docker compose down
 ```
 
 #### 2.2.2 Pulsar配置
