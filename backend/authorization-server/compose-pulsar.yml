@@ -7,7 +7,8 @@ services:
     container_name: zookeeper
     restart: on-failure
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.3.1
     volumes:
       - ./data/zookeeper:/pulsar/data/zookeeper
     environment:
@@ -29,7 +30,8 @@ services:
     hostname: pulsar-init
     image: apachepulsar/pulsar:3.2.1
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.3.2
     command: >
       bin/pulsar initialize-cluster-metadata \
                --cluster cluster-a \
@@ -47,7 +49,8 @@ services:
     container_name: bookie
     restart: on-failure
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.3.3
     environment:
       - clusterName=cluster-a
       - zkServers=zookeeper:2181
@@ -73,7 +76,8 @@ services:
     hostname: broker
     restart: on-failure
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.3.4
     environment:
       - metadataStoreUrl=zk:zookeeper:2181
       - zookeeperServers=zookeeper:2181
@@ -98,10 +102,10 @@ services:
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker"
 
   # Start pulsar-manager
-  dashboard:
+  pulsar-manager:
     image: apachepulsar/pulsar-manager:v0.4.0
-    container_name: dashboard
-    hostname: dashboard
+    container_name: pulsar-manager
+    hostname: pulsar-manager
     ports:
       - "9527:9527"
       - "7750:7750"
@@ -112,4 +116,5 @@ services:
     environment:
       SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.3.5

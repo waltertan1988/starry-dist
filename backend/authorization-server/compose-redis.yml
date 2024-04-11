@@ -11,4 +11,5 @@ services:
     volumes:
       - ./data/redis:/data
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.2.1

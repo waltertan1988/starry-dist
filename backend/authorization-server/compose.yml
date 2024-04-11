@@ -3,7 +3,16 @@ version: '3.x'
 networks:
   starry:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
 
 include:
-  - compose-pulsar.yml
+    # mysql子网网段：172.18.1.0/24
+#  - compose-mysql.yml
+    # redis子网网段：172.18.2.0/24
   - compose-redis.yml
+    # pulsar子网网段：172.18.3.0/24
+  - compose-pulsar.yml
