@@ -479,7 +479,7 @@ docker compose的主文件为compose.yml
 * https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
 * https://redis.io/docs/install/install-stack/docker/
 ```shell
-sudo mkdir -p ./data/zookeeper ./data/bookkeeper ./data/redis
+sudo mkdir -p ./data/zookeeper ./data/bookkeeper ./data/redis ./data/mysql/master/conf.d
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 # 启动

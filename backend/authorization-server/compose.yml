@@ -11,7 +11,7 @@ networks:
 
 include:
     # mysql子网网段：172.18.1.0/24
-#  - compose-mysql.yml
+  - compose-mysql.yml
     # redis子网网段：172.18.2.0/24
   - compose-redis.yml
     # pulsar子网网段：172.18.3.0/24

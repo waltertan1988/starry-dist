@@ -12,8 +12,10 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./data/redis:/data
+      - ./data/mysql/master/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/master/datadir:/var/lib/mysql
     networks:
-      - starry
+      starry:
+        ipv4_address: 172.18.1.1
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
