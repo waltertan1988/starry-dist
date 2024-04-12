@@ -43,7 +43,7 @@ spring:
   datasource:
     username: root
     password: ''
-    url: jdbc:mysql://localhost/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
     hikari:
       minimum-idle: 50
       maximum-pool-size: 150
