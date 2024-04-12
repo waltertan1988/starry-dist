@@ -4,10 +4,10 @@
 ## 1. 开始使用
 ### 1.1 依赖中间件
 #### 必须中间件
-* JDK21
-* MySql
-* Redis
-* Pulsar
+* JDK 21
+* MySql 8.0.36
+* Redis 7.2.0-v9
+* Pulsar 3.2.1
 #### 可选中间件
 * Docker Compose
 * Elasticsearch(v8.12.1) + IK分词器插件
@@ -40,9 +40,9 @@ CREATE TABLE `users` (
     `credentials_expired` BIT(1) NOT NULL COMMENT '密码是否已过期',
     `oidc_registration_id` varchar(255) DEFAULT NULL COMMENT 'OAuth2授权服务器的在本应用内的OIDC注册ID',
     `open_id` varchar(128) DEFAULT NULL COMMENT '用户在OAuth2授权服务器中的开放账号',
-    `expired_sessions_clean_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '清理失效会话集时间',
-    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `expired_sessions_clean_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '清理失效会话集时间',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_username`(`username`),
     KEY `idx_oidcRegistrationId_openId` (`oidc_registration_id`,`open_id`),
     KEY `idx_expiredSessionsCleanTime` (`expired_sessions_clean_time`)
@@ -52,8 +52,8 @@ CREATE TABLE `authorities` (
    `id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',
    `username` varchar(128) NOT NULL COMMENT '账号，关联users.username',
    `authority` varchar(128) NOT NULL COMMENT '权限项编码值，关联authority_item.code',
-   `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+   `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
    UNIQUE KEY `ix_auth_username` (`username`,`authority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '用户权限配置表';
 
@@ -65,8 +65,8 @@ CREATE TABLE `resource_group` (
     `seq` BIGINT(20) NOT NULL DEFAULT 1000 COMMENT '顺序，数值越小越靠前',
     `parent_group_code` VARCHAR(128) NOT NULL COMMENT '上一层级分组的编码值，关联resource_group.code',
     `config` VARCHAR(1024) DEFAULT NULL COMMENT 'JSON配置',
-    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_code` (`code`),
     KEY `idx_type` (`type`),
     KEY `idx_parentGroupCode` (`parent_group_code`)
@@ -81,8 +81,8 @@ CREATE TABLE `resource_item` (
     `seq` BIGINT(20) NOT NULL DEFAULT 1000 COMMENT '顺序，数值越小越靠前',
     `parent_group_code` VARCHAR(128) NOT NULL COMMENT '所在资源分组的编码值，关联resource_group.code',
     `config` VARCHAR(1024) DEFAULT NULL COMMENT 'JSON配置',
-    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_code` (`code`),
     UNIQUE KEY `uk_pattern` (`pattern`),
     KEY `idx_parentGroupCode` (`parent_group_code`)
@@ -95,8 +95,8 @@ CREATE TABLE `authority_item` (
     `parent_code` VARCHAR(128) NULL COMMENT '上一层级权限的编码值，关联authority_item.code',
     `priority` INT NOT NULL DEFAULT 1000 COMMENT '优先级，数值越小，优先级越高',
     `system_authority` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否为系统权限（即无法修改）。0-否，1-是',
-    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_code` (`code`),
     KEY `idx_parentCode` (`parent_code`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='权限项配置表';
@@ -105,8 +105,8 @@ CREATE TABLE `authority_resource` (
     `id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',
     `resource_item_code` VARCHAR(128) NOT NULL COMMENT '资源项编码，关联resource_item.code',
     `authority_item_code` VARCHAR(128) NOT NULL COMMENT '权限项编码，关联authority_item.code',
-    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `idx_resourceItemCode_authorityItemCode` (`resource_item_code`,`authority_item_code`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='权限资源项关联表';
 ```
