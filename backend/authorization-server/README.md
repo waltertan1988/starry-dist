@@ -469,9 +469,9 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 
 ## 2. 启动服务
 ### 2.1 启动Mysql和Elasticsearch
-在本示例中，MySQL和Elasticsearch分别独立部署
+在本示例中，Elasticsearch分别独立部署
 
-### 2.2 Docker Compose启动其他中间件（如：Pulsar、Redis-Stack等）
+### 2.2 Docker Compose启动其他中间件（如：MySQL、Redis-Stack、Pulsar等）
 docker compose的主文件为compose.yml
 
 #### 2.2.1 宿主机上准备待挂载的目录并启动
