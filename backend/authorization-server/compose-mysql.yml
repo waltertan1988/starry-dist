@@ -19,3 +19,22 @@ services:
         ipv4_address: 172.18.1.1
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
+
+  mysql-slave1:
+    image: mysql:8.0.36
+    container_name: mysql-slave1
+    hostname: mysql-slave1
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data/mysql/slave1/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/slave1/datadir:/var/lib/mysql
+    networks:
+      starry:
+        ipv4_address: 172.18.1.2
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    depends_on:
+      - mysql-master
