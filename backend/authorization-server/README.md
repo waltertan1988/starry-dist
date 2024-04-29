@@ -517,6 +517,29 @@ curl \
 * 租户：${app.pulsar.base-reg.tenant}
 * 命名空间：${app.pulsar.base-reg.namespace}
 
+#### 2.2.3 配置MYSQL
+MYSQL主服务配置文件：
+cat ./data/mysql/master/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=1
+port=3306
+
+sync_binlog=1
+innodb_flush_log_at_trx_commit=1
+```
+
+MYSQL从服务配置文件：
+cat ./data/mysql/slave1/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=2
+port=3306
+
+sync_binlog=1
+innodb_flush_log_at_trx_commit=1
+```
+
 ### 2.3 启动Java应用
 ```shell
 # 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
