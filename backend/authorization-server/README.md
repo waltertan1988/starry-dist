@@ -541,8 +541,8 @@ innodb_flush_log_at_trx_commit=1
 ```
 > 注：关于搭建MYSQL主从环境：   
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
->（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
+>（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
+>（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
 
 ### 2.3 启动Java应用
 ```shell
