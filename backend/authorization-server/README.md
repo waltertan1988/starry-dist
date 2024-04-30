@@ -527,6 +527,11 @@ port=3306
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
+
+rpl_semi_sync_source_enabled=1
+rpl_semi_sync_replica_enabled=1
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
 ```
 
 MYSQL从服务配置文件：
@@ -538,6 +543,11 @@ port=3306
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
+
+rpl_semi_sync_source_enabled=1
+rpl_semi_sync_replica_enabled=1
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
 ```
 > 注：关于搭建MYSQL主从环境：   
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
