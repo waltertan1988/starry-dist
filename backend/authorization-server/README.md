@@ -527,6 +527,7 @@ port=3306
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
+binlog_format=ROW
 
 rpl_semi_sync_source_enabled=1
 rpl_semi_sync_replica_enabled=1
@@ -543,6 +544,7 @@ port=3306
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
+binlog_format=ROW
 
 rpl_semi_sync_source_enabled=1
 rpl_semi_sync_replica_enabled=1
