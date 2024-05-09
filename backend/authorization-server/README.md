@@ -475,12 +475,9 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ### 2.2 Docker Compose启动其他中间件（如：MySQL、Redis-Stack、Pulsar等）
 docker compose的主文件为compose.yml
 
-#### 2.2.1 宿主机上准备待挂载的目录并启动
-参考：
-* https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
-* https://redis.io/docs/install/install-stack/docker/
+#### 2.2.1 宿主机上准备待挂载的目录
 ```shell
-# Pulsar相关目录
+# Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
 # Reids相关目录
 sudo mkdir -p ./data/redis
@@ -489,35 +486,9 @@ sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
-# 启动
-sudo docker compose up -d
-# 停止
-#sudo docker compose down
 ```
 
-#### 2.2.2 Pulsar配置
-（1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
-```shell
-# 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
-
-docker exec -it <PulsarManager容器ID> /bin/bash
-
-CSRF_TOKEN=$(curl http://pulsar-manager:7750/pulsar-manager/csrf-token)
-
-curl \
--H "X-XSRF-TOKEN: $CSRF_TOKEN" \
--H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
--H 'Content-Type: application/json' \
--X PUT http://pulsar-manager:7750/pulsar-manager/users/superuser \
--d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
-```
-> 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
-
-（2）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
-* 租户：${app.pulsar.base-reg.tenant}
-* 命名空间：${app.pulsar.base-reg.namespace}
-
-#### 2.2.3 配置MYSQL
+#### 2.2.2 配置MYSQL
 MYSQL主服务配置文件：
 cat ./data/mysql/master/conf.d/config-file.cnf
 ```
@@ -554,7 +525,41 @@ replication_optimize_for_static_plugin_config=1
 > 注：关于搭建MYSQL主从环境：   
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
 >（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
+>（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
+
+
+#### 2.2.3 启动中间件服务
+参考：
+* https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
+* https://redis.io/docs/install/install-stack/docker/
+```shell
+# 启动
+sudo docker compose up -d
+# 停止
+#sudo docker compose down
+```
+
+#### 2.2.4 Pulsar配置
+（1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
+```shell
+# 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
+
+docker exec -it <PulsarManager容器ID> /bin/bash
+
+CSRF_TOKEN=$(curl http://pulsar-manager:7750/pulsar-manager/csrf-token)
+
+curl \
+-H "X-XSRF-TOKEN: $CSRF_TOKEN" \
+-H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
+-H 'Content-Type: application/json' \
+-X PUT http://pulsar-manager:7750/pulsar-manager/users/superuser \
+-d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
+```
+> 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
+
+（2）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
+* 租户：${app.pulsar.base-reg.tenant}
+* 命名空间：${app.pulsar.base-reg.namespace}
 
 ### 2.3 启动Java应用
 ```shell

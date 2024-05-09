@@ -23,6 +23,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
 
   # Init cluster metadata
   pulsar-init:
@@ -42,6 +46,10 @@ services:
     depends_on:
       zookeeper:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
 
   # Start bookie
   bookie:
@@ -68,6 +76,10 @@ services:
     volumes:
       - ./data/bookkeeper:/pulsar/data/bookkeeper
     command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf && exec bin/pulsar bookie"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
 
   # Start broker
   broker:
@@ -100,6 +112,10 @@ services:
       - "6650:6650"
       - "8080:8080"
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
 
   # Start pulsar-manager
   pulsar-manager:
@@ -118,3 +134,7 @@ services:
     networks:
       starry:
         ipv4_address: 172.18.3.5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'

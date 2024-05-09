@@ -13,3 +13,7 @@ services:
     networks:
       starry:
         ipv4_address: 172.18.2.1
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'

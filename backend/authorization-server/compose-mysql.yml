@@ -19,6 +19,10 @@ services:
         ipv4_address: 172.18.1.1
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
 
   mysql-slave1:
     image: mysql:8.0.36
@@ -38,3 +42,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
     depends_on:
       - mysql-master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
