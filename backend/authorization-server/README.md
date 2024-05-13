@@ -500,10 +500,16 @@ sync_binlog=1
 innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
 
+# 配置半同步复制
 #rpl_semi_sync_source_enabled=1
 #rpl_semi_sync_replica_enabled=1
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
 ```
 
 MYSQL从服务配置文件：
@@ -517,10 +523,16 @@ sync_binlog=1
 innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
 
+# 配置半同步复制
 #rpl_semi_sync_source_enabled=1
 #rpl_semi_sync_replica_enabled=1
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
 ```
 #### 2.2.3 配置主从异步复制的步骤：
 ```text
@@ -547,6 +559,7 @@ replication_optimize_for_static_plugin_config=1
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
 >（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
 >（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
+>（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
 
 #### 2.2.4 启动中间件服务
 参考：
