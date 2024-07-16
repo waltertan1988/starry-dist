@@ -26,7 +26,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ## 项目说明 
 基于Vue3和Element Plus研发的后台管理系统
 
-### 目录结构说明 
+### 1. 目录结构说明 
 * public  
 第三方默认的资源(css、图片等)
 * src  
@@ -49,7 +49,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 * vue.config.js  
 配置与后端交互的跨域代理
 
-### 自定义组件 
+### 2. 自定义组件 
 基于Element Plus的常用组件进行系统级整合
 
 #### 全局布局组件：components/AdminLayout.vue 
@@ -64,7 +64,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 #### 图标选择器组件：components/IconSelector.vue 
 支持快速选择图标
 
-### 自定义指令 
+### 3. 自定义指令 
 #### v-hasAllFunctions与v-hasAnyFunctions，判断当前用户是否拥有指定的权限功能 
 ```html
 <!--是否同时拥有admin_menu_operation与admin_menutree_load_for_all_user这两种功能权限-->
@@ -78,3 +78,32 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 </div>
 ```
 > 建议同时加入v-show="false"，让页面在初始渲染时不显示html标签
+
+### 4. 生产环境部署（使用Nginx作为反向代理）
+* 执行以下命令，将会在本工程内生成名为“dist”的目录
+```shell
+npm run build
+```
+* 把整个dist目录拷贝到nginx的主目录下
+* 修改nginx主目录下的配置文件conf/nginx.conf，配置以下内容：
+```text
+server {
+    listen       80;
+    server_name  localhost;
+    
+    location / {
+        # 配置nginx指向的根目录为dist
+        root   dist;
+        index  index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # 配置反向代理
+    location /api/auth/ {
+        proxy_pass  http://localhost:8080/;
+    }
+}
+```
+* 启动nginx
+* 访问http://localhost/login进行登录
+
