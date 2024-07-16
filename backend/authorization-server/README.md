@@ -591,6 +591,10 @@ curl \
 > 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
 
 （2）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
+* 创建环境
+> Environment Name：dev  
+> Service URL：http://10.12.73.41:8080  
+> Bookie URL：http://10.12.73.41:6650  
 * 租户：${app.pulsar.base-reg.tenant}
 * 命名空间：${app.pulsar.base-reg.namespace}
 
