@@ -44,7 +44,7 @@
     <div>
       <el-table ref="tableRef" :data="functionDataListRef" :row-key="getTableRowKey" :tree-props="{children: 'resourceGroupVoList'}"
                 border highlight-current-row v-loading="functionDataLoadingRef" @row-click="onRowClick">
-        <el-table-column label="功能行名称" width="300" fixed>
+        <el-table-column label="功能行名称" fixed>
           <template #default="scope">
             <el-icon :size="15" v-if="scope.row.config && scope.row.config.icon" style="margin-right: 5px;">
               <component :is="scope.row.config.icon"></component>

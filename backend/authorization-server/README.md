@@ -561,7 +561,16 @@ enforce-gtid-consistency=ON
 >（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
 >（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
 
-#### 2.2.4 启动中间件服务
+#### 2.2.4 按需修改以下中间件配置（假设中间件的宿主机IP是192.168.10.131）
+* compose-pulsar.yml
+```yaml
+services: 
+  broker: 
+    environment: 
+      - advertisedListeners=external:pulsar://192.168.10.131:6650
+```
+
+#### 2.2.5 启动中间件服务
 参考：
 * https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
 * https://redis.io/docs/install/install-stack/docker/
@@ -572,7 +581,7 @@ sudo docker compose up -d
 #sudo docker compose down
 ```
 
-#### 2.2.5 Pulsar配置
+#### 2.2.6 Pulsar配置
 （1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
 ```shell
 # 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
@@ -588,17 +597,32 @@ curl \
 -X PUT http://pulsar-manager:7750/pulsar-manager/users/superuser \
 -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
 ```
-> 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
 
-（2）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
+（2） 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
+
+（3）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
 * 创建环境
 > Environment Name：dev  
-> Service URL：http://10.12.73.41:8080  
-> Bookie URL：http://10.12.73.41:6650  
-* 租户：${app.pulsar.base-reg.tenant}
-* 命名空间：${app.pulsar.base-reg.namespace}
+> Service URL：http://192.168.10.131:8080  
+> Bookie URL：http://192.168.10.131:6650  
+> 租户：${app.pulsar.base-reg.tenant}
+> 命名空间：${app.pulsar.base-reg.namespace}
 
 ### 2.3 启动Java应用
+#### 2.3.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
+* application.yml
+```yaml
+app:
+  middleware-host: 192.168.10.131
+```
+
+* redisson.yml
+```yaml
+singleServerConfig:
+  address: "redis://192.168.10.131:6379"
+```
+
+#### 2.3.2 启动springboot应用时，添加以下vm参数
 ```shell
 # 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 java -jar --add-opens java.base/sun.net=ALL-UNNAMED xxx-app.jar

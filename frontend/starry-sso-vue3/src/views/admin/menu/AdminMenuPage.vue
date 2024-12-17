@@ -44,10 +44,10 @@
     <div>
       <el-table ref="tableRef" :data="menuDataListRef" :row-key="getTableRowKey" :tree-props="{children: 'resourceGroupVoList'}"
                 border highlight-current-row v-loading="menuDataLoadingRef" @row-click="onRowClick">
-        <el-table-column prop="name" label="菜单行名称" width="200" fixed/>
+        <el-table-column prop="name" label="菜单行名称" fixed/>
         <el-table-column prop="code" label="菜单行编码" width="250" fixed/>
         <el-table-column prop="seq" label="顺序" width="65"/>
-        <el-table-column prop="rowType" label="菜单路径" :formatter="(row, column, cellValue) => cellValue === 1 ? null : row.pattern" width="200"/>
+        <el-table-column prop="rowType" label="菜单路径" :formatter="(row, column, cellValue) => cellValue === 1 ? null : row.pattern" width="300"/>
         <el-table-column prop="createTime" label="创建时间" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)" width="160"/>
         <el-table-column prop="updateTime" label="修改时间" :formatter="(row, column, cellValue) => DateUtil.dateToString(cellValue)" width="160"/>
         <el-table-column label="操作" width="75" fixed="right">
