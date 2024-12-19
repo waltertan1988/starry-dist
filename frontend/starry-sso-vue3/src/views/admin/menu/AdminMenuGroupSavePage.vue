@@ -37,7 +37,7 @@
       <el-col :offset="4" :span="4">
         <el-text tag="b">图标：</el-text>
       </el-col>
-      <el-col :span="1">
+      <el-col :span="12">
         <IconSelector :icon-key="ruleForm.config.icon" @onSelected="iconKey => ruleForm.config.icon = iconKey"></IconSelector>
       </el-col>
     </el-row>
