@@ -57,7 +57,7 @@
       <el-col :offset="3" :span="5">
         <el-text tag="b">上级菜单组编码：</el-text>
       </el-col>
-      <el-col :span="1">
+      <el-col :span="12" style="text-align: left;">
         <template v-if="componentParamRef.opType === 'createGroup'">{{selectedRowRef.code}}</template>
         <template v-else>{{selectedRowRef.parentGroupCode}}</template>
       </el-col>

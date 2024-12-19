@@ -48,7 +48,7 @@
       <el-col :offset="4" :span="4">
         <el-text tag="b">图标：</el-text>
       </el-col>
-      <el-col :span="1">
+      <el-col :span="12">
         <IconSelector :icon-key="ruleForm.config.icon" @onSelected="iconKey => ruleForm.config.icon = iconKey"></IconSelector>
       </el-col>
     </el-row>
@@ -58,7 +58,7 @@
       <el-col :offset="3" :span="5">
         <el-text tag="b">所属菜单组编码：</el-text>
       </el-col>
-      <el-col :span="1">
+      <el-col :span="12" style="text-align: left;">
         <template v-if="componentParamRef.opType === 'createItem'">{{selectedRowRef.code}}</template>
         <template v-else>{{selectedRowRef.parentGroupCode}}</template>
       </el-col>

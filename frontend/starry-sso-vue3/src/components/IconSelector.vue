@@ -4,15 +4,21 @@
       <div>
         <div style="cursor: pointer;" v-if="selectedIconKeyRef">
           <el-row>
-            <el-col :span="1">
+            <el-col :span="3">
               <el-icon size="20">
                 <component :is="selectedIconKeyRef"></component>
               </el-icon>
             </el-col>
-            <el-col :push="22" :span="1">{{selectedIconKeyRef}}</el-col>
+            <el-col :span="12" style="text-align: left">{{selectedIconKeyRef}}</el-col>
           </el-row>
         </div>
-        <el-button type="primary" size="small" plain v-else>选择</el-button>
+        <div v-else>
+          <el-row>
+            <el-col :span="3">
+              <el-button type="primary" size="small" plain >选择</el-button>
+            </el-col>
+          </el-row>
+        </div>
       </div>
     </template>
     <template #default>
