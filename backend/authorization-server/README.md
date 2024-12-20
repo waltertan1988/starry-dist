@@ -524,8 +524,8 @@ innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
 
 # 配置半同步复制
-#rpl_semi_sync_source_enabled=1
-#rpl_semi_sync_replica_enabled=1
+rpl_semi_sync_source_enabled=1
+rpl_semi_sync_replica_enabled=1
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
 
