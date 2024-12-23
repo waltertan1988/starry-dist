@@ -131,7 +131,6 @@ function save(){
     return
   }
 
-  // TODO 不知为何这里会报错：children must be keyed
   ruleFormRef.value.validate(valid => {
     if (valid) {
       const config = {
