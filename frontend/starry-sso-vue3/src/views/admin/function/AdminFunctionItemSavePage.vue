@@ -40,7 +40,7 @@
       <el-col :span="9">
         <el-form-item prop="httpMethodList">
           <el-checkbox-group v-model="ruleForm.httpMethodList" size="small">
-            <el-checkbox-button v-for="httpMethod in allHttpMethodList" :key="httpMethod" :label="httpMethod">
+            <el-checkbox-button v-for="httpMethod in allHttpMethodList" :key="httpMethod" :value="httpMethod">
               {{ httpMethod }}
             </el-checkbox-button>
           </el-checkbox-group>
