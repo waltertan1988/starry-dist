@@ -4,7 +4,9 @@
             <div class="logo">
               <img src="../assets/star.svg" width="30" height="30">
               <span v-show="!isMemuCollapseRef" style="font-weight: bold; margin-left: 5px;">{{vueAppLoginPageTitleRef}}</span>
-              <el-icon style="margin-left: 5px;" @click="isMemuCollapseRef = !isMemuCollapseRef"><Fold v-if="!isMemuCollapseRef"/><Expand v-else/></el-icon>
+              <el-icon style="margin-left: 5px; cursor: pointer;" @click="toggleMenuCollapse">
+                <Fold v-if="!isMemuCollapseRef"/><Expand v-else/>
+              </el-icon>
             </div>
             <div class="toolbar">
                 <div v-if="userPrincipal.nickname">
@@ -134,7 +136,7 @@
     })
 
     // 左侧菜单是否折叠
-    const isMemuCollapseRef = ref(false)
+    const isMemuCollapseRef = ref(sessionStorage.getItem(SessionStorage.KEYS.PRINCIPAL.IS_MENU_TREE_COLLAPSE) === "true")
     // 菜单树
     const menuTreeList = ref([])
     // 菜单树中默认打开的子菜单组
@@ -160,6 +162,12 @@
                 }
             )
         }
+    }
+
+    /** 切换左侧菜单的折叠/展开效果 */
+    function toggleMenuCollapse(){
+      isMemuCollapseRef.value = !isMemuCollapseRef.value
+      sessionStorage.setItem(SessionStorage.KEYS.PRINCIPAL.IS_MENU_TREE_COLLAPSE, isMemuCollapseRef.value)
     }
 
     /**
