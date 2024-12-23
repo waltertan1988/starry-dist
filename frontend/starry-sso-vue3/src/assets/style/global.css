@@ -1,7 +1,8 @@
 @charset "UTF-8";
 :root{
     --starry-header-height: 30px;
-    --starry-aside-width: 200px;
+    --starry-aside-expend-width: 200px;
+    --starry-aside-fold-width: 65px;
     --starry-main-height: calc(100vh - var(--starry-header-height) - var(--starry-footer-height));
     --starry-footer-height: 25px;
 }

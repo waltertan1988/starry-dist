@@ -2,7 +2,9 @@
     <el-container id="starryContainer">
         <el-header id="starryHeader">
             <div class="logo">
-              <span style="font-weight: bold">{{vueAppLoginPageTitleRef}}</span>
+              <img src="../assets/star.svg" width="30" height="30">
+              <span v-show="!isMemuCollapseRef" style="font-weight: bold; margin-left: 5px;">{{vueAppLoginPageTitleRef}}</span>
+              <el-icon style="margin-left: 5px;" @click="isMemuCollapseRef = !isMemuCollapseRef"><Fold v-if="!isMemuCollapseRef"/><Expand v-else/></el-icon>
             </div>
             <div class="toolbar">
                 <div v-if="userPrincipal.nickname">
@@ -24,9 +26,9 @@
 
         <el-main id="starryMain">
             <el-container>
-                <el-aside id="starryAside">
+                <el-aside id="starryAside" :class="[isMemuCollapseRef ? 'fold' : 'expand']">
                     <el-scrollbar>
-                        <el-menu :router="true" :default-active="$route.path" :default-openeds="menuGroupDefaultOpeneds" :key="elMenuKeyRef">
+                        <el-menu :collapse="isMemuCollapseRef" :router="true" :default-active="$route.path" :default-openeds="menuGroupDefaultOpeneds" :key="elMenuKeyRef">
                             <MenuGroup :menu-list="menuTreeList"></MenuGroup>
                         </el-menu>
                     </el-scrollbar>
@@ -111,7 +113,7 @@
     import Principal from "../util/principal";
     import Login from "../util/login";
     import SessionStorage from "../util/sessionStorage";
-    import {Expand, Setting} from "@element-plus/icons-vue";
+    import {Expand, Fold, Setting} from "@element-plus/icons-vue";
     import {useStore} from "vuex";
 
     const store = useStore()
@@ -131,6 +133,8 @@
         nickname: Cookie.get(Cookie.KEYS.PRINCIPAL.NICKNAME)
     })
 
+    // 左侧菜单是否折叠
+    const isMemuCollapseRef = ref(false)
     // 菜单树
     const menuTreeList = ref([])
     // 菜单树中默认打开的子菜单组
@@ -374,9 +378,16 @@
     }
 
     #starryAside {
-        width: var(--starry-aside-width);
         color: var(--el-text-color-primary);
         background: var(--el-color-primary-light-8);
+    }
+
+    #starryAside.expand{
+      width: var(--starry-aside-expend-width);
+    }
+
+    #starryAside.fold{
+      width: var(--starry-aside-fold-width);
     }
 
     #starryAside .el-scrollbar {
