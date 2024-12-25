@@ -28,7 +28,7 @@
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="com.walter.domain.mbg" targetProject="src/main/resources">
+        <sqlMapGenerator targetPackage="com.walter.starry.security.base.mapper" targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
@@ -36,7 +36,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="authorities" domainObjectName="Authority">
+        <table tableName="users" domainObjectName="AclUser2">
 <!--            <generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
         </table>
     </context>

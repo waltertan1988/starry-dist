@@ -131,3 +131,6 @@ spring:
   # 优雅停机的宽限期
   lifecycle:
     timeout-per-shutdown-phase: 120s
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
