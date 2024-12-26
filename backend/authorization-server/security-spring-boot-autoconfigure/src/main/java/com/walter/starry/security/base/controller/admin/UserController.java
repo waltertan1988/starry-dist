@@ -7,7 +7,6 @@ import com.walter.starry.security.base.common.enums.SystemRoleEnum;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
 import com.walter.starry.security.base.controller.AbstractBaseController;
 import com.walter.starry.security.base.entity.AclAuthority;
-import com.walter.starry.security.base.entity.AclUser;
 import com.walter.starry.security.base.entity.AclUser2;
 import com.walter.starry.security.base.entity.AclUser2Example;
 import com.walter.starry.security.base.mapper.AclUser2Mapper;
@@ -44,8 +43,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin/user")
 public class UserController extends AbstractBaseController {
-    @Autowired
-    private AclUserRepository aclUserRepository;
     @Autowired
     private AclUser2Mapper aclUserMapper;
     @Autowired
@@ -114,14 +111,13 @@ public class UserController extends AbstractBaseController {
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{
                 // 修改
-                AclUser example = new AclUser();
-                example.setUsername(req.getUsername());
-                Optional<AclUser> userOptional = aclUserRepository.findOne(Example.of(example));
-                userOptional.ifPresent(user -> {
-                    user.setNickname(req.getNickname());
-                    user.setEnabled(req.getEnabled());
-                    aclUserRepository.save(user);
-                });
+                AclUser2Example example = new AclUser2Example();
+                example.createCriteria().andUsernameEqualTo(req.getUsername());
+
+                AclUser2 update = new AclUser2();
+                update.setNickname(req.getNickname());
+                update.setEnabled(req.getEnabled());
+                aclUserMapper.updateByExampleSelective(update, example);
             }
 
             return null;
