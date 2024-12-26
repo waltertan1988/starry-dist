@@ -626,7 +626,7 @@ singleServerConfig:
 #### 2.3.2 启动springboot应用时，添加以下vm参数
 ```shell
 # 在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
-java -jar --add-opens java.base/sun.net=ALL-UNNAMED xxx-app.jar
+java --add-opens java.base/sun.net=ALL-UNNAMED -jar xxx-app.jar
 ```
 
 ### 2.4 如何访问

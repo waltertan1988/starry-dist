@@ -11,7 +11,6 @@ import com.walter.starry.security.base.entity.AclUser2;
 import com.walter.starry.security.base.entity.AclUser2Example;
 import com.walter.starry.security.base.mapper.AclUser2Mapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
-import com.walter.starry.security.base.repository.AclUserRepository;
 import com.walter.starry.security.base.service.AuthorityItemService;
 import com.walter.starry.security.base.util.IdUtil;
 import com.walter.starry.security.base.vo.request.user.*;
