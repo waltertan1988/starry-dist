@@ -1,27 +1,31 @@
 package com.walter.starry.security.base.controller.admin;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.walter.starry.security.base.bo.AclUserBo;
 import com.walter.starry.security.base.common.enums.SystemRoleEnum;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
 import com.walter.starry.security.base.controller.AbstractBaseController;
 import com.walter.starry.security.base.entity.AclAuthority;
 import com.walter.starry.security.base.entity.AclUser;
+import com.walter.starry.security.base.entity.AclUser2;
+import com.walter.starry.security.base.entity.AclUser2Example;
+import com.walter.starry.security.base.mapper.AclUser2Mapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.repository.AclUserRepository;
 import com.walter.starry.security.base.service.AuthorityItemService;
 import com.walter.starry.security.base.util.IdUtil;
 import com.walter.starry.security.base.vo.request.user.*;
 import com.walter.starry.security.base.vo.response.ApiResponse;
+import com.walter.starry.security.base.vo.response.base.PageVo;
 import com.walter.starry.security.base.vo.response.user.UserAvailableAuthorityResponse;
 import com.walter.starry.security.base.vo.response.user.UserResponse;
 import com.walter.starry.security.base.vo.response.user.UserSessionResponse;
-import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Example;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
@@ -43,6 +47,8 @@ public class UserController extends AbstractBaseController {
     @Autowired
     private AclUserRepository aclUserRepository;
     @Autowired
+    private AclUser2Mapper aclUserMapper;
+    @Autowired
     private AclAuthorityRepository aclAuthorityRepository;
     @Autowired
     private JpaUserDetailsService jpaUserDetailsService;
@@ -55,31 +61,30 @@ public class UserController extends AbstractBaseController {
      * @return
      */
     @PostMapping("/list")
-    public ApiResponse<Page<UserResponse>> list(@RequestBody ListUserRequest req){
-        Specification<AclUser> spec = (root, query, builder) -> {
-            List<Predicate> andPredicates = new ArrayList<>();
-            if(StringUtils.isNotBlank(req.getUsername())){
-                andPredicates.add(builder.equal(root.get("username"), req.getUsername()));
-            }
-            if(StringUtils.isNotBlank(req.getNickname())){
-                andPredicates.add(builder.like(root.get("nickname"), "%" + req.getNickname() + "%"));
-            }
-            if(Objects.nonNull(req.getEnabled())){
-                andPredicates.add(builder.equal(root.get("enabled"), req.getEnabled()));
-            }
-            if(Objects.nonNull(req.getCreateTimeBegin())){
-                andPredicates.add(builder.greaterThanOrEqualTo(root.get("createTime"), req.getCreateTimeBegin()));
-            }
-            if(Objects.nonNull(req.getCreateTimeEnd())){
-                andPredicates.add(builder.lessThanOrEqualTo(root.get("createTime"), req.getCreateTimeEnd()));
-            }
-            return builder.and(andPredicates.toArray(new Predicate[0]));
-        };
+    public ApiResponse<PageVo<UserResponse>> list(@RequestBody ListUserRequest req){
+        PageHelper.startPage(req.getPageNumber() + 1, req.getPageSize());
 
-        Pageable pageable = PageRequest.of(req.getPageNumber(), req.getPageSize(), Sort.by("createTime").descending().and(Sort.by("username")));
-        Page<AclUser> page = aclUserRepository.findAll(spec, pageable);
+        AclUser2Example example = new AclUser2Example();
+        AclUser2Example.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(req.getUsername())){
+            criteria.andUsernameEqualTo(req.getUsername());
+        }
+        if(StringUtils.isNotBlank(req.getNickname())){
+            criteria.andNicknameLike(req.getNickname());
+        }
+        if(Objects.nonNull(req.getEnabled())){
+            criteria.andEnabledEqualTo(req.getEnabled());
+        }
+        if(Objects.nonNull(req.getCreateTimeBegin())){
+            criteria.andCreateTimeGreaterThanOrEqualTo(req.getCreateTimeBegin());
+        }
+        if(Objects.nonNull(req.getCreateTimeEnd())){
+            criteria.andCreateTimeLessThanOrEqualTo(req.getCreateTimeEnd());
+        }
+        example.setOrderByClause("create_time desc, username");
+        PageInfo<AclUser2> page = new PageInfo<>(aclUserMapper.selectByExample(example));
 
-        List<UserResponse> list = page.getContent().stream().map(u -> {
+        List<UserResponse> list = page.getList().stream().map(u -> {
             UserResponse userResponse = new UserResponse();
             BeanUtils.copyProperties(u, userResponse);
             userResponse.setExpiredSessionsCleanTime(u.getExpiredSessionsCleanTime().getTime());
@@ -89,7 +94,7 @@ public class UserController extends AbstractBaseController {
             return userResponse;
         }).toList();
 
-        return ApiResponse.success(new PageImpl<>(list, pageable, page.getTotalElements()));
+        return ApiResponse.success(new PageVo<>(list, req.getPageNumber(), req.getPageSize(), page.getTotal()));
     }
 
     /**
