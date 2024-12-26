@@ -20,9 +20,9 @@ import com.walter.starry.authorization.server.app.AuthorizationServerApplication
 import com.walter.starry.security.base.bo.elasticsearch.EsUser;
 import com.walter.starry.security.base.common.enums.ElasticsearchIndexAliasEnum;
 import com.walter.starry.security.base.entity.AclAuthority;
-import com.walter.starry.security.base.entity.AclUser2;
-import com.walter.starry.security.base.entity.AclUser2Example;
-import com.walter.starry.security.base.mapper.AclUser2Mapper;
+import com.walter.starry.security.base.entity.AclUser;
+import com.walter.starry.security.base.entity.example.AclUserExample;
+import com.walter.starry.security.base.mapper.AclUserMapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.util.JsonUtil;
 import jakarta.persistence.criteria.Predicate;
@@ -58,7 +58,7 @@ public class ElasticsearchTest {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
     @Autowired
-    private AclUser2Mapper aclUserMapper;
+    private AclUserMapper aclUserMapper;
     @Autowired
     private AclAuthorityRepository aclAuthorityRepository;
 
@@ -78,9 +78,9 @@ public class ElasticsearchTest {
          */
         @Test
         void index() throws IOException {
-            AclUser2Example aclUserExample = new AclUser2Example();
+            AclUserExample aclUserExample = new AclUserExample();
             aclUserExample.createCriteria().andUsernameEqualTo("director");
-            AclUser2 aclUser = aclUserMapper.selectByExample(aclUserExample).stream().findFirst().orElseThrow();
+            AclUser aclUser = aclUserMapper.selectByExample(aclUserExample).stream().findFirst().orElseThrow();
             EsUser esUser = new EsUser();
             BeanUtils.copyProperties(aclUser, esUser);
 
@@ -110,17 +110,17 @@ public class ElasticsearchTest {
         void bulkIndex() throws IOException {
             final AtomicReference<String> lastUsernameRef = new AtomicReference<>(StringUtils.EMPTY);
 
-            Supplier<AclUser2Example> aclUser2Example = () -> {
+            Supplier<AclUserExample> aclUser2Example = () -> {
                 PageHelper.startPage(1, 10);
-                AclUser2Example aclUserExample = new AclUser2Example();
+                AclUserExample aclUserExample = new AclUserExample();
                 aclUserExample.createCriteria().andUsernameGreaterThan(lastUsernameRef.get());
                 aclUserExample.setOrderByClause("username");
                 return aclUserExample;
             };
 
-            List<AclUser2> aclUserList = aclUserMapper.selectByExample(aclUser2Example.get());
+            List<AclUser> aclUserList = aclUserMapper.selectByExample(aclUser2Example.get());
             while (CollectionUtils.isNotEmpty(aclUserList)){
-                List<String> usernameList = aclUserList.stream().map(AclUser2::getUsername).toList();
+                List<String> usernameList = aclUserList.stream().map(AclUser::getUsername).toList();
 
                 Specification<AclAuthority> aclAuthoritySpec = (root, query, builder) -> {
                     List<Predicate> andPredicates = new ArrayList<>();

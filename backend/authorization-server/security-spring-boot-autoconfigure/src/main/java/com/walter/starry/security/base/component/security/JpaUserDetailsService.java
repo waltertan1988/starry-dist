@@ -3,9 +3,9 @@ package com.walter.starry.security.base.component.security;
 import com.walter.starry.security.base.bo.AclUserBo;
 import com.walter.starry.security.base.component.security.oauth2.OidcUserDetailsService;
 import com.walter.starry.security.base.entity.AclAuthority;
-import com.walter.starry.security.base.entity.AclUser2;
-import com.walter.starry.security.base.entity.AclUser2Example;
-import com.walter.starry.security.base.mapper.AclUser2Mapper;
+import com.walter.starry.security.base.entity.AclUser;
+import com.walter.starry.security.base.entity.example.AclUserExample;
+import com.walter.starry.security.base.mapper.AclUserMapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -40,7 +40,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
     private static final String DEFAULT_PASSWORD = "123456";
 
-    private AclUser2Mapper aclUserMapper;
+    private AclUserMapper aclUserMapper;
 
     private AclAuthorityRepository aclAuthorityRepository;
 
@@ -49,7 +49,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
     public JpaUserDetailsService(){
     }
 
-    public JpaUserDetailsService(DataSource dataSource, AclUser2Mapper aclUserMapper, AclAuthorityRepository aclAuthorityRepository,
+    public JpaUserDetailsService(DataSource dataSource, AclUserMapper aclUserMapper, AclAuthorityRepository aclAuthorityRepository,
                                  FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
         super.setDataSource(dataSource);
         this.aclUserMapper = aclUserMapper;
@@ -77,7 +77,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
         // 保存用户
         Date now = new Date();
-        AclUser2 aclUser = new AclUser2();
+        AclUser aclUser = new AclUser();
         aclUser.setId(aclUserBo.getId());
         aclUser.setUsername(aclUserBo.getUsername());
         aclUser.setNickname(aclUserBo.getNickname());
@@ -124,7 +124,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
     @Override
     protected List<UserDetails> loadUsersByUsername(String username) {
-        AclUser2Example example = new AclUser2Example();
+        AclUserExample example = new AclUserExample();
         example.createCriteria().andUsernameEqualTo(username);
         return aclUserMapper.selectByExample(example).stream().map(u ->
                 (UserDetails) new AclUserBo(u.getId(), u.getUsername(), u.getNickname(), u.getPassword(), u.getOidcRegistrationId(), u.getOpenId(),
@@ -134,7 +134,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
 
     @Override
     public UserDetails loadUserByRegistrationIdAndOpenId(String registrationId, String openId) throws UsernameNotFoundException {
-        AclUser2Example example = new AclUser2Example();
+        AclUserExample example = new AclUserExample();
         example.createCriteria().andOidcRegistrationIdEqualTo(registrationId).andOpenIdEqualTo(openId);
         return aclUserMapper.selectByExample(example).stream().findFirst()
                 .map(user -> this.loadUserByUsername(user.getUsername()))
@@ -164,7 +164,7 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
         }
 
         // 删除数据库
-        AclUser2Example example = new AclUser2Example();
+        AclUserExample example = new AclUserExample();
         example.createCriteria().andUsernameEqualTo(username);
         aclUserMapper.deleteByExample(example);
 

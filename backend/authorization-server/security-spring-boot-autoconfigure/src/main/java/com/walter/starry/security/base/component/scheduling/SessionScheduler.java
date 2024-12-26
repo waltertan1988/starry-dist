@@ -1,19 +1,17 @@
 package com.walter.starry.security.base.component.scheduling;
 
+import com.github.pagehelper.PageHelper;
 import com.walter.starry.security.base.component.redis.InfraRedisKeys;
 import com.walter.starry.security.base.component.redis.RedisLockTemplate;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
 import com.walter.starry.security.base.config.properties.AppSchedulingCleanUserExpiredSessionsProperties;
 import com.walter.starry.security.base.entity.AclUser;
-import com.walter.starry.security.base.repository.AclUserRepository;
-import jakarta.persistence.criteria.Predicate;
+import com.walter.starry.security.base.entity.example.AclUserExample;
+import com.walter.starry.security.base.mapper.AclUserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.session.FindByIndexNameSessionRepository;
@@ -43,7 +41,7 @@ public class SessionScheduler {
     @Autowired
     private RedisLockTemplate redisLockTemplate;
     @Autowired
-    private AclUserRepository aclUserRepository;
+    private AclUserMapper aclUserMapper;
     @Autowired
     private JpaUserDetailsService jpaUserDetailsService;
 
@@ -68,16 +66,14 @@ public class SessionScheduler {
                 final Date cleanEndDate = DateUtils.addDays(runStartTime, -props.getCleanFromDaysBefore());
                 log.info("cleanUserExpiredSessions start. runStartTime:{}, expectedRunEndTime:{}, cleanEndDate:{}", runStartTime, new Date(expectedRunEndTimestamp), cleanEndDate);
 
-                Pageable pageable = PageRequest.of(0, 100);
-                Specification<AclUser> spec = (root, query, builder) -> {
-                    List<Predicate> andPredicates = new ArrayList<>();
-                    andPredicates.add(builder.lessThan(root.get("expiredSessionsCleanTime"), cleanEndDate));
-                    if(props.isExcludeDisabledUser()){
-                        andPredicates.add(builder.equal(root.get("enabled"), true));
-                    }
-                    return builder.and(andPredicates.toArray(new Predicate[0]));
-                };
-                List<AclUser> userList = aclUserRepository.findAll(spec, pageable).getContent();
+                PageHelper.startPage(1, 100);
+                AclUserExample example = new AclUserExample();
+                AclUserExample.Criteria criteria = example.createCriteria().andExpiredSessionsCleanTimeLessThan(cleanEndDate);
+                if(props.isExcludeDisabledUser()){
+                    criteria.andEnabledEqualTo(true);
+                }
+
+                List<AclUser> userList = aclUserMapper.selectByExample(example);
                 while (CollectionUtils.isNotEmpty(userList)){
                     List<String> usernames = new ArrayList<>();
                     for (AclUser aclUser : userList) {
@@ -91,14 +87,19 @@ public class SessionScheduler {
                     }
 
                     if(CollectionUtils.isNotEmpty(usernames)){
-                        aclUserRepository.updateExpiredSessionsCleanTime(usernames, runStartTime);
+                        AclUser update = new AclUser();
+                        update.setExpiredSessionsCleanTime(runStartTime);
+
+                        AclUserExample updateExample = new AclUserExample();
+                        updateExample.createCriteria().andUsernameIn(usernames);
+                        aclUserMapper.updateByExampleSelective(update, updateExample);
                     }
 
                     if(System.currentTimeMillis() > expectedRunEndTimestamp){
                         log.warn("cleanUserExpiredSessions is paused because it exceeded the running duration.");
                         break;
                     }
-                    userList = aclUserRepository.findAll(spec, pageable).getContent();
+                    userList = aclUserMapper.selectByExample(example);
                 }
 
                 log.info("cleanUserExpiredSessions finish");

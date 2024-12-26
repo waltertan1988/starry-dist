@@ -4,9 +4,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
-import com.walter.starry.security.base.entity.AclUser2;
-import com.walter.starry.security.base.entity.AclUser2Example;
-import com.walter.starry.security.base.mapper.AclUser2Mapper;
+import com.walter.starry.security.base.entity.AclUser;
+import com.walter.starry.security.base.entity.example.AclUserExample;
+import com.walter.starry.security.base.mapper.AclUserMapper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +25,16 @@ public class MyBatisTest {
     Logger log = LoggerFactory.getLogger(MyBatisTest.class);
 
     @Autowired
-    private AclUser2Mapper aclUser2Mapper;
+    private AclUserMapper aclUserMapper;
 
     @Test
     void selectByExampleAndPagination(){
         try(Page<?> ignored = PageHelper.startPage(1, 1)){
-            AclUser2Example example = new AclUser2Example();
+            AclUserExample example = new AclUserExample();
             example.createCriteria().andNicknameLike("%员%");
             example.setOrderByClause("id desc");
-            List<AclUser2> userList = aclUser2Mapper.selectByExample(example);
-            PageInfo<AclUser2> info = new PageInfo<>(userList);
+            List<AclUser> userList = aclUserMapper.selectByExample(example);
+            PageInfo<AclUser> info = new PageInfo<>(userList);
 
             log.info("当前页：{}", info.getPageNum());
             log.info("总记录数：{}", info.getTotal());
