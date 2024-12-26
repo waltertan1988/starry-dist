@@ -14,14 +14,16 @@ import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.ObjectBuilder;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
 import com.walter.starry.security.base.bo.elasticsearch.EsUser;
 import com.walter.starry.security.base.common.enums.ElasticsearchIndexAliasEnum;
 import com.walter.starry.security.base.entity.AclAuthority;
-import com.walter.starry.security.base.entity.AclUser;
+import com.walter.starry.security.base.entity.AclUser2;
+import com.walter.starry.security.base.entity.AclUser2Example;
+import com.walter.starry.security.base.mapper.AclUser2Mapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
-import com.walter.starry.security.base.repository.AclUserRepository;
 import com.walter.starry.security.base.util.JsonUtil;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,9 +37,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
@@ -45,6 +44,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +58,7 @@ public class ElasticsearchTest {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
     @Autowired
-    private AclUserRepository aclUserRepository;
+    private AclUser2Mapper aclUserMapper;
     @Autowired
     private AclAuthorityRepository aclAuthorityRepository;
 
@@ -78,9 +78,9 @@ public class ElasticsearchTest {
          */
         @Test
         void index() throws IOException {
-            AclUser aclUserExample = new AclUser();
-            aclUserExample.setUsername("director");
-            AclUser aclUser = aclUserRepository.findOne(Example.of(aclUserExample)).orElseThrow();
+            AclUser2Example aclUserExample = new AclUser2Example();
+            aclUserExample.createCriteria().andUsernameEqualTo("director");
+            AclUser2 aclUser = aclUserMapper.selectByExample(aclUserExample).stream().findFirst().orElseThrow();
             EsUser esUser = new EsUser();
             BeanUtils.copyProperties(aclUser, esUser);
 
@@ -109,15 +109,18 @@ public class ElasticsearchTest {
         @Test
         void bulkIndex() throws IOException {
             final AtomicReference<String> lastUsernameRef = new AtomicReference<>(StringUtils.EMPTY);
-            Pageable pageable = PageRequest.of(0, 10, Sort.by("username").ascending());
-            Specification<AclUser> aclUserSpec = (root, query, builder) -> {
-                List<Predicate> andPredicates = new ArrayList<>();
-                andPredicates.add(builder.greaterThan(root.get("username"), lastUsernameRef.get()));
-                return builder.and(andPredicates.toArray(new Predicate[0]));
+
+            Supplier<AclUser2Example> aclUser2Example = () -> {
+                PageHelper.startPage(1, 10);
+                AclUser2Example aclUserExample = new AclUser2Example();
+                aclUserExample.createCriteria().andUsernameGreaterThan(lastUsernameRef.get());
+                aclUserExample.setOrderByClause("username");
+                return aclUserExample;
             };
-            List<AclUser> aclUserList = aclUserRepository.findAll(aclUserSpec, pageable).getContent();
+
+            List<AclUser2> aclUserList = aclUserMapper.selectByExample(aclUser2Example.get());
             while (CollectionUtils.isNotEmpty(aclUserList)){
-                List<String> usernameList = aclUserList.stream().map(AclUser::getUsername).toList();
+                List<String> usernameList = aclUserList.stream().map(AclUser2::getUsername).toList();
 
                 Specification<AclAuthority> aclAuthoritySpec = (root, query, builder) -> {
                     List<Predicate> andPredicates = new ArrayList<>();
@@ -162,7 +165,7 @@ public class ElasticsearchTest {
 
                 // 获取下一批用户
                 lastUsernameRef.set(usernameList.getLast());
-                aclUserList = aclUserRepository.findAll(aclUserSpec, pageable).getContent();
+                aclUserList = aclUserMapper.selectByExample(aclUser2Example.get());
             }
         }
 
