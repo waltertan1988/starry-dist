@@ -513,11 +513,34 @@ enforce-gtid-consistency=ON
 #skip_replica_start=ON
 ```
 
-MYSQL从服务配置文件：
+MYSQL从服务1配置文件：
 cat ./data/mysql/slave1/conf.d/config-file.cnf
 ```
 [mysqld]
 server_id=2
+port=3306
+
+sync_binlog=1
+innodb_flush_log_at_trx_commit=1
+binlog_format=ROW
+
+# 配置半同步复制
+rpl_semi_sync_source_enabled=1
+rpl_semi_sync_replica_enabled=1
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
+```
+
+MYSQL从服务2配置文件：
+cat ./data/mysql/slave2/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=3
 port=3306
 
 sync_binlog=1
