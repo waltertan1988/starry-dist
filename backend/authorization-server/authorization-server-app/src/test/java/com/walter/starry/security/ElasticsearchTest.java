@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.ScriptLanguage;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
@@ -13,6 +14,7 @@ import co.elastic.clients.elasticsearch.core.msearch.MultiSearchResponseItem;
 import co.elastic.clients.elasticsearch.core.msearch.RequestItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.json.JsonpUtils;
 import co.elastic.clients.util.ObjectBuilder;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -96,9 +98,9 @@ public class ElasticsearchTest {
 
             // 添加索引
             IndexResponse response = elasticsearchClient.index(i -> i
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .id(String.valueOf(esUser.getId()))
-                .document(esUser)
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .id(String.valueOf(esUser.getId()))
+                    .document(esUser)
             );
             logger.info("Indexed with version " + response.version());
         }
@@ -146,11 +148,11 @@ public class ElasticsearchTest {
                 BulkRequest.Builder br = new BulkRequest.Builder();
                 for (EsUser esUser : esUserList) {
                     br.operations(op -> op
-                        .index(idx -> idx
-                            .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                            .id(String.valueOf(esUser.getId()))
-                            .document(esUser)
-                        )
+                            .index(idx -> idx
+                                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                                    .id(String.valueOf(esUser.getId()))
+                                    .document(esUser)
+                            )
                     );
                 }
                 BulkResponse result = elasticsearchClient.bulk(br.build());
@@ -175,13 +177,13 @@ public class ElasticsearchTest {
         @Test
         void update() throws IOException {
             UpdateResponse<EsUser> updateResponse = elasticsearchClient.update(u -> u
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .id("1")
-                .script(s -> s.inline(i -> i
-                    .lang(ScriptLanguage.Painless)
-                    .source("ctx._source.nickname = params.nickname")
-                    .params("nickname", JsonData.of("孙悟空")))
-                ), EsUser.class);
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .id("1")
+                    .script(s -> s.inline(i -> i
+                            .lang(ScriptLanguage.Painless)
+                            .source("ctx._source.nickname = params.nickname")
+                            .params("nickname", JsonData.of("孙悟空")))
+                    ), EsUser.class);
 
             System.out.println("version: " + updateResponse.version());
         }
@@ -192,8 +194,8 @@ public class ElasticsearchTest {
         @Test
         void deleteByQuery() throws IOException {
             DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(d -> d
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("username").value("member")))
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("username").value("member")))
             );
 
             logger.info("delete total: {}", response.total());
@@ -205,8 +207,8 @@ public class ElasticsearchTest {
         @Test
         public void count() throws IOException {
             CountResponse countResponse = elasticsearchClient.count(c -> c
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("nickname").value("管理")))
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("nickname").value("管理")))
             );
 
             System.out.println(">>>>>> Count:" + countResponse.count());
@@ -218,9 +220,9 @@ public class ElasticsearchTest {
         @Test
         void get() throws IOException {
             GetResponse<EsUser> getResponse = elasticsearchClient.get(g -> g
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .sourceIncludes("update_time")
-                .id("1"), EsUser.class);
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .sourceIncludes("update_time")
+                    .id("1"), EsUser.class);
 
             EsUser esUser = getResponse.source();
             System.out.println(esUser.getUpdateTime());
@@ -235,26 +237,26 @@ public class ElasticsearchTest {
         @Test
         void searchEsUser() throws IOException {
             SearchResponse<EsUser> search = elasticsearchClient.search(s -> s
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .source(src -> src.filter(f -> f.includes("username", "nickname", "enabled", "authorities", "update_time")))
-                .from(0).size(5)
-                .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
-                .query(q0 -> q0
-                    .bool(b -> b
-                        .filter(
-                            Query.of(q1 -> q1.term(t -> t.field("enabled").value(true))),
-                            Query.of(q1 -> q1.wildcard(w -> w.field("nickname.keyword").value("*员*"))),
-                            Query.of(q1 -> q1.terms(t -> t.field("username")
-                                .terms(ts -> ts.value(Lists.newArrayList(
-                                    FieldValue.of("admin"),
-                                    FieldValue.of("bizadmin"),
-                                    FieldValue.of("member")))))
-                            ),
-                            Query.of(q1 -> q1
-                                .range(r -> r.field("update_time")
-                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
-                                    .gte(JsonData.of("2024-02-06 09:57:00.000"))
-                                    .lt(JsonData.of("2024-02-06 09:58:00.000"))
+                            .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                            .source(src -> src.filter(f -> f.includes("username", "nickname", "enabled", "authorities", "update_time")))
+                            .from(0).size(5)
+                            .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
+                            .query(q0 -> q0
+                                    .bool(b -> b
+                                            .filter(
+                                                    Query.of(q1 -> q1.term(t -> t.field("enabled").value(true))),
+                                                    Query.of(q1 -> q1.wildcard(w -> w.field("nickname.keyword").value("*员*"))),
+                                                    Query.of(q1 -> q1.terms(t -> t.field("username")
+                                                            .terms(ts -> ts.value(Lists.newArrayList(
+                                                                    FieldValue.of("admin"),
+                                                                    FieldValue.of("bizadmin"),
+                                                                    FieldValue.of("member")))))
+                                                    ),
+                                                    Query.of(q1 -> q1
+                                                                    .range(r -> r.field("update_time")
+                                                                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
+                                                                                    .gte(JsonData.of("2024-02-06 09:57:00.000"))
+                                                                                    .lt(JsonData.of("2024-02-06 09:58:00.000"))
 
 //                                    .timeZone(TimeZone.getDefault().getID())
 //                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
@@ -267,15 +269,15 @@ public class ElasticsearchTest {
 //
 //                                    .gte(JsonData.of("2023-10-17T09:23:00.000Z"))
 //                                    .lt(JsonData.of("2023-10-17T09:24:00.000Z"))
-                                )
-                            ),
-                            Query.of(q1 -> q1
-                                .nested(n -> n
-                                    .path("authorities")
-                                    .query(q2 -> q2.term(t -> t.field("authorities.authority").value("ROLE_USER")))
-                                )
-                            )
-                        ))),
+                                                                    )
+                                                    ),
+                                                    Query.of(q1 -> q1
+                                                            .nested(n -> n
+                                                                    .path("authorities")
+                                                                    .query(q2 -> q2.term(t -> t.field("authorities.authority").value("ROLE_USER")))
+                                                            )
+                                                    )
+                                            ))),
                     EsUser.class);
 
             System.out.println(">>>>>> Total:" + search.hits().total());
@@ -287,29 +289,41 @@ public class ElasticsearchTest {
         }
 
         /**
+         * 打印Query原生的DSL语句
+         */
+        @Test
+        public void printNativeQuery(){
+            BoolQuery boolQuery = BoolQuery.of(b -> b.filter(Lists.newArrayList(
+                    Query.of(q1 -> q1.term(t -> t.field("first_name").value("walter"))),
+                    Query.of(q1 -> q1.term(t -> t.field("last_name").value("tan")))
+            )));
+            logger.info("printNativeQuery: {}", JsonpUtils.toString(boolQuery));
+        }
+
+        /**
          * 批量请求查询用户信息
          */
         @Test
         void msearchEsUser() throws IOException {
             MsearchResponse<EsUser> msearchResponse = elasticsearchClient.msearch(s -> s
-                .searches(Lists.newArrayList(
-                    RequestItem.of(r -> r
-                        .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
-                        .body(b -> b
-                            .source(src -> src.filter(f -> f.includes("username", "nickname", "update_time")))
-                            .from(0).size(5)
-                            .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
-                            .query(q -> q.match(m -> m.field("nickname").query("管理")))
-                        )
-                    ),
-                    RequestItem.of(r -> r
-                        .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
-                        .body(b -> b
-                            .source(src -> src.filter(f -> f.includes("username", "nickname", "authorities")))
-                            .query(q -> q.match(m -> m.field("nickname").query("普通")))
-                        )
-                    )
-                )), EsUser.class);
+                    .searches(Lists.newArrayList(
+                            RequestItem.of(r -> r
+                                    .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
+                                    .body(b -> b
+                                            .source(src -> src.filter(f -> f.includes("username", "nickname", "update_time")))
+                                            .from(0).size(5)
+                                            .sort(sort -> sort.field(f -> f.field("username").order(SortOrder.Desc)))
+                                            .query(q -> q.match(m -> m.field("nickname").query("管理")))
+                                    )
+                            ),
+                            RequestItem.of(r -> r
+                                    .header(h -> h.index(ElasticsearchIndexAliasEnum.USER.getAlias()))
+                                    .body(b -> b
+                                            .source(src -> src.filter(f -> f.includes("username", "nickname", "authorities")))
+                                            .query(q -> q.match(m -> m.field("nickname").query("普通")))
+                                    )
+                            )
+                    )), EsUser.class);
 
             for (MultiSearchResponseItem<EsUser> responseItem : msearchResponse.responses()) {
                 if(responseItem.isFailure()){
@@ -334,23 +348,23 @@ public class ElasticsearchTest {
             final String pitKeepAlive = "5s";
             final int pageSize = 3;
             final Function<SortOptions.Builder, ObjectBuilder<SortOptions>> sortFunc = s -> s
-                .field(f -> f.field("username").order(SortOrder.Desc));
+                    .field(f -> f.field("username").order(SortOrder.Desc));
 
             // 开启PIT
             String pitId = elasticsearchClient.openPointInTime(pit -> pit
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .keepAlive(k -> k.time(pitKeepAlive))
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .keepAlive(k -> k.time(pitKeepAlive))
             ).id();
             AtomicReference<String> pitIdRef = new AtomicReference<>(pitId);
 
             // 滚动分页查询
             int n = 0;
             SearchResponse<EsUser> response = elasticsearchClient.search(s -> s
-                .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
-                .size(pageSize)
-                .sort(sortFunc)
-                .trackTotalHits(t -> t.enabled(false) // 禁用totalHits以加速分页
-                ), EsUser.class
+                    .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
+                    .size(pageSize)
+                    .sort(sortFunc)
+                    .trackTotalHits(t -> t.enabled(false) // 禁用totalHits以加速分页
+                    ), EsUser.class
             );
             while (CollectionUtils.isNotEmpty(response.hits().hits())){
                 for (Hit<EsUser> hit : response.hits().hits()) {
@@ -361,11 +375,11 @@ public class ElasticsearchTest {
                 pitIdRef.set(response.pitId());// 使用响应体中的最新的pitId
                 List<FieldValue> searchAfterSortList = response.hits().hits().getLast().sort();
                 response = elasticsearchClient.search(s -> s
-                    .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
-                    .size(pageSize)
-                    .sort(sortFunc)
-                    .searchAfter(searchAfterSortList)
-                    .trackTotalHits(t -> t.enabled(false)), EsUser.class
+                        .pit(p -> p.id(pitIdRef.get()).keepAlive(k -> k.time(pitKeepAlive)))
+                        .size(pageSize)
+                        .sort(sortFunc)
+                        .searchAfter(searchAfterSortList)
+                        .trackTotalHits(t -> t.enabled(false)), EsUser.class
                 );
             }
 
@@ -383,10 +397,10 @@ public class ElasticsearchTest {
         void valueCount() throws IOException {
             final String key = "value_count(openId)";
             SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("enabled").value(true)))
-                .aggregations(key, a -> a.valueCount(vc -> vc.field("open_id")))
-                .size(0), Void.class);
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("enabled").value(true)))
+                    .aggregations(key, a -> a.valueCount(vc -> vc.field("open_id")))
+                    .size(0), Void.class);
 
             Aggregate aggregate = searchResponse.aggregations().get(key);
             System.out.printf("%s: %s%n", key, aggregate.valueCount().value());
@@ -399,10 +413,10 @@ public class ElasticsearchTest {
         void min() throws IOException {
             final String key = "min(create_time)";
             SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("enabled").value(false)))
-                .aggregations(key, a -> a.min(vc -> vc.field("create_time")))
-                .size(0), Void.class);
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("enabled").value(false)))
+                    .aggregations(key, a -> a.min(vc -> vc.field("create_time")))
+                    .size(0), Void.class);
 
             Aggregate aggregate = searchResponse.aggregations().get(key);
             System.out.printf("%s: %s%n", key, aggregate.min().valueAsString());
@@ -416,13 +430,13 @@ public class ElasticsearchTest {
             final String key1 = "nested(authorities)";
             final String key2 = "max(create_time)";
             SearchResponse<Void> searchResponse = elasticsearchClient.search(search -> search
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("enabled").value(true)))
-                .aggregations(key1, a -> a
-                    .nested(n -> n.path("authorities"))
-                    .aggregations(key2, agg -> agg.max(m -> m.field("authorities.create_time")))
-                )
-                .size(0), Void.class);
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("enabled").value(true)))
+                    .aggregations(key1, a -> a
+                            .nested(n -> n.path("authorities"))
+                            .aggregations(key2, agg -> agg.max(m -> m.field("authorities.create_time")))
+                    )
+                    .size(0), Void.class);
 
             Aggregate aggregate = searchResponse.aggregations().get(key1).nested().aggregations().get(key2);
             System.out.printf("%s.%s: %s%n", key1, key2, aggregate.max().valueAsString());
@@ -439,14 +453,14 @@ public class ElasticsearchTest {
 
             // 开启PIT
             String pitId = elasticsearchClient.openPointInTime(pit -> pit
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .keepAlive(k -> k.time("1m"))
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .keepAlive(k -> k.time("1m"))
             ).id();
 
             // 删除1条数据
             elasticsearchClient.deleteByQuery(d -> d
-                .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                .query(q -> q.term(t -> t.field("username").value("admin")))
+                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                    .query(q -> q.term(t -> t.field("username").value("admin")))
             );
 
             // 等待ES刷新磁盘
@@ -474,8 +488,8 @@ public class ElasticsearchTest {
 
             for (int i = 0; i < 100000; i++) {
                 String pitId = elasticsearchClient.openPointInTime(pit -> pit
-                    .index(ElasticsearchIndexAliasEnum.USER.getAlias())
-                    .keepAlive(k -> k.time(pitKeepAlive))
+                        .index(ElasticsearchIndexAliasEnum.USER.getAlias())
+                        .keepAlive(k -> k.time(pitKeepAlive))
                 ).id();
 
                 pitIdSet.add(pitId);
