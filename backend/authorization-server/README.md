@@ -38,15 +38,24 @@ CREATE TABLE `users` (
     `account_expired` BIT(1) NOT NULL COMMENT '账号是否已过期',
     `account_locked` BIT(1) NOT NULL COMMENT '账号是否已被锁',
     `credentials_expired` BIT(1) NOT NULL COMMENT '密码是否已过期',
-    `oidc_registration_id` varchar(255) DEFAULT NULL COMMENT 'OAuth2授权服务器的在本应用内的OIDC注册ID',
-    `open_id` varchar(128) DEFAULT NULL COMMENT '用户在OAuth2授权服务器中的开放账号',
     `expired_sessions_clean_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '清理失效会话集时间',
     `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_username`(`username`),
-    KEY `idx_oidcRegistrationId_openId` (`oidc_registration_id`,`open_id`),
     KEY `idx_expiredSessionsCleanTime` (`expired_sessions_clean_time`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户表';
+
+CREATE TABLE `users_oidc` (
+    `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',
+    `username` VARCHAR(128) NOT NULL COMMENT '用户账号',
+    `oidc_registration_id` varchar(255) NOT NULL COMMENT 'OAuth2授权服务器的在本应用内的OIDC注册ID',
+    `open_id` varchar(128) NOT NULL COMMENT '用户在OAuth2授权服务器中的开放账号',
+    `enabled` BIT(1) NOT NULL COMMENT '是否启用',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    UNIQUE KEY `uk_oidcRegistrationId_openId`(`oidc_registration_id`, `open_id`),
+    KEY `idx_username` (`username`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户表OIDC表';
 
 CREATE TABLE `authorities` (
    `id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',
@@ -199,24 +208,28 @@ CREATE TABLE oauth2_authorized_client (
 #### DML
 ##### 初始化用户数据
 ```mysql
-# 初始化账号密码：
+# 初始化用户的账号密码：
 # admin：admin
 # user：password
 # 其他用户：123456
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('005f1963cea242d7bfff02ac015d99c2','孙悟空','{bcrypt}$2a$10$BNXc26ePiWL8IU5jbSBtEeXbWxbPZDN4HG0bc0KH5uvMPuxr48F4u','','','','',null,null,'2023-10-13 15:03:31.000','2023-10-17 16:27:47.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('46519d99796b44c8a118ed4bda76e932','牛魔','{bcrypt}$2a$10$JrhJqcNCFMqAi0xNhcremeP.VCX/AcDU9eNXzC6zf786ATAMvb7qK','','','','',null,null,'2023-10-13 15:00:58.000','2023-10-13 15:00:58.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('4c48613ca16d4c059c338c72d5f5c50f','虞姬','{bcrypt}$2a$10$.brmthUo6puO4yVvmo2U5.l3jmy5qSrS.70Yq07/tCDU8oCixXzb6','','','','',null,null,'2023-10-13 15:02:30.000','2023-10-13 15:02:30.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('6713043017134daa84a4fe3bc48273b0','王昭君','{bcrypt}$2a$10$YihEcfnG8tZuYwA7Lf2TDeUcyfzq7sO0qBc.0Il2qoADNhuTK3WMa','','','','',null,null,'2023-10-13 15:01:21.000','2023-10-13 15:01:21.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('8bfe071ac9f0435db23c3d776d5056a7','亚瑟','{bcrypt}$2a$10$4DUfBhn9W6URMo9b1/0yV.WEwhSrDjxn/xn2cfVBWmxK5luv.PMx6','','','','',null,null,'2023-10-13 15:01:38.000','2023-10-13 15:01:38.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('a2c96299b8a14d22a3a5a1b8b57d4688','孙策','{bcrypt}$2a$10$Opj/t1yOySxH0xUXjEnEeuUW5d2LOstslWpvYBj5zdqtxXxW/d3W.','','','','',null,null,'2023-10-13 15:03:21.000','2023-10-13 15:03:21.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('admin','系统管理员','{bcrypt}$2a$10$5YvVJO2gRQVuPVVDjOR4nupwXAvpL1WgVIbRXxI.m3D6TgvcpuJwy',b'1','','','','oidc-client','admin','2099-09-19 16:30:24.000','2099-09-19 16:30:24.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('b030502b03044a819150eae9b7764a0b','花木兰','{bcrypt}$2a$10$5kFPJ0L45vR.goSlwjWpqeqGlI5yyDHGi6KxU4JAv3veBgwQSzvOy','','','','',null,null,'2023-10-13 15:00:17.000','2023-10-13 15:00:17.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('bizadmin','B端系统管理员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','',null,null,'2099-09-19 16:30:24.000','2023-10-12 19:24:02.796');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('cb714c1aa257442f93b319013d8d5753','阿轲','{bcrypt}$2a$10$lpDqpBb/lVk6SlahAJHbv.rlcm6jVVL5aZNk.ouP/cgNbEbjes9fC','','','','',null,null,'2023-10-13 15:00:35.000','2023-10-13 15:00:35.000');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('cliadmin','C端系统管理员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','',null,null,'2099-09-19 16:30:24.000','2023-10-12 19:44:03.047');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('director','总监A','{bcrypt}$2a$10$1cpm5ojUVH.VoRl9/EfUK.s2eRYtnxmsUOh6KmP/EzagMKsOrnu2O',b'1','','','',null,null,'2099-09-19 16:30:24.000','2023-10-12 19:24:11.576');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('member','C端会员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','',null,null,'2099-09-19 16:30:24.000','2023-10-12 19:24:00.015');
-insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `oidc_registration_id`, `open_id`, `create_time`, `update_time`) values('user','普通用户A','{bcrypt}$2a$10$HijxNDm6TA7ZZ/ELSAnd7eAk4F5/HuHOxmtsNW0Mn5pXdOJex74SW',b'1','','','','oidc-client','user','2099-09-19 16:30:24.000','2023-10-12 19:24:07.366');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('005f1963cea242d7bfff02ac015d99c2','孙悟空','{bcrypt}$2a$10$BNXc26ePiWL8IU5jbSBtEeXbWxbPZDN4HG0bc0KH5uvMPuxr48F4u','','','','','2023-10-13 15:03:31.000','2023-10-17 16:27:47.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('46519d99796b44c8a118ed4bda76e932','牛魔','{bcrypt}$2a$10$JrhJqcNCFMqAi0xNhcremeP.VCX/AcDU9eNXzC6zf786ATAMvb7qK','','','','','2023-10-13 15:00:58.000','2023-10-13 15:00:58.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('4c48613ca16d4c059c338c72d5f5c50f','虞姬','{bcrypt}$2a$10$.brmthUo6puO4yVvmo2U5.l3jmy5qSrS.70Yq07/tCDU8oCixXzb6','','','','','2023-10-13 15:02:30.000','2023-10-13 15:02:30.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('6713043017134daa84a4fe3bc48273b0','王昭君','{bcrypt}$2a$10$YihEcfnG8tZuYwA7Lf2TDeUcyfzq7sO0qBc.0Il2qoADNhuTK3WMa','','','','','2023-10-13 15:01:21.000','2023-10-13 15:01:21.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('8bfe071ac9f0435db23c3d776d5056a7','亚瑟','{bcrypt}$2a$10$4DUfBhn9W6URMo9b1/0yV.WEwhSrDjxn/xn2cfVBWmxK5luv.PMx6','','','','','2023-10-13 15:01:38.000','2023-10-13 15:01:38.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('a2c96299b8a14d22a3a5a1b8b57d4688','孙策','{bcrypt}$2a$10$Opj/t1yOySxH0xUXjEnEeuUW5d2LOstslWpvYBj5zdqtxXxW/d3W.','','','','','2023-10-13 15:03:21.000','2023-10-13 15:03:21.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('admin','系统管理员','{bcrypt}$2a$10$5YvVJO2gRQVuPVVDjOR4nupwXAvpL1WgVIbRXxI.m3D6TgvcpuJwy',b'1','','','','2099-09-19 16:30:24.000','2099-09-19 16:30:24.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('b030502b03044a819150eae9b7764a0b','花木兰','{bcrypt}$2a$10$5kFPJ0L45vR.goSlwjWpqeqGlI5yyDHGi6KxU4JAv3veBgwQSzvOy','','','','','2023-10-13 15:00:17.000','2023-10-13 15:00:17.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('bizadmin','B端系统管理员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','','2099-09-19 16:30:24.000','2023-10-12 19:24:02.796');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('cb714c1aa257442f93b319013d8d5753','阿轲','{bcrypt}$2a$10$lpDqpBb/lVk6SlahAJHbv.rlcm6jVVL5aZNk.ouP/cgNbEbjes9fC','','','','','2023-10-13 15:00:35.000','2023-10-13 15:00:35.000');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('cliadmin','C端系统管理员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','','2099-09-19 16:30:24.000','2023-10-12 19:44:03.047');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('director','总监A','{bcrypt}$2a$10$1cpm5ojUVH.VoRl9/EfUK.s2eRYtnxmsUOh6KmP/EzagMKsOrnu2O',b'1','','','','2099-09-19 16:30:24.000','2023-10-12 19:24:11.576');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('member','C端会员A','{bcrypt}$2a$10$Z6krsAwqjxdzNBTPywwequkYrPS2YPQwQJ6g95MFpkQNupxLi4MkK',b'1','','','','2099-09-19 16:30:24.000','2023-10-12 19:24:00.015');
+insert into `users` (`username`, `nickname`, `password`, `enabled`, `account_expired`, `account_locked`, `credentials_expired`, `create_time`, `update_time`) values('user','普通用户A','{bcrypt}$2a$10$HijxNDm6TA7ZZ/ELSAnd7eAk4F5/HuHOxmtsNW0Mn5pXdOJex74SW',b'1','','','','2099-09-19 16:30:24.000','2023-10-12 19:24:07.366');
+
+# 初始化用户账号关联的OIDC信息（用于支持用户进行OIDC单点登录，非必须）
+INSERT INTO users_oidc(`id`, `username`, `oidc_registration_id`, `open_id`, `enabled`, `create_time`, `update_time`) VALUES(NULL, 'admin', 'oidc-client', 'admin', b'1', NOW(), NOW());
+INSERT INTO users_oidc(`id`, `username`, `oidc_registration_id`, `open_id`, `enabled`, `create_time`, `update_time`) VALUES(NULL, 'user', 'oidc-client', 'user', b'1', NOW(), NOW());
 ```
 > 注：也可以通过执行此方法创建用户：com.walter.starry.authorizationserver.app.AuthorizationServerApplicationTests.UserDetailsServiceTest.createUser
 
@@ -415,14 +428,6 @@ PUT /authorization_server.user.v1
             "credentials_expired": {
                 "type": "boolean"
             },
-            "oidc_registration_id": {
-                "type": "keyword",
-                "ignore_above": 255
-            },
-            "open_id": {
-                "type": "keyword",
-                "ignore_above": 128
-            },
             "expired_sessions_clean_time": {
                 "type": "date",
                 "format": "date_optional_time"
@@ -497,6 +502,7 @@ cat ./data/mysql/master/conf.d/config-file.cnf
 [mysqld]
 server_id=1
 port=3306
+default-time-zone='+08:00'
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
@@ -520,6 +526,7 @@ cat ./data/mysql/slave1/conf.d/config-file.cnf
 [mysqld]
 server_id=2
 port=3306
+default-time-zone='+08:00'
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
@@ -543,6 +550,7 @@ cat ./data/mysql/slave2/conf.d/config-file.cnf
 [mysqld]
 server_id=3
 port=3306
+default-time-zone='+08:00'
 
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
