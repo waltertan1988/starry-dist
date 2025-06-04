@@ -17,10 +17,6 @@ public class UserResponse {
 
     private String password;
 
-    private String oidcRegistrationId;
-
-    private String openId;
-
     private Boolean accountExpired;
 
     private Boolean accountLocked;

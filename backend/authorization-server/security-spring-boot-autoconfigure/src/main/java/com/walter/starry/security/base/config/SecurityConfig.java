@@ -5,6 +5,7 @@ import com.walter.starry.security.base.component.security.filter.CompositeLoginP
 import com.walter.starry.security.base.component.security.filter.CompositeLogoutPageGeneratingFilter;
 import com.walter.starry.security.base.config.properties.AppSecurityProperties;
 import com.walter.starry.security.base.mapper.AclUserMapper;
+import com.walter.starry.security.base.mapper.AclUserOidcMapper;
 import com.walter.starry.security.base.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,9 +215,10 @@ public class SecurityConfig {
     @Bean
     public JpaUserDetailsService userDetailsService(DataSource dataSource,
                                                     AclUserMapper aclUserMapper,
+                                                    AclUserOidcMapper aclUserOidcMapper,
                                                     AclAuthorityRepository aclAuthorityRepository,
                                                     FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository) {
-        return new JpaUserDetailsService(dataSource, aclUserMapper, aclAuthorityRepository, findByIndexNameSessionRepository);
+        return new JpaUserDetailsService(dataSource, aclUserMapper, aclUserOidcMapper, aclAuthorityRepository, findByIndexNameSessionRepository);
     }
 
     private AjaxSupportedAuthenticationFailureHandler getAjaxSupportedAuthenticationFailureHandler(HttpSecurity http){

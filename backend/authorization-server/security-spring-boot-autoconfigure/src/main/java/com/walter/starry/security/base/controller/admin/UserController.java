@@ -105,7 +105,7 @@ public class UserController extends AbstractBaseController {
             if(StringUtils.isBlank(req.getUsername())){
                 // 新增
                 String username = UUID.randomUUID().toString().replaceAll("-", "");
-                AclUserBo aclUserBo = new AclUserBo(IdUtil.genNextGlobalId(), username, req.getNickname(), null, null, null,
+                AclUserBo aclUserBo = new AclUserBo(IdUtil.genNextGlobalId(), username, req.getNickname(), null,
                         true, true, true, req.getEnabled(), new HashSet<>());
                 jpaUserDetailsService.createUser(aclUserBo);
             }else{

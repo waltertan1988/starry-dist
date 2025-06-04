@@ -28,10 +28,6 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     private String password;
 
-    private String oauth2RegistrationId;
-
-    private String openId;
-
     private boolean accountNonExpired;
 
     private boolean accountNonLocked;
@@ -51,15 +47,14 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
     public AclUserBo(){
     }
 
-    public AclUserBo(Long id, String username, String nickname, String password, String oauth2RegistrationId, String openId,
+    public AclUserBo(Long id, String username, String nickname, String password,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                      Collection<GrantedAuthority> authorities) {
-        this(id, username, nickname, password, oauth2RegistrationId, openId,
-                accountNonExpired, accountNonLocked, credentialsNonExpired, enabled,
+        this(id, username, nickname, password, accountNonExpired, accountNonLocked, credentialsNonExpired, enabled,
                 null, null, null, authorities);
     }
 
-    public AclUserBo(Long id, String username, String nickname, String password, String oauth2RegistrationId, String openId,
+    public AclUserBo(Long id, String username, String nickname, String password,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                      Date expiredSessionsCleanTime, Date createTime, Date updateTime,
                      Collection<GrantedAuthority> authorities) {
@@ -67,8 +62,6 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
         this.username = username;
         this.nickname = nickname;
         this.password = password;
-        this.oauth2RegistrationId = oauth2RegistrationId;
-        this.openId = openId;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -100,14 +93,6 @@ public class AclUserBo implements UserDetails, CredentialsContainer {
 
     public String getNickname() {
         return nickname;
-    }
-
-    public String getOauth2RegistrationId() {
-        return oauth2RegistrationId;
-    }
-
-    public String getOpenId() {
-        return openId;
     }
 
     @Override
