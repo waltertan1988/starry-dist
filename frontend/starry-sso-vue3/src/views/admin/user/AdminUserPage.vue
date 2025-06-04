@@ -78,6 +78,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item :icon="Edit" @click="openOpDialog('update', scope.row)">修改</el-dropdown-item>
                   <el-dropdown-item :icon="UserFilled" @click="openOpDialog('role', scope.row)">分配角色</el-dropdown-item>
+                  <el-dropdown-item :icon="Connection" @click="openOpDialog('oidc', scope.row)">OIDC配置</el-dropdown-item>
                   <el-dropdown-item :icon="Remove" @click="openOpDialog('removeSession', scope.row)">踢出会话</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -98,7 +99,7 @@
 
 <script setup>
 import {h, ref, shallowRef} from "vue";
-import {Search, Plus, Edit, Delete, UserFilled, MoreFilled, Remove} from '@element-plus/icons-vue';
+import {Search, Plus, Edit, Delete, UserFilled, MoreFilled, Remove, Connection} from '@element-plus/icons-vue';
 import HttpApi from "@/util/api";
 import DateUtil from "@/util/date";
 import {ElMessage, ElMessageBox} from "element-plus";
@@ -108,6 +109,7 @@ import PaginationTable from "@/components/PaginationTable";
 import AdminUserSavePage from "@/views/admin/user/AdminUserSavePage.vue";
 import AdminUserRolePage from "@/views/admin/user/AdminUserRolePage.vue";
 import AdminUserSessionPage from "@/views/admin/user/AdminUserSessionPage.vue";
+import AdminUserOidcPage from "@/views/admin/user/AdminUserOidcPage.vue";
 
 /** 组件定义段 */
 
@@ -217,10 +219,18 @@ function openOpDialog(opType, row) {
     opDialogAttrRef.value.component = shallowRef(AdminUserSavePage)
 
   }else if(opType === 'role'){
+    // 分配角色
     opRowDataRef.value = row
     opDialogAttrRef.value.title = "分配角色"
     opDialogAttrRef.value.width = "50%"
     opDialogAttrRef.value.component = shallowRef(AdminUserRolePage)
+
+  }else if(opType === 'oidc'){
+    // OIDC配置
+    opRowDataRef.value = row
+    opDialogAttrRef.value.title = "OIDC配置"
+    opDialogAttrRef.value.width = "50%"
+    opDialogAttrRef.value.component = shallowRef(AdminUserOidcPage)
 
   }else if(opType === 'removeSession'){
     // 踢出会话

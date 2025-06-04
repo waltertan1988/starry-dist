@@ -55,7 +55,7 @@ CREATE TABLE `users_oidc` (
     `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY `uk_oidcRegistrationId_openId`(`oidc_registration_id`, `open_id`),
     KEY `idx_username` (`username`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户表OIDC表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT '用户OIDC表';
 
 CREATE TABLE `authorities` (
    `id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',

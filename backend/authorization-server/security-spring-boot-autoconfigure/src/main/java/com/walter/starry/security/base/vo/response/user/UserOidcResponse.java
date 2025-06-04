@@ -17,4 +17,6 @@ public class UserOidcResponse {
     private String oidcRegistrationId;
     private String openId;
     private Boolean enabled;
+    private Long createTimeTs;
+    private Long updateTimeTs;
 }

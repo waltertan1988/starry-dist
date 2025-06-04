@@ -10,6 +10,7 @@ import com.walter.starry.security.base.entity.example.AclUserOidcExample;
 import com.walter.starry.security.base.mapper.AclUserMapper;
 import com.walter.starry.security.base.mapper.AclUserOidcMapper;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
+import com.walter.starry.security.base.vo.request.user.ChangeUserOidcEnabledRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -210,6 +211,33 @@ public class JpaUserDetailsService extends JdbcUserDetailsManager implements Oid
             }).toList();
             aclAuthorityRepository.saveAll(saveList);
         }
+    }
+
+    /**
+     * 获取用户的OIDC列表
+     * @param username
+     * @return
+     */
+    public List<AclUserOidc> listUserOidc(String username) {
+        AclUserOidcExample example = new AclUserOidcExample();
+        example.createCriteria().andUsernameEqualTo(username);
+        return aclUserOidcMapper.selectByExample(example).stream()
+                .sorted(Comparator.comparingInt(o -> BooleanUtils.isTrue(o.getEnabled()) ? 0 : 1))
+                .toList();
+    }
+
+    /**
+     * 修改用户OIDC的停启用状态
+     * @param req
+     */
+    public void changeUserOidcEnabled(ChangeUserOidcEnabledRequest req) {
+        AclUserOidcExample example = new AclUserOidcExample();
+        example.createCriteria().andOidcRegistrationIdEqualTo(req.getOidcRegistrationId()).andOpenIdEqualTo(req.getOpenId());
+
+        AclUserOidc update = new AclUserOidc();
+        update.setEnabled(req.getEnabled());
+        update.setUpdateTime(new Date());
+        aclUserOidcMapper.updateByExampleSelective(update, example);
     }
 
     /**

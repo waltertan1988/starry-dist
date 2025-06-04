@@ -17,6 +17,7 @@ import com.walter.starry.security.base.vo.request.user.*;
 import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.vo.response.base.PageVo;
 import com.walter.starry.security.base.vo.response.user.UserAvailableAuthorityResponse;
+import com.walter.starry.security.base.vo.response.user.UserOidcResponse;
 import com.walter.starry.security.base.vo.response.user.UserResponse;
 import com.walter.starry.security.base.vo.response.user.UserSessionResponse;
 import org.apache.commons.collections4.CollectionUtils;
@@ -270,6 +271,37 @@ public class UserController extends AbstractBaseController {
 
             // 踢出目标用户的会话
             jpaUserDetailsService.removeSession(req.getUsername());
+            return null;
+        });
+    }
+
+    /**
+     * 获取用户的OIDC列表
+     * @param username
+     * @return
+     */
+    @GetMapping("/oidc/list")
+    public ApiResponse<List<UserOidcResponse>> listUserOidc(String username){
+        return super.apiCall("listUserOidc", null,
+                () -> jpaUserDetailsService.listUserOidc(username).stream().map(oidc -> {
+                    UserOidcResponse res = new UserOidcResponse();
+                    BeanUtils.copyProperties(oidc, res);
+                    res.setCreateTimeTs(oidc.getCreateTime().getTime());
+                    res.setUpdateTimeTs(oidc.getUpdateTime().getTime());
+                    return res;
+                }).toList());
+    }
+
+    /**
+     * 修改用户OIDC的停启用状态
+     * @param req
+     * @param bindingResult
+     * @return
+     */
+    @PostMapping("/oidc/changeEnabled")
+    public ApiResponse<Void> changeUserOidcEnabled(@Validated @RequestBody ChangeUserOidcEnabledRequest req, BindingResult bindingResult){
+        return super.apiCall("changeUserOidcEnabled", bindingResult, () -> {
+            jpaUserDetailsService.changeUserOidcEnabled(req);
             return null;
         });
     }
