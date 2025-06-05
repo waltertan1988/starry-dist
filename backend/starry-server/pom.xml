@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.walter.starry</groupId>
-	<artifactId>authorization-server-parent</artifactId>
+	<artifactId>starry-server-parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>authorization-server-parent</name>
+	<name>starry-server-parent</name>
 	<description>Demo project for Spring OAuth2.1 Authorization Server</description>
 
 	<properties>
@@ -42,8 +42,8 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>authorization-client-app</module>
-		<module>authorization-server-app</module>
+		<module>starry-business-app</module>
+		<module>starry-authorization-server-app</module>
 		<module>authorization-server-spring-boot-autoconfigure</module>
 		<module>security-spring-boot-autoconfigure</module>
 		<module>mybatis-generator</module>

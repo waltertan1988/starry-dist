@@ -9,21 +9,55 @@ app:
       clean-from-days-before: 30
 
   pulsar:
+    # 本应用所需的pulsar注册信息
     base-reg:
       tenant: starry
       namespace: ${spring.application.name}
 
   security:
     enable-front-back-seperated: true
-    namespace-prefix: AuthorizationServer
+    namespace-prefix: ${spring.application.name}
 
     # 非Ajax方式登录成功后，默认重定向到由前端提供的后台功能页面
-    default-login-success-target-url: http://localhost:7080/admin
+    default-login-success-target-url: http://127.0.0.1:7080/admin
 
     oauth2:
       client:
         # 是否开启OAuth2客户端登录
-        enable: false
+        enable: true
+
+        # OAuth2客户端的注册配置列表
+        registration:
+          oidc-client:
+            provider: spring
+            client-id: oidc-client
+            client-secret: secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/oidc-client
+            scope: openid,profile
+            client-name: Spring
+          github:
+            provider: github
+            client-id: your-app-client-id
+            client-secret: your-app-client-secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/github
+            scope: read:user
+            client-name: GitHub
+
+        # 授权服务器提供者配置列表
+        provider:
+          spring:
+            authorization-uri: http://localhost:9000/oauth2/authorize
+            token-uri: http://localhost:9000/oauth2/token
+            jwk-set-uri: http://localhost:9000/oauth2/jwks
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
 
 logging:
   pattern:
@@ -32,12 +66,12 @@ logging:
     org.springframework.security: trace
 
 server:
-  port: 9000
+  port: 8080
   shutdown: graceful
 
 spring:
   application:
-    name: authorization-server-app
+    name: starry-business-app
 
   # DataSource
   datasource:

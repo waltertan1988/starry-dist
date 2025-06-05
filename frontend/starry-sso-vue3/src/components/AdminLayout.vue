@@ -48,7 +48,7 @@
 
         <el-footer id="starryFooter">
             <hr style="margin: 0">
-            <span style="font-size:10px; color: grey;">© 2023 Walter Tan</span>
+            <span style="font-size:10px; color: grey;">© 2020 Walter Tan</span>
         </el-footer>
     </el-container>
 
