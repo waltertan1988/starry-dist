@@ -179,10 +179,15 @@ public class ElasticsearchTest {
             UpdateResponse<EsUser> updateResponse = elasticsearchClient.update(u -> u
                     .index(ElasticsearchIndexAliasEnum.USER.getAlias())
                     .id("1")
-                    .script(s -> s.inline(i -> i
-                            .lang(ScriptLanguage.Painless)
+//                    .script(s -> s.inline(i -> i
+//                            .lang(ScriptLanguage.Painless)
+//                            .source("ctx._source.nickname = params.nickname")
+//                            .params("nickname", JsonData.of("孙悟空")))
+//                    ), EsUser.class);
+                    // TODO tyx 测试新版script的api
+                    .script(s -> s.lang(ScriptLanguage.Painless)
                             .source("ctx._source.nickname = params.nickname")
-                            .params("nickname", JsonData.of("孙悟空")))
+                            .params("nickname", JsonData.of("孙悟空"))
                     ), EsUser.class);
 
             System.out.println("version: " + updateResponse.version());
@@ -252,25 +257,31 @@ public class ElasticsearchTest {
                                                                     FieldValue.of("bizadmin"),
                                                                     FieldValue.of("member")))))
                                                     ),
-                                                    Query.of(q1 -> q1
-                                                                    .range(r -> r.field("update_time")
-                                                                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
-                                                                                    .gte(JsonData.of("2024-02-06 09:57:00.000"))
-                                                                                    .lt(JsonData.of("2024-02-06 09:58:00.000"))
-
-//                                    .timeZone(TimeZone.getDefault().getID())
-//                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
-//                                    .gte(JsonData.of("2023-10-17 17:23:00.000"))
-//                                    .lt(JsonData.of("2023-10-17 17:24:00.000"))
+//                                                    Query.of(q1 -> q1
+//                                                                    .range(r -> r.field("update_time") // 高版本api已经不支持此写法
+//                                                                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
+//                                                                                    .gte(JsonData.of("2024-02-06 09:57:00.000"))
+//                                                                                    .lt(JsonData.of("2024-02-06 09:58:00.000"))
 //
-//                                    .format("yyyy-MM-dd HH:mm:ss.SSSZ")
-//                                    .gte(JsonData.of("2023-10-17 17:23:00.000+0800"))
-//                                    .lt(JsonData.of("2023-10-17 17:24:00.000+0800"))
-//
-//                                    .gte(JsonData.of("2023-10-17T09:23:00.000Z"))
-//                                    .lt(JsonData.of("2023-10-17T09:24:00.000Z"))
-                                                                    )
-                                                    ),
+////                                    .timeZone(TimeZone.getDefault().getID())
+////                                    .format("yyyy-MM-dd HH:mm:ss.SSS")
+////                                    .gte(JsonData.of("2023-10-17 17:23:00.000"))
+////                                    .lt(JsonData.of("2023-10-17 17:24:00.000"))
+////
+////                                    .format("yyyy-MM-dd HH:mm:ss.SSSZ")
+////                                    .gte(JsonData.of("2023-10-17 17:23:00.000+0800"))
+////                                    .lt(JsonData.of("2023-10-17 17:24:00.000+0800"))
+////
+////                                    .gte(JsonData.of("2023-10-17T09:23:00.000Z"))
+////                                    .lt(JsonData.of("2023-10-17T09:24:00.000Z"))
+//                                                                    )
+//                                                    ),
+                                                    // TODO tyx 测试新版range的api
+                                                    Query.of(q1 -> q1.range(r -> r.date(d -> d
+                                                            .field("update_time")
+                                                            .format("yyyy-MM-dd HH:mm:ss.SSS")
+                                                            .gte("2024-02-06 09:57:00.000")
+                                                            .lt("2024-02-06 09:58:00.000")))),
                                                     Query.of(q1 -> q1
                                                             .nested(n -> n
                                                                     .path("authorities")
