@@ -1,0 +1,71 @@
+version: '3.x'
+
+services:
+  mysql-master:
+    image: mysql:8.0.36
+    container_name: mysql-master
+    hostname: mysql-master
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/master/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/master/datadir:/var/lib/mysql
+    networks:
+      starry:
+        ipv4_address: 172.18.1.1
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  mysql-slave1:
+    image: mysql:8.0.36
+    container_name: mysql-slave1
+    hostname: mysql-slave1
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data/mysql/slave1/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/slave1/datadir:/var/lib/mysql
+    networks:
+      starry:
+        ipv4_address: 172.18.1.2
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    depends_on:
+      - mysql-master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  mysql-slave2:
+    image: mysql:8.0.36
+    container_name: mysql-slave2
+    hostname: mysql-slave2
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./data/mysql/slave2/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/slave2/datadir:/var/lib/mysql
+    networks:
+      starry:
+        ipv4_address: 172.18.1.3
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    depends_on:
+      - mysql-master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'

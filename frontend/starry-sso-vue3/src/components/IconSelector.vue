@@ -1,5 +1,5 @@
 <template>
-  <el-popover ref="elPopoverRef" :width="600" trigger="click" placement="right">
+  <el-popover ref="elPopoverRef" :width="600" trigger="click">
     <template #reference>
       <div>
         <div style="cursor: pointer;" v-if="selectedIconKeyRef">

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.6</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.walter.starry</groupId>
+	<artifactId>starry-server-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>starry-server-parent</name>
+	<description>Demo project for Spring OAuth2.1 Authorization Server</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>21</java.version>
+		<guava.version>32.1.2-jre</guava.version>
+		<commons-lang3.version>3.13.0</commons-lang3.version>
+		<commons-collections4.version>4.4</commons-collections4.version>
+		<redisson.version>3.26.0</redisson.version>
+		<mybatis-spring-boot-starter.version>3.0.4</mybatis-spring-boot-starter.version>
+		<pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>authorization-server-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>security-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<modules>
+		<module>starry-business-app</module>
+		<module>starry-authorization-server-app</module>
+		<module>authorization-server-spring-boot-autoconfigure</module>
+		<module>security-spring-boot-autoconfigure</module>
+		<module>mybatis-generator</module>
+	</modules>
+</project>
