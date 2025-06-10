@@ -1,5 +1,5 @@
 # Authorization-Server
-一套基于Spring-Authorization-Server、MySQL、Redis、Pulsar的后端应用。
+一套基于Spring-Authorization-Server、MySQL、Redis、Pulsar的后端应用平台。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
