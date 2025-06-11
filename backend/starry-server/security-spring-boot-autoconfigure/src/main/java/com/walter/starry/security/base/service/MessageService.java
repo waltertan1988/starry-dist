@@ -45,9 +45,8 @@ public class MessageService {
      * @param namespace
      * @param message
      * @return
-     * @throws PulsarClientException
      */
-    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, String message) throws PulsarClientException {
+    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, String message) {
         String topic = String.format(messageTopicEnum.getPulsarTopic(), tenant, namespace);
         MessageId messageId = stringPulsarTemplate.newMessage(message).withTopic(topic).send();
         return messageId.toString();
@@ -58,9 +57,8 @@ public class MessageService {
      * @param messageTopicEnum
      * @param message
      * @return
-     * @throws PulsarClientException
      */
-    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String message) throws PulsarClientException {
+    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String message) {
         return this.publishToPulsar(messageTopicEnum, appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace(), message);
     }
 }

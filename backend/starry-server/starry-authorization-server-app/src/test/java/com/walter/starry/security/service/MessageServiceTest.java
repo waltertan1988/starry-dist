@@ -4,7 +4,6 @@ import com.walter.starry.authorization.server.app.AuthorizationServerApplication
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.config.properties.AppPulsarProperties;
 import com.walter.starry.security.base.service.MessageService;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class MessageServiceTest {
     class PulsarTest {
 
         @Test
-        void publishToPulsar() throws PulsarClientException {
+        void publishToPulsar() {
             String tenant = appPulsarProperties.getBaseReg().getTenant();
             String namespace = appPulsarProperties.getBaseReg().getNamespace();
             String messageId = messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, tenant, namespace, "Hello Pulsar!");

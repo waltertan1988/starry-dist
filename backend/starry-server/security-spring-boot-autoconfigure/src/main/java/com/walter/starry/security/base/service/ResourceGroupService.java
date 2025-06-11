@@ -316,7 +316,7 @@ public class ResourceGroupService {
             String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofCreate(after)));
             try {
                 messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
             }
         });
@@ -355,7 +355,7 @@ public class ResourceGroupService {
                 String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after)));
                 try {
                     messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-                } catch (PulsarClientException ex) {
+                } catch (Throwable ex) {
                     log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
                 }
 
@@ -472,7 +472,7 @@ public class ResourceGroupService {
                 String message = JsonUtil.toJson(messageList);
                 try {
                     messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-                } catch (PulsarClientException ex) {
+                } catch (Throwable ex) {
                     log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
                 }
 
@@ -525,7 +525,7 @@ public class ResourceGroupService {
             String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData)));
             try {
                 messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
             }
 

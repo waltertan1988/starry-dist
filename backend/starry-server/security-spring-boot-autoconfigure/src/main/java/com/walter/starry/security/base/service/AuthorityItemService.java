@@ -2,24 +2,23 @@ package com.walter.starry.security.base.service;
 
 import com.google.common.collect.Lists;
 import com.walter.starry.security.base.bo.AuthorityItemBo;
+import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.exception.BizException;
+import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
 import com.walter.starry.security.base.entity.AclAuthorityItem;
 import com.walter.starry.security.base.repository.AclAuthorityItemRepository;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
+import com.walter.starry.security.base.util.JsonUtil;
 import com.walter.starry.security.base.vo.request.role.MoveRoleRequest;
 import com.walter.starry.security.base.vo.request.role.SaveRoleRequest;
 import com.walter.starry.security.base.vo.response.ApiResponse;
-import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
-import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.common.exception.BizException;
-import com.walter.starry.security.base.common.message.RoleChangeMessage;
-import com.walter.starry.security.base.util.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -167,7 +166,7 @@ public class AuthorityItemService {
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now))));
             try {
                 messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
         });
@@ -209,7 +208,7 @@ public class AuthorityItemService {
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
             try {
                 messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
 
@@ -249,7 +248,7 @@ public class AuthorityItemService {
             String message = JsonUtil.toJson(messageList);
             try {
                 messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
 
@@ -285,7 +284,7 @@ public class AuthorityItemService {
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
             try {
                 messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
+            } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
         });
