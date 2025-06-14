@@ -5,6 +5,7 @@ import com.walter.starry.security.base.config.properties.AppPulsarProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.pulsar.core.PulsarTopic;
@@ -23,6 +24,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
+@ConditionalOnProperty(name = "spring.pulsar.admin.service-url")
 public class PulsarTopicConfig implements InitializingBean {
 
     @Autowired
