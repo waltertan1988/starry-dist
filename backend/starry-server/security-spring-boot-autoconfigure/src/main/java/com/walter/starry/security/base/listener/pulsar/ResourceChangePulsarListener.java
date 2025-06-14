@@ -5,7 +5,6 @@ import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.pulsar.annotation.PulsarListener;
@@ -34,10 +33,6 @@ public class ResourceChangePulsarListener{
 
         try{
             List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
-
-            if(CollectionUtils.isEmpty(messageList)){
-                return;
-            }
 
             // 检查并尝试刷新本地缓存（资源与权限的关联关系）
             resourceGroupService.tryRefreshLocalCaches(messageList);

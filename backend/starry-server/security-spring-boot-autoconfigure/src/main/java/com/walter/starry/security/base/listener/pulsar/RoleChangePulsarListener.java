@@ -5,7 +5,6 @@ import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.service.RoleService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.pulsar.annotation.PulsarListener;
@@ -34,10 +33,6 @@ public class RoleChangePulsarListener {
 
         try{
             List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
-
-            if(CollectionUtils.isEmpty(messageList)){
-                return;
-            }
 
             // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
             roleService.tryRefreshLocalCaches(messageList);

@@ -7,7 +7,6 @@ import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -32,10 +31,6 @@ public class ResourceChangeRedisListener implements MessageListener {
         String body = new String(message.getBody());
         log.info("ResourceChangeMessage body: {}", body);
         List<ResourceChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
-
-        if(CollectionUtils.isEmpty(messageList)){
-            return;
-        }
 
         // 检查并尝试刷新本地缓存（资源与权限的关联关系）
         resourceGroupService.tryRefreshLocalCaches(messageList);

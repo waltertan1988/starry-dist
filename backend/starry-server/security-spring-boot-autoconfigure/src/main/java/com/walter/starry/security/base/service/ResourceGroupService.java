@@ -3,6 +3,11 @@ package com.walter.starry.security.base.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.exception.BizException;
+import com.walter.starry.security.base.common.message.ResourceChangeMessage;
+import com.walter.starry.security.base.component.redis.InfraRedisKeys;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
 import com.walter.starry.security.base.entity.AclAuthorityResource;
 import com.walter.starry.security.base.entity.AclResourceGroup;
@@ -10,13 +15,8 @@ import com.walter.starry.security.base.entity.AclResourceItem;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
 import com.walter.starry.security.base.repository.AclResourceGroupRepository;
 import com.walter.starry.security.base.repository.AclResourceItemRepository;
-import com.walter.starry.security.base.vo.response.ApiResponse;
-import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
-import com.walter.starry.security.base.component.redis.InfraRedisKeys;
-import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.common.exception.BizException;
-import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.util.JsonUtil;
+import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.vo.response.resource.ResourceGroupVo;
 import com.walter.starry.security.base.vo.response.resource.ResourceItemVo;
 import jakarta.annotation.Resource;
@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -598,6 +597,10 @@ public class ResourceGroupService {
      * @param messageList
      */
     public void tryRefreshLocalCaches(List<ResourceChangeMessage> messageList) {
+        if(CollectionUtils.isEmpty(messageList)){
+            return;
+        }
+
         boolean needRefreshRequestMatcherEntryHolder = false;
 
         for (ResourceChangeMessage changeMessage : messageList) {
