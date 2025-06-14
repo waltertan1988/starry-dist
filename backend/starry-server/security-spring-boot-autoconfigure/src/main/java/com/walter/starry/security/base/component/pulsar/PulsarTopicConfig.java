@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.pulsar.core.PulsarTopic;
+import org.springframework.pulsar.core.PulsarTopicBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -31,14 +32,14 @@ public class PulsarTopicConfig implements InitializingBean {
     public PulsarTopic roleChangeBroadcastBasePulsarTopic() {
         String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
-        return PulsarTopic.builder(topic).build();
+        return new PulsarTopicBuilder().name(topic).build();
     }
 
     @Bean
     public PulsarTopic resourceChangeBroadcastBasePulsarTopic() {
         String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
-        return PulsarTopic.builder(topic).build();
+        return new PulsarTopicBuilder().name(topic).build();
     }
 
     @Override
