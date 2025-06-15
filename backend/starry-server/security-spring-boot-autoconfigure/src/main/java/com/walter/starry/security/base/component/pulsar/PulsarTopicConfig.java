@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "spring.pulsar.admin.service-url")
+@ConditionalOnProperty(name = "app.pulsar.base-reg.enabled", havingValue = "true")
 public class PulsarTopicConfig implements InitializingBean {
 
     @Autowired

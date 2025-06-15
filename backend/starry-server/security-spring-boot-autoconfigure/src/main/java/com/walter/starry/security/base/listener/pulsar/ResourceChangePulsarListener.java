@@ -20,13 +20,13 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "spring.pulsar.client.service-url")
+@ConditionalOnProperty(name = "app.pulsar.base-reg.enabled", havingValue = "true")
 public class ResourceChangePulsarListener{
     @Autowired
     private ResourceGroupService resourceGroupService;
 
     @PulsarListener(
-        topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.getPulsar().getTopic(), @appPulsarProperties.baseReg.tenant, @appPulsarProperties.baseReg.namespace)}"},
+        topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.pulsar.topic, @appPulsarProperties.baseReg.tenant, @appPulsarProperties.baseReg.namespace)}"},
         subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )

@@ -28,6 +28,8 @@ public class AppPulsarProperties {
 
     @Data
     public static class Reg {
+        /** 是否启用 */
+        private boolean enabled = false;
         /**
          * pulsar租户
          */
