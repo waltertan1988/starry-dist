@@ -3,7 +3,7 @@ package com.walter.starry.security.base.service;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.config.properties.AppMsgProps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pulsar.client.api.*;
+import org.apache.pulsar.client.api.MessageId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,12 +28,31 @@ public class MessageService {
     private PulsarTemplate<String> stringPulsarTemplate;
 
     /**
+     * 发送本应用的广播消息消息
+     * @param messageTopicEnum
+     * @param message
+     * @return
+     */
+    public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
+        if(appMsgProps.getRedis().isEnabled()){
+            Long receivedClientNum = this.publishBroadcastToRedis(messageTopicEnum, message);
+            return Objects.toString(receivedClientNum, null);
+        }
+
+        if (Objects.nonNull(appMsgProps.getPulsar().getBaseReg()) && appMsgProps.getPulsar().getBaseReg().enabled()) {
+            return this.publishToPulsar(messageTopicEnum, appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace(), message);
+        }
+
+        throw new RuntimeException("sendBroadcastMessage not support");
+    }
+
+    /**
      * 发送Redis广播消息
      * @param messageTopicEnum
      * @param message
      */
-    public void publishBroadcastToRedis(MessageTopicEnum messageTopicEnum, String message){
-        stringRedisTemplate.convertAndSend(messageTopicEnum.name(), Objects.requireNonNull(message));
+    public Long publishBroadcastToRedis(MessageTopicEnum messageTopicEnum, String message){
+        return stringRedisTemplate.convertAndSend(messageTopicEnum.name(), Objects.requireNonNull(message));
     }
 
     /**
@@ -48,15 +67,5 @@ public class MessageService {
         String topic = String.format(messageTopicEnum.getPulsar().getTopic(), tenant, namespace);
         MessageId messageId = stringPulsarTemplate.newMessage(message).withTopic(topic).send();
         return messageId.toString();
-    }
-
-    /**
-     * 发送Pulsar消息
-     * @param messageTopicEnum
-     * @param message
-     * @return
-     */
-    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String message) {
-        return this.publishToPulsar(messageTopicEnum, appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace(), message);
     }
 }

@@ -165,7 +165,7 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now))));
             try {
-                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                messageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
@@ -207,7 +207,7 @@ public class AuthorityItemService {
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now);
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
             try {
-                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                messageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
@@ -247,7 +247,7 @@ public class AuthorityItemService {
                     .toList();
             String message = JsonUtil.toJson(messageList);
             try {
-                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                messageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
@@ -283,7 +283,7 @@ public class AuthorityItemService {
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), null, req.getMoveToCode(), now);
             String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
             try {
-                messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                messageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
             }
