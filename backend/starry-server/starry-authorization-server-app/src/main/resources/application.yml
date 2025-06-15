@@ -8,10 +8,11 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-  pulsar:
-    base-reg:
-      tenant: starry
-      namespace: ${spring.application.name}
+  message:
+    pulsar:
+      base-reg:
+        tenant: starry
+        namespace: ${spring.application.name}
 
   security:
     enable-front-back-seperated: true
@@ -100,3 +101,8 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
+
+#rocketmq:
+#  name-server: ${app.middleware-host}:9876
+#  producer:
+#    group: ${spring.application.name}

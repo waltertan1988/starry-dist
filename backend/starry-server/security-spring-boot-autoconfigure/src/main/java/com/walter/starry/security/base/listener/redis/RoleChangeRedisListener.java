@@ -3,13 +3,14 @@ package com.walter.starry.security.base.listener.redis;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
-import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
 import com.walter.starry.security.base.service.RoleService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -19,9 +20,9 @@ import java.util.List;
  * @DateTime: 2023-10-14 13:43:50
  */
 @Slf4j
-@Deprecated
-//@Component
+@Component
 @RedisSubscribeTopic(MessageTopicEnum.ROLE_CHANGE_BROADCAST)
+@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
 public class RoleChangeRedisListener implements MessageListener {
     @Autowired
     private RoleService roleService;

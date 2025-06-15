@@ -1,12 +1,13 @@
 package com.walter.starry.security.base.config;
 
-import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
+import com.walter.starry.security.base.listener.redis.RedisSubscribeTopic;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -47,6 +48,7 @@ public class RedisConfig {
      * @return
      */
     @Bean
+    @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
     RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, @Qualifier("redisSubscribeVirtualThreadTaskExecutor") ExecutorService executor) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);

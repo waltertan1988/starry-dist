@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.service;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.config.properties.AppPulsarProperties;
+import com.walter.starry.security.base.config.properties.AppMsgProps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @Service
 public class MessageService {
     @Autowired
-    private AppPulsarProperties appPulsarProperties;
+    private AppMsgProps appMsgProps;
     @Autowired
     @Qualifier("stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
@@ -59,6 +59,6 @@ public class MessageService {
      * @return
      */
     public String publishToPulsar(MessageTopicEnum messageTopicEnum, String message) {
-        return this.publishToPulsar(messageTopicEnum, appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace(), message);
+        return this.publishToPulsar(messageTopicEnum, appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace(), message);
     }
 }

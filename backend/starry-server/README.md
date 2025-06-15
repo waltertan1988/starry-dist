@@ -604,7 +604,7 @@ services:
 ```
 > 注：
 > （1）假设中间件的宿主机IP是192.168.10.131
-> （2）如果使用Pulsar作为本应用的基础MQ中间件，需在application.yml设置app.pulsar.base-reg.enabled为true
+> （2）如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
 #### 2.2.5 启动中间件服务
 参考：

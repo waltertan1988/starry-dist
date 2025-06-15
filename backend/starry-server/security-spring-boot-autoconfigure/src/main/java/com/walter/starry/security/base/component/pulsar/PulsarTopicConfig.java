@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.component.pulsar;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.config.properties.AppPulsarProperties;
+import com.walter.starry.security.base.config.properties.AppMsgProps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,31 +24,33 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "app.pulsar.base-reg.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "app.message.pulsar.base-reg.namespace")
 public class PulsarTopicConfig implements InitializingBean {
 
     @Autowired
-    private AppPulsarProperties appPulsarProperties;
+    private AppMsgProps appMsgProps;
 
     @Bean
     public PulsarTopic roleChangeBroadcastBasePulsarTopic() {
-        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsar().getTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
+        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsar().getTopic(),
+                appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return new PulsarTopicBuilder().name(topic).build();
     }
 
     @Bean
     public PulsarTopic resourceChangeBroadcastBasePulsarTopic() {
-        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsar().getTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
+        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsar().getTopic(),
+                appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return new PulsarTopicBuilder().name(topic).build();
     }
 
     @Override
     public void afterPropertiesSet() {
-        boolean flag = Objects.nonNull(appPulsarProperties.getBaseReg())
-                && StringUtils.hasText(appPulsarProperties.getBaseReg().getTenant())
-                && StringUtils.hasText(appPulsarProperties.getBaseReg().getNamespace());
+        boolean flag = Objects.nonNull(appMsgProps.getPulsar().getBaseReg())
+                && StringUtils.hasText(appMsgProps.getPulsar().getBaseReg().getTenant())
+                && StringUtils.hasText(appMsgProps.getPulsar().getBaseReg().getNamespace());
         Assert.isTrue(flag, "properties [app.pulsar.base-reg.tenant] and [app.pulsar.base-reg.namespace] should be setup");
     }
 }

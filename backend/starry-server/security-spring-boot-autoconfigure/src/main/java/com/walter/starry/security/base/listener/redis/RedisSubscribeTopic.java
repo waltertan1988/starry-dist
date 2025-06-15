@@ -1,4 +1,4 @@
-package com.walter.starry.security.base.listener.annotation;
+package com.walter.starry.security.base.listener.redis;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 
@@ -9,7 +9,6 @@ import java.lang.annotation.*;
  * @Author: walter.tan
  * @DateTime: 2023-10-14 14:07:21
  */
-@Deprecated
 @Target(ElementType.TYPE)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
