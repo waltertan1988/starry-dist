@@ -9,6 +9,11 @@ app:
       clean-from-days-before: 30
 
   message:
+    # 启用redis消息
+#    redis:
+#      enabled: true
+
+    # 启用pulsar消息
     pulsar:
       # 本应用所需的pulsar注册信息
       base-reg:
