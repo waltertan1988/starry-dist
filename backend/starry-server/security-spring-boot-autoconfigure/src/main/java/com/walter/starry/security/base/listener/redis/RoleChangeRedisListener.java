@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 角色变更的广播消息订阅（已废弃，由Pulsar代替）
+ * 角色变更的广播消息订阅
  * @Author: walter.tan
  * @DateTime: 2023-10-14 13:43:50
  */
@@ -30,7 +30,7 @@ public class RoleChangeRedisListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String body = new String(message.getBody());
-        log.info("RoleChangeMessage body: {}", body);
+        log.info("redis RoleChangeMessage body: {}", body);
         List<RoleChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）

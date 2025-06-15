@@ -42,7 +42,7 @@ public class RedisConfig {
     }
 
     /**
-     * 配置Redis消息监听（不建议使用Redis的PUB/SUB模式，建议使用Pulsar）
+     * 配置Redis消息监听
      * @param connectionFactory
      * @param executor
      * @return

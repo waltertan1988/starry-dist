@@ -24,16 +24,14 @@ public class MessageService {
     @Autowired
     @Qualifier("stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
-
     @Autowired
     private PulsarTemplate<String> stringPulsarTemplate;
 
     /**
-     * 发送Redis广播消息（已废弃，建议使用Pulsar）
+     * 发送Redis广播消息
      * @param messageTopicEnum
      * @param message
      */
-    @Deprecated
     public void publishBroadcastToRedis(MessageTopicEnum messageTopicEnum, String message){
         stringRedisTemplate.convertAndSend(messageTopicEnum.name(), Objects.requireNonNull(message));
     }

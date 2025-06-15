@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 资源变更的广播消息订阅（已废弃，由Pulsar代替）
+ * 资源变更的广播消息订阅
  * @Author: walter.tan
  * @DateTime: 2023-10-14 13:43:50
  */
@@ -30,7 +30,7 @@ public class ResourceChangeRedisListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String body = new String(message.getBody());
-        log.info("ResourceChangeMessage body: {}", body);
+        log.info("redis ResourceChangeMessage body: {}", body);
         List<ResourceChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（资源与权限的关联关系）
