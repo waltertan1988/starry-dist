@@ -32,14 +32,14 @@ public class PulsarTopicConfig implements InitializingBean {
 
     @Bean
     public PulsarTopic roleChangeBroadcastBasePulsarTopic() {
-        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
+        String topic = String.format(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getPulsar().getTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return new PulsarTopicBuilder().name(topic).build();
     }
 
     @Bean
     public PulsarTopic resourceChangeBroadcastBasePulsarTopic() {
-        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsarTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
+        String topic = String.format(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getPulsar().getTopic(), appPulsarProperties.getBaseReg().getTenant(), appPulsarProperties.getBaseReg().getNamespace());
         log.info("creating pulsar topic: {}", topic);
         return new PulsarTopicBuilder().name(topic).build();
     }

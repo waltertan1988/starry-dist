@@ -26,7 +26,7 @@ public class ResourceChangePulsarListener{
     private ResourceGroupService resourceGroupService;
 
     @PulsarListener(
-        topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.getPulsarTopic(), @appPulsarProperties.baseReg.tenant, @appPulsarProperties.baseReg.namespace)}"},
+        topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.getPulsar().getTopic(), @appPulsarProperties.baseReg.tenant, @appPulsarProperties.baseReg.namespace)}"},
         subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )

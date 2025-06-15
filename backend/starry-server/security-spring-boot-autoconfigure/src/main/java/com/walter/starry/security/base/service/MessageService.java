@@ -47,7 +47,7 @@ public class MessageService {
      * @return
      */
     public String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, String message) {
-        String topic = String.format(messageTopicEnum.getPulsarTopic(), tenant, namespace);
+        String topic = String.format(messageTopicEnum.getPulsar().getTopic(), tenant, namespace);
         MessageId messageId = stringPulsarTemplate.newMessage(message).withTopic(topic).send();
         return messageId.toString();
     }
