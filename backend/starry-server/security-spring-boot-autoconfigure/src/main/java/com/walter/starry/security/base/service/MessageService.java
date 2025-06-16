@@ -4,12 +4,14 @@ import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.config.properties.AppMsgProps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.MessageId;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.pulsar.core.PulsarTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -25,6 +27,8 @@ public class MessageService {
     @Qualifier("stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+    @Autowired
     private PulsarTemplate<String> stringPulsarTemplate;
 
     /**
@@ -33,10 +37,16 @@ public class MessageService {
      * @param message
      * @return
      */
+    @Nullable
     public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
         if(appMsgProps.getRedis().isEnabled()){
             Long receivedClientNum = this.publishBroadcastToRedis(messageTopicEnum, message);
             return Objects.toString(receivedClientNum, null);
+        }
+
+        if(appMsgProps.getRocketMq().isEnabled()){
+            this.publishToRocketMq(messageTopicEnum, message);
+            return null;
         }
 
         if (Objects.nonNull(appMsgProps.getPulsar().getBaseReg()) && appMsgProps.getPulsar().getBaseReg().enabled()) {
@@ -67,5 +77,14 @@ public class MessageService {
         String topic = String.format(messageTopicEnum.getPulsar().getTopic(), tenant, namespace);
         MessageId messageId = stringPulsarTemplate.newMessage(message).withTopic(topic).send();
         return messageId.toString();
+    }
+
+    /**
+     * 发送RocketMq消息
+     * @param messageTopicEnum
+     * @param message
+     */
+    public void publishToRocketMq(MessageTopicEnum messageTopicEnum, String message){
+        rocketMQTemplate.convertAndSend(messageTopicEnum.name(), message);
     }
 }

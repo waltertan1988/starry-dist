@@ -23,9 +23,18 @@ public class AppMsgProps {
     /** Pulsar消息配置 */
     private Pulsar pulsar;
 
+    /** RocketMq消息配置 */
+    private RocketMq rocketMq;
+
     @Data
     public static class Redis {
         /** 是否启用Redis消息 */
+        private boolean enabled = false;
+    }
+
+    @Data
+    public static class RocketMq {
+        /** 是否启用RocketMq消息 */
         private boolean enabled = false;
     }
 
