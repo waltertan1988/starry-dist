@@ -25,6 +25,7 @@ public class AppMsgProps {
 
     @Data
     public static class Redis{
+        /** 是否启用Redis消息 */
         private boolean enabled = false;
     }
 

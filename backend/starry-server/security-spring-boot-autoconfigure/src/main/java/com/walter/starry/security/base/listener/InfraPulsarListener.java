@@ -3,13 +3,14 @@ package com.walter.starry.security.base.listener;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
+import com.walter.starry.security.base.component.pulsar.PulsarTopicConfig;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.service.RoleService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.pulsar.annotation.PulsarListener;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "app.message.pulsar.base-reg.namespace")
+@ConditionalOnBean(PulsarTopicConfig.class)
 public class InfraPulsarListener {
     @Autowired
     private RoleService roleService;
@@ -39,7 +40,7 @@ public class InfraPulsarListener {
         subscriptionType = SubscriptionType.Exclusive
     )
     public void onRoleChange(String message){
-        log.info("Pulsar RoleChangeMessage message: {}", message);
+        log.info("pulsar RoleChangeMessage message: {}", message);
 
         try{
             List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
@@ -47,7 +48,7 @@ public class InfraPulsarListener {
             // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
             roleService.tryRefreshLocalCaches(messageList);
         }catch (Exception ex){
-            log.error("Pulsar RoleChangeMessage fail", ex);
+            log.error("pulsar RoleChangeMessage fail", ex);
         }
     }
 

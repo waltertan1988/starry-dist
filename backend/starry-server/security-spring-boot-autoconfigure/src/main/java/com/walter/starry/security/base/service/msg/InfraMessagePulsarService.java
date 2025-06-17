@@ -1,10 +1,11 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.component.pulsar.PulsarTopicConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.MessageId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.pulsar.core.PulsarTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = {"spring.pulsar.client.service-url", "spring.pulsar.admin.service-url"})
+@ConditionalOnBean(PulsarTopicConfig.class)
 public class InfraMessagePulsarService extends AbstractInfraMessageService {
     @Autowired
     private PulsarTemplate<String> stringPulsarTemplate;
