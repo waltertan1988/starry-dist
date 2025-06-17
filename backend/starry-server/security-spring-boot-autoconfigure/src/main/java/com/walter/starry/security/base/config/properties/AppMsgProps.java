@@ -25,7 +25,7 @@ public class AppMsgProps {
 
     @Data
     public static class Redis{
-        /** 是否启用Redis消息 */
+        /** 是否启用Redis消息，如使用了其他消息中间件，建议禁用此选项 */
         private boolean enabled = false;
     }
 
