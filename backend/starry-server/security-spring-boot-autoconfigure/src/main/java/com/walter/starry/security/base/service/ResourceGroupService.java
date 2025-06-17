@@ -15,6 +15,7 @@ import com.walter.starry.security.base.entity.AclResourceItem;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
 import com.walter.starry.security.base.repository.AclResourceGroupRepository;
 import com.walter.starry.security.base.repository.AclResourceItemRepository;
+import com.walter.starry.security.base.service.msg.InfraMessageService;
 import com.walter.starry.security.base.util.JsonUtil;
 import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.vo.response.resource.ResourceGroupVo;
@@ -52,7 +53,7 @@ public class ResourceGroupService {
     @Autowired
     private InfraRedisKeys infraRedisKeys;
     @Autowired
-    private MessageService messageService;
+    private InfraMessageService infraMessageService;
     @Autowired
     private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;
     @Autowired
@@ -314,7 +315,7 @@ public class ResourceGroupService {
             ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(req.getCode(), req.getName(), req.getHttpMethodList(), req.getPattern(), req.getSeq(), now);
             String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofCreate(after)));
             try {
-                messageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
             }
@@ -353,7 +354,7 @@ public class ResourceGroupService {
                 ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(item.getCode(), item.getName(), item.getHttpMethodList(), item.getPattern(), item.getSeq(), now);
                 String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after)));
                 try {
-                    messageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
                 } catch (Throwable ex) {
                     log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
                 }
@@ -470,7 +471,7 @@ public class ResourceGroupService {
                     )).toList();
                 String message = JsonUtil.toJson(messageList);
                 try {
-                    messageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
                 } catch (Throwable ex) {
                     log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
                 }
@@ -523,7 +524,7 @@ public class ResourceGroupService {
                     resourceItemCode, newRoleCodeList, removeRoleCodeList);
             String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData)));
             try {
-                messageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
             } catch (Throwable ex) {
                 log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
             }

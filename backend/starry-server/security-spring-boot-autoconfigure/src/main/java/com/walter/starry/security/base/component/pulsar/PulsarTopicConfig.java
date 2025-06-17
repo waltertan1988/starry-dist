@@ -24,9 +24,8 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "app.message.pulsar.base-reg.namespace")
+@ConditionalOnProperty(name = {"spring.pulsar.client.service-url", "spring.pulsar.admin.service-url", "app.message.pulsar.base-reg.namespace"})
 public class PulsarTopicConfig implements InitializingBean {
-
     @Autowired
     private AppMsgProps appMsgProps;
 

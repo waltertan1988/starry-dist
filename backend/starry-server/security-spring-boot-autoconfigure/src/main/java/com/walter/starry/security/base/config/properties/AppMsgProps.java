@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 应用的Pulsar配置
+ * 应用的消息中间件配置
  * @Author: walter.tan
  * @DateTime: 2024-03-27 22:33:50
  */
@@ -23,18 +23,8 @@ public class AppMsgProps {
     /** Pulsar消息配置 */
     private Pulsar pulsar;
 
-    /** RocketMq消息配置 */
-    private RocketMq rocketMq;
-
     @Data
-    public static class Redis {
-        /** 是否启用Redis消息 */
-        private boolean enabled = false;
-    }
-
-    @Data
-    public static class RocketMq {
-        /** 是否启用RocketMq消息 */
+    public static class Redis{
         private boolean enabled = false;
     }
 
