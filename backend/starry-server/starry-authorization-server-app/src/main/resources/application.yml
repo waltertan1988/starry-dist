@@ -8,16 +8,15 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-  message:
-    # 启用redis消息
+#  message:
 #    redis:
+#      # 启用redis消息
 #      enabled: true
-
-    # 启用pulsar消息
-    pulsar:
-      base-reg:
-        tenant: starry
-        namespace: ${spring.application.name}
+#    pulsar:
+#      # 本应用所需的pulsar注册信息
+#      base-reg:
+#        tenant: starry
+#        namespace: ${spring.application.name}
 
   security:
     enable-front-back-seperated: true
@@ -78,11 +77,11 @@ spring:
       timeout: 3000ms
 
   # Pulsar配置
-  pulsar:
-    client:
-      service-url: pulsar://${app.middleware-host}:6650
-    admin:
-      service-url: http://${app.middleware-host}:8080
+#  pulsar:
+#    client:
+#      service-url: pulsar://${app.middleware-host}:6650
+#    admin:
+#      service-url: http://${app.middleware-host}:8080
 
   # ES
   elasticsearch:
