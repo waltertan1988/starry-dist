@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum MessageTopicEnum {
+    TEST_BROADCAST(new Pulsar("persistent://%s/%s/test-broadcast", 0)),
     /** 角色变更 广播 */
     ROLE_CHANGE_BROADCAST(new Pulsar("persistent://%s/%s/role-change-broadcast", 0)),
     /**资源变更 广播*/

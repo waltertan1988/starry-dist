@@ -1,5 +1,3 @@
-version: '3.x'
-
 networks:
   starry:
     driver: bridge
@@ -10,9 +8,10 @@ networks:
           gateway: 172.18.0.1
 
 include:
-    # mysql子网网段：172.18.1.0/24
+    ## mysql子网网段：172.18.1.0/24
   - compose-mysql.yml
-    # redis子网网段：172.18.2.0/24
+    ## redis子网网段：172.18.2.0/24
   - compose-redis.yml
-    # pulsar子网网段：172.18.3.0/24
-  - compose-pulsar.yml
+    ## MQ子网网段：172.18.3.0/24
+  - compose-rocketmq.yml
+#  - compose-pulsar.yml
