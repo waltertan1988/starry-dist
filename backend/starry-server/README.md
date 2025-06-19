@@ -491,6 +491,11 @@ sudo mkdir -p ./data/redis
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
 sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
+# RocketMQ相关目录
+sudo mkdir -p ./data/rocketmq/namesrv/logs
+sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
+sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
+sudo chmod 777 -R ./data/rocketmq
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```
@@ -594,7 +599,23 @@ enforce-gtid-consistency=ON
 >（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
 >（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
 
-#### 2.2.4 如果消息队列采用Pulsar，还需要修改以下部署配置
+#### 2.2.4 消息队列配置
+假设中间件的宿主机IP是192.168.10.131
+#### 2.2.4.1 如果消息队列采用RocketMQ，还需要修改以下部署配置
+cat ./data/rocketmq/broker/conf/broker.conf
+```properties
+brokerClusterName = DefaultCluster
+brokerName = broker-a
+brokerId = 0
+deleteWhen = 04
+fileReservedTime = 48
+brokerRole = ASYNC_MASTER
+flushDiskType = ASYNC_FLUSH
+
+# 需按宿主机IP修改此配置
+brokerIP1 = 192.168.10.131
+```
+#### 2.2.4.2 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
 ```yaml
 services: 
@@ -602,9 +623,7 @@ services:
     environment: 
       - advertisedListeners=external:pulsar://192.168.10.131:6650
 ```
-> 注：
-> （1）假设中间件的宿主机IP是192.168.10.131
-> （2）如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
+> 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
 #### 2.2.5 启动中间件服务
 参考：
