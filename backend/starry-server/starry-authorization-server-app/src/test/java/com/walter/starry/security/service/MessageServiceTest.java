@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @Author: walter.tan
  * @DateTime: 2024-03-28 15:18:45
@@ -25,7 +23,5 @@ public class MessageServiceTest {
     void sendBroadcastMessage() throws InterruptedException {
         String resp = infraMessageService.sendBroadcastMessage(MessageTopicEnum.TEST_BROADCAST, "Hello World!");
         log.info("resp: {}", resp);
-
-        TimeUnit.SECONDS.sleep(10);
     }
 }
