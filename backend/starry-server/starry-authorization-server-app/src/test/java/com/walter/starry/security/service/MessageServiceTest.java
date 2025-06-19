@@ -20,7 +20,7 @@ public class MessageServiceTest {
     private InfraMessageService infraMessageService;
 
     @Test
-    void sendBroadcastMessage() throws InterruptedException {
+    void sendBroadcastMessage() {
         String resp = infraMessageService.sendBroadcastMessage(MessageTopicEnum.TEST_BROADCAST, "Hello World!");
         log.info("resp: {}", resp);
     }

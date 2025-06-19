@@ -8,10 +8,10 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-  message:
-    redis:
-      # 启用redis消息
-      enabled: true
+#  message:
+#    redis:
+#      # 启用redis消息
+#      enabled: true
 #    pulsar:
 #      # 本应用所需的pulsar注册信息
 #      base-reg:
@@ -106,7 +106,7 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
-#rocketmq:
-#  name-server: ${app.middleware-host}:9876
-#  producer:
-#    group: ${spring.application.name}
+rocketmq:
+  name-server: ${app.middleware-host}:9876
+  producer:
+    group: ${spring.application.name}
