@@ -31,6 +31,19 @@ public class InfraPulsarListener {
     private ResourceGroupService resourceGroupService;
 
     /**
+     * 测试的广播消息订阅
+     * @param message
+     */
+    @PulsarListener(
+        topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).TEST_BROADCAST.pulsar.topic, @appMsgProps.pulsar.baseReg.tenant, @appMsgProps.pulsar.baseReg.namespace)}"},
+        subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).TEST_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
+        subscriptionType = SubscriptionType.Exclusive
+    )
+    public void testBroadcastChange(String message){
+        log.info("pulsar TEST_BROADCAST message: {}", message);
+    }
+
+    /**
      * 角色变更的广播消息订阅
      * @param message
      */
