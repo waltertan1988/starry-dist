@@ -601,7 +601,18 @@ enforce-gtid-consistency=ON
 
 #### 2.2.4 消息队列配置
 假设中间件的宿主机IP是192.168.10.131
-#### 2.2.4.1 如果消息队列采用RocketMQ，还需要修改以下部署配置
+
+#### 2.2.4.1 如果消息队列采用Redis，还需要修改以下部署配置
+* application.yml:
+```yaml
+app:
+  message:
+    redis:
+      # 启用redis消息
+      enabled: true
+```
+
+#### 2.2.4.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
 cat ./data/rocketmq/broker/conf/broker.conf
 ```properties
 brokerClusterName = DefaultCluster
@@ -615,7 +626,14 @@ flushDiskType = ASYNC_FLUSH
 # 需按宿主机IP修改此配置
 brokerIP1 = 192.168.10.131
 ```
-#### 2.2.4.2 如果消息队列采用Pulsar，还需要修改以下部署配置
+
+* application.yml:
+```yaml
+rocketmq:
+  name-server: ${app.middleware-host}:9876
+```
+
+#### 2.2.4.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
 ```yaml
 services: 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = {"rocketmq.producer.group"})
+@ConditionalOnProperty(name = {"rocketmq.name-server"})
 public class InfraMessageRocketMqService extends AbstractInfraMessageService {
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
