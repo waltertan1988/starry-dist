@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -24,7 +23,6 @@ public class InfraMessageService {
      * @param message
      * @return
      */
-    @Nullable
     public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
         return infraMessageServiceList
                 .stream()

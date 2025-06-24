@@ -11,15 +11,25 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum MessageTopicEnum {
-    TEST_BROADCAST(new Pulsar("persistent://%s/%s/test-broadcast", 0)),
+    /** 测试 广播 */
+    TEST_BROADCAST(new RocketMq("TEST"), new Pulsar("persistent://%s/%s/test-broadcast", 0)),
     /** 角色变更 广播 */
-    ROLE_CHANGE_BROADCAST(new Pulsar("persistent://%s/%s/role-change-broadcast", 0)),
+    ROLE_CHANGE_BROADCAST(new RocketMq("ROLE_CHANGE"), new Pulsar("persistent://%s/%s/role-change-broadcast", 0)),
     /**资源变更 广播*/
-    RESOURCE_CHANGE_BROADCAST(new Pulsar("persistent://%s/%s/resource-change-broadcast", 0))
+    RESOURCE_CHANGE_BROADCAST(new RocketMq("RESOURCE_CHANGE"), new Pulsar("persistent://%s/%s/resource-change-broadcast", 0))
     ;
+
+    /** RocketMq信息 */
+    private final RocketMq rocketMq;
 
     /** Pulsar信息 */
     private final Pulsar pulsar;
+
+    @Getter
+    @AllArgsConstructor
+    public static class RocketMq{
+        private String tags;
+    }
 
     @Getter
     @AllArgsConstructor

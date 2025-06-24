@@ -110,3 +110,4 @@ rocketmq:
   name-server: ${app.middleware-host}:9876
   producer:
     group: ${spring.application.name}
+    namespace: ${spring.application.name}

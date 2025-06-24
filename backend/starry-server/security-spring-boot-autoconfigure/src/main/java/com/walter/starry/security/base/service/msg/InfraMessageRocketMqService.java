@@ -1,7 +1,9 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.listener.InfraRocketMqBroadcastListener;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,7 +23,10 @@ public class InfraMessageRocketMqService extends AbstractInfraMessageService {
 
     @Override
     public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
-        rocketMQTemplate.convertAndSend(messageTopicEnum.name(), message);
-        return null;
+        String topic = InfraRocketMqBroadcastListener.TOPIC;
+        String tags = messageTopicEnum.getRocketMq().getTags();
+        String destination = String.format("%s:%s", topic, tags);
+        SendResult sendResult = rocketMQTemplate.syncSend(destination, message);
+        return sendResult.getMsgId();
     }
 }
