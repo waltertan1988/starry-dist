@@ -12,6 +12,7 @@ app:
 #    redis:
 #      # 启用redis消息
 #      enabled: true
+#      namespace: ${spring.application.name}
 #    pulsar:
 #      # 本应用所需的pulsar注册信息
 #      base-reg:
@@ -106,6 +107,7 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 
+# RocketMQ配置
 rocketmq:
   name-server: ${app.middleware-host}:9876
   producer:

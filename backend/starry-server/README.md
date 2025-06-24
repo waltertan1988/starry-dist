@@ -610,6 +610,7 @@ app:
     redis:
       # 启用redis消息
       enabled: true
+      namespace: ${spring.application.name}
 ```
 
 #### 2.2.4.2 如果消息队列采用RocketMQ，还需要修改以下部署配置

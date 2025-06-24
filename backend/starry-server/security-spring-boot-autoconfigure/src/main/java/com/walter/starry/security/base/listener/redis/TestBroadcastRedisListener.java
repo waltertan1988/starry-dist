@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@RedisSubscribeTopic(MessageTopicEnum.TEST_BROADCAST)
+@RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.TEST_BROADCAST)
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
-public class TestBroadcaseRedisListener implements MessageListener {
+public class TestBroadcastRedisListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String body = new String(message.getBody());

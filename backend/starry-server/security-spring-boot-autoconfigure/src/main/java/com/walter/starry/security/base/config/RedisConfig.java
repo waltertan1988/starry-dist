@@ -1,7 +1,8 @@
 package com.walter.starry.security.base.config;
 
-import com.walter.starry.security.base.listener.redis.RedisSubscribeTopic;
+import com.walter.starry.security.base.listener.redis.RedisSubscribe;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Configuration
 public class RedisConfig {
+    @Autowired
+    private ConfigurableEnvironment environment;
     @Autowired
     private List<MessageListener> messageListenerList;
 
@@ -55,16 +59,28 @@ public class RedisConfig {
         container.setTaskExecutor(executor);
 
         for (MessageListener messageListener : messageListenerList) {
-            RedisSubscribeTopic redisSubscribeTopic = AnnotationUtils.findAnnotation(messageListener.getClass(), RedisSubscribeTopic.class);
-            if(Objects.isNull(redisSubscribeTopic)){
-                log.warn("@RedisSubscribeTopic is missing and skip adding MessageListener: {}", messageListener.getClass().getName());
+            RedisSubscribe redisSubscribe = AnnotationUtils.findAnnotation(messageListener.getClass(), RedisSubscribe.class);
+            if(Objects.isNull(redisSubscribe)){
+                log.warn("@{} is missing and skip adding MessageListener: {}", RedisSubscribe.class.getSimpleName(), messageListener.getClass().getName());
                 continue;
             }
-            // TODO tyx 支持命名空间前缀
-            container.addMessageListener(messageListener, ChannelTopic.of(redisSubscribeTopic.value().name()));
+
+            String topic = redisSubscribe.topic().name();
+            String namespace = environment.resolvePlaceholders(redisSubscribe.namespace());
+            container.addMessageListener(messageListener, ChannelTopic.of(this.getChannelName(namespace, topic)));
         }
 
         return container;
+    }
+
+    /**
+     * 获取订阅消息的channel名称
+     * @param namespace
+     * @param topic
+     * @return
+     */
+    public String getChannelName(String namespace, String topic){
+        return StringUtils.isBlank(namespace) ? topic : String.format("%s:%s", namespace, topic);
     }
 
     /**

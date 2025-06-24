@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@RedisSubscribeTopic(MessageTopicEnum.ROLE_CHANGE_BROADCAST)
+@RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.ROLE_CHANGE_BROADCAST)
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
 public class RoleChangeRedisListener implements MessageListener {
     @Autowired
