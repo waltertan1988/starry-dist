@@ -625,6 +625,8 @@ flushDiskType = ASYNC_FLUSH
 
 # 需按宿主机IP修改此配置
 brokerIP1 = 192.168.10.131
+# 是否自动创建主题，生产环境建议禁用
+autoCreateTopicEnable = true
 ```
 
 * application.yml:

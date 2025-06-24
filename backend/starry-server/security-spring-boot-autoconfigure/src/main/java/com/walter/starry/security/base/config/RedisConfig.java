@@ -60,6 +60,7 @@ public class RedisConfig {
                 log.warn("@RedisSubscribeTopic is missing and skip adding MessageListener: {}", messageListener.getClass().getName());
                 continue;
             }
+            // TODO tyx 支持命名空间前缀
             container.addMessageListener(messageListener, ChannelTopic.of(redisSubscribeTopic.value().name()));
         }
 
