@@ -56,7 +56,7 @@
                        :doSearch="searchUserList" :on-selection-change="onTableSelectionChange">
         <el-table-column type="selection" width="40" fixed/>
         <el-table-column prop="id" label="ID" width="80" fixed/>
-        <el-table-column prop="username" label="账号" width="280" fixed/>
+        <el-table-column prop="username" label="账号" fixed/>
         <el-table-column prop="nickname" label="昵称" width="180" fixed/>
         <el-table-column prop="enabled" label="启用" width="60" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="accountExpired" label="已过期" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
