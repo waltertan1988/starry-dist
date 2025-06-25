@@ -1,6 +1,6 @@
 <template>
     <AdminLayout>
-      <div style="text-align: left">
+      <div style="text-align: left; margin: 10px 10px 0 10px">
         <div class="blank5"></div>
         <el-row justify="start">
           <el-col :span="7">
