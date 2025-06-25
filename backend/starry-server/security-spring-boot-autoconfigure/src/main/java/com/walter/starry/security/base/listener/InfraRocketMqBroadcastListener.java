@@ -42,7 +42,8 @@ public class InfraRocketMqBroadcastListener implements RocketMQListener<MessageE
     public void onMessage(MessageExt messageExt) {
         String tags = messageExt.getTags();
         String body = new String(messageExt.getBody(), StandardCharsets.UTF_8);
-        log.info("rocketmq messageExt received. tags: {}, body: {}", tags, body);
+
+        log.info("rocketmq messageExt received. tags: {}, msgId: {}, body: {}", tags, messageExt.getMsgId(), body);
 
         if(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getRocketMq().getTags().equals(tags)){
             List<RoleChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});

@@ -47,3 +47,16 @@ services:
     environment:
       - NAMESRV_ADDR=rmqnamesrv:9876
     command: sh mqproxy
+  rmq-dashboard:
+    image: apacherocketmq/rocketmq-dashboard:2.0.1
+    container_name: rmqdashboard
+    ports:
+      - 18080:8080
+    networks:
+      starry:
+        ipv4_address: 172.18.3.4
+    restart: always
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876"
+    depends_on:
+      - rmq-proxy
