@@ -7,20 +7,19 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * 标准Vo
+ * 标准响应体Vo
+ * @author walter.tan
  * @param <T>
  */
 @Data
 public class ApiResponse<T> {
-
+    /** 是否成功 */
     private Boolean success;
-
+    /** 错误编码 */
     private String errCode;
-
+    /** 错误信息 */
     private String errMsg;
-
-    private String traceId;
-
+    /** 响应业务数据 */
     private T data;
 
     public static <T> ApiResponse<T> success(){
