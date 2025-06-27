@@ -1,8 +1,7 @@
 package com.walter.starry.security.base.component.security;
 
-import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.util.JsonUtil;
-import jakarta.servlet.ServletException;
+import com.walter.starry.security.base.vo.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -19,7 +18,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class AjaxAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         String json = JsonUtil.toJson(ApiResponse.fail(ApiResponse.ErrCode.UNAUTHORIZED, authException.getMessage()));
         response.setContentType("application/json;charset=UTF-8");
         if(StringUtils.hasText(json)){
