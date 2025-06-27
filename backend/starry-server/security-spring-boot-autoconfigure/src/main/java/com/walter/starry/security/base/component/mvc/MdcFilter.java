@@ -19,7 +19,7 @@ public class MdcFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
-            String traceId = StringUtils.firstNonBlank(MdcUtil.getTraceId(), request.getHeader(MdcUtil.ATTR_TRACE_ID), MdcUtil.genNewTraceId());
+            String traceId = StringUtils.firstNonBlank(MdcUtil.getTraceId(), request.getHeader(MdcUtil.ATTR_TRACE_ID), request.getParameter(MdcUtil.ATTR_TRACE_ID), MdcUtil.genNewTraceId());
             MdcUtil.setTraceId(traceId);
             response.addHeader(MdcUtil.ATTR_TRACE_ID, traceId);
             filterChain.doFilter(request, response);

@@ -9,7 +9,7 @@ import java.util.UUID;
  * @DateTime: 2025-06-25 16:28:53
  */
 public class MdcUtil {
-    public static final String ATTR_TRACE_ID = "traceId";
+    public static final String ATTR_TRACE_ID = "starry-traceId";
 
     public static String getTraceId(){
         return MDC.get(ATTR_TRACE_ID);
