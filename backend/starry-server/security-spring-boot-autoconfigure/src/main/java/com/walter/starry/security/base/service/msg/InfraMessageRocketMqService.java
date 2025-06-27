@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.listener.InfraRocketMqBroadcastListener;
+import com.walter.starry.security.base.listener.rocketmq.InfraRocketMqBroadcastListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;

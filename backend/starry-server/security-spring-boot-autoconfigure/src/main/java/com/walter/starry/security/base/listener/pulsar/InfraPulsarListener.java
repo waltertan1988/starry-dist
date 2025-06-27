@@ -1,4 +1,4 @@
-package com.walter.starry.security.base.listener;
+package com.walter.starry.security.base.listener.pulsar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;

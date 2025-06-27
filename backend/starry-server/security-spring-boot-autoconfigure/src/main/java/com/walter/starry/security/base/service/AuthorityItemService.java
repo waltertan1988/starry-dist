@@ -12,7 +12,6 @@ import com.walter.starry.security.base.repository.AclAuthorityItemRepository;
 import com.walter.starry.security.base.repository.AclAuthorityRepository;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
 import com.walter.starry.security.base.service.msg.InfraMessageService;
-import com.walter.starry.security.base.util.JsonUtil;
 import com.walter.starry.security.base.vo.request.role.MoveRoleRequest;
 import com.walter.starry.security.base.vo.request.role.SaveRoleRequest;
 import com.walter.starry.security.base.vo.response.ApiResponse;
@@ -164,11 +163,11 @@ public class AuthorityItemService {
 
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
-            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now))));
+            List<RoleChangeMessage> msgObj = Lists.newArrayList(RoleChangeMessage.ofCreate(new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now)));
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
         });
     }
@@ -206,11 +205,11 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(oldAclAuthorityItem.getCode(), oldAclAuthorityItem.getName(), oldAclAuthorityItem.getParentCode(), now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), req.getName(), req.getParentCode(), now);
-            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
+            List<RoleChangeMessage> msgObj = Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after));
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
 
             // 踢出受角色编码变更影响的用户的session
@@ -243,14 +242,13 @@ public class AuthorityItemService {
 
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 发送“角色变更”广播，刷新层次角色及权限与资源关联关系的本地缓存
-            List<RoleChangeMessage> messageList = codeList.stream()
+            List<RoleChangeMessage> msgObj = codeList.stream()
                     .map(code -> RoleChangeMessage.ofDelete(new RoleChangeMessage.RoleData(code, null, null, now)))
                     .toList();
-            String message = JsonUtil.toJson(messageList);
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
 
             // 踢出待删角色对应用户的session
@@ -282,11 +280,11 @@ public class AuthorityItemService {
             // 发送“角色变更”广播，刷新层次角色的本地缓存
             RoleChangeMessage.RoleData before = new RoleChangeMessage.RoleData(req.getCode(), null, oldParentCode, now);
             RoleChangeMessage.RoleData after = new RoleChangeMessage.RoleData(req.getCode(), null, req.getMoveToCode(), now);
-            String message = JsonUtil.toJson(Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after)));
+            List<RoleChangeMessage> msgObj = Lists.newArrayList(RoleChangeMessage.ofUpdate(before, after));
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.ROLE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.ROLE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
         });
     }

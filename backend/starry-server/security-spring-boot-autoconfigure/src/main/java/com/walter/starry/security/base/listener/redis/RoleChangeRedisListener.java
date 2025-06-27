@@ -8,8 +8,6 @@ import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,15 +21,14 @@ import java.util.List;
 @Component
 @RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.ROLE_CHANGE_BROADCAST)
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
-public class RoleChangeRedisListener implements MessageListener {
+public class RoleChangeRedisListener extends AbstractMdcRedisMessageListener {
     @Autowired
     private RoleService roleService;
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {
-        String body = new String(message.getBody());
-        log.info("redis RoleChangeMessage body: {}", body);
-        List<RoleChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
+    public void handle(String message, byte[] pattern) {
+        log.info("redis RoleChangeMessage message: {}", message);
+        List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
         roleService.tryRefreshLocalCaches(messageList);

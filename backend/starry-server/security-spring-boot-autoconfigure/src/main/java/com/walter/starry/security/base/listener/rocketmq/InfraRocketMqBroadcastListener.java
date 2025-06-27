@@ -1,4 +1,4 @@
-package com.walter.starry.security.base.listener;
+package com.walter.starry.security.base.listener.rocketmq;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
@@ -12,12 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -31,7 +29,7 @@ import java.util.List;
     consumerGroup = "${spring.application.name}", messageModel = MessageModel.BROADCASTING
 )
 @ConditionalOnBean(InfraMessageRocketMqService.class)
-public class InfraRocketMqBroadcastListener implements RocketMQListener<MessageExt> {
+public class InfraRocketMqBroadcastListener extends AbstractMdcRocketMqMessageListener {
     public static final String TOPIC = "INFRA_BROADCAST";
     @Autowired
     private RoleService roleService;
@@ -39,19 +37,18 @@ public class InfraRocketMqBroadcastListener implements RocketMQListener<MessageE
     private ResourceGroupService resourceGroupService;
 
     @Override
-    public void onMessage(MessageExt messageExt) {
+    public void handle(String message, MessageExt messageExt) {
         String tags = messageExt.getTags();
-        String body = new String(messageExt.getBody(), StandardCharsets.UTF_8);
 
-        log.info("rocketmq messageExt received. tags: {}, msgId: {}, body: {}", tags, messageExt.getMsgId(), body);
+        log.info("rocketmq messageExt received. tags: {}, msgId: {}, message: {}", tags, messageExt.getMsgId(), message);
 
         if(MessageTopicEnum.ROLE_CHANGE_BROADCAST.getRocketMq().getTags().equals(tags)){
-            List<RoleChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
+            List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
             // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
             roleService.tryRefreshLocalCaches(messageList);
         }else if(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.getRocketMq().getTags().equals(tags)){
-            List<ResourceChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
+            List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
             // 检查并尝试刷新本地缓存（资源与权限的关联关系）
             resourceGroupService.tryRefreshLocalCaches(messageList);

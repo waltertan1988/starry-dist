@@ -8,8 +8,6 @@ import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,15 +21,14 @@ import java.util.List;
 @Component
 @RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.RESOURCE_CHANGE_BROADCAST)
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
-public class ResourceChangeRedisListener implements MessageListener {
+public class ResourceChangeRedisListener extends AbstractMdcRedisMessageListener {
     @Autowired
     private ResourceGroupService resourceGroupService;
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {
-        String body = new String(message.getBody());
-        log.info("redis ResourceChangeMessage body: {}", body);
-        List<ResourceChangeMessage> messageList = JsonUtil.toList(body, new TypeReference<>() {});
+    public void handle(String message, byte[] pattern) {
+        log.info("redis ResourceChangeMessage message: {}", message);
+        List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（资源与权限的关联关系）
         resourceGroupService.tryRefreshLocalCaches(messageList);

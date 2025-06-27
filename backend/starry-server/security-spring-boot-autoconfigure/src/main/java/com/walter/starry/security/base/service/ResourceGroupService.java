@@ -313,11 +313,11 @@ public class ResourceGroupService {
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 新增的资源项，其顺序值可能会影响本地缓存里的排序
             ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(req.getCode(), req.getName(), req.getHttpMethodList(), req.getPattern(), req.getSeq(), now);
-            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofCreate(after)));
+            List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofCreate(after));
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
         });
     }
@@ -352,11 +352,11 @@ public class ResourceGroupService {
                 // 资源项编码、模式路径、请求方法类型或顺序发生变化，刷新本地缓存
                 ResourceChangeMessage.ResourceData before = new ResourceChangeMessage.ResourceData(oldItem.getCode(), oldItem.getName(), oldItem.getHttpMethodList(), oldItem.getPattern(), oldItem.getSeq(), now);
                 ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(item.getCode(), item.getName(), item.getHttpMethodList(), item.getPattern(), item.getSeq(), now);
-                String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after)));
+                List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after));
                 try {
-                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
                 } catch (Throwable ex) {
-                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                    log.error("send MQ fail", ex);
                 }
 
                 // 修改资源编码，需要剔除Redis缓存
@@ -465,15 +465,14 @@ public class ResourceGroupService {
 
             adminCommonVirtualThreadTaskExecutor.execute(() -> {
                 // 刷新本地缓存
-                List<ResourceChangeMessage> messageList = itemCodes.stream()
+                List<ResourceChangeMessage> msgObj = itemCodes.stream()
                     .map(code -> ResourceChangeMessage.ofDelete(
                         new ResourceChangeMessage.ResourceData(code, null, null, null, null, now)
                     )).toList();
-                String message = JsonUtil.toJson(messageList);
                 try {
-                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
                 } catch (Throwable ex) {
-                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                    log.error("send MQ fail", ex);
                 }
 
                 // 剔除Redis缓存
@@ -522,11 +521,11 @@ public class ResourceGroupService {
             // 刷新本地缓存
             ResourceChangeMessage.ChangeAuthorityData changeAuthorityData = new ResourceChangeMessage.ChangeAuthorityData(
                     resourceItemCode, newRoleCodeList, removeRoleCodeList);
-            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData)));
+            List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData));
             try {
-                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
             } catch (Throwable ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                log.error("send MQ fail", ex);
             }
 
             // 剔除Redis缓存

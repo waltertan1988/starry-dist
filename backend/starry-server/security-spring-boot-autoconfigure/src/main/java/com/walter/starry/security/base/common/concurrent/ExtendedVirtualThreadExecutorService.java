@@ -1,8 +1,10 @@
 package com.walter.starry.security.base.common.concurrent;
 
+import com.walter.starry.security.base.util.MdcUtil;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -88,9 +90,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Callable<T> wrapperTask = () -> {
             try{
-                return task.call();
+                return toMdcCallable(parentTraceId, task).call();
             }finally {
                 semaphore.release();
             }
@@ -105,9 +109,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Runnable wrapperTask = () -> {
             try{
-                task.run();
+                toMdcRunnable(parentTraceId, task).run();
             }finally {
                 semaphore.release();
             }
@@ -122,9 +128,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Runnable wrapperTask = () -> {
             try{
-                task.run();
+                toMdcRunnable(parentTraceId, task).run();
             }finally {
                 semaphore.release();
             }
@@ -141,9 +149,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Collection<? extends Callable<T>> wrapperTasks = tasks.stream().map(task -> (Callable<T>) () -> {
             try{
-                return task.call();
+                return toMdcCallable(parentTraceId, task).call();
             }finally {
                 semaphore.release();
             }
@@ -161,9 +171,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Collection<? extends Callable<T>> wrapperTasks = tasks.stream().map(task -> (Callable<T>) () -> {
             try{
-                return task.call();
+                return toMdcCallable(parentTraceId, task).call();
             }finally {
                 semaphore.release();
             }
@@ -181,8 +193,10 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         try{
-            return executorService.invokeAny(tasks);
+            return executorService.invokeAny(tasks.stream().map(t -> toMdcCallable(parentTraceId, t)).toList());
         }finally {
             semaphore.release(tasks.size());
         }
@@ -197,8 +211,10 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         try{
-            return executorService.invokeAny(tasks, timeout, unit);
+            return executorService.invokeAny(tasks.stream().map(t -> toMdcCallable(parentTraceId, t)).toList(), timeout, unit);
         }finally {
             semaphore.release(tasks.size());
         }
@@ -210,9 +226,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
+        String parentTraceId = MdcUtil.getTraceId();
+
         Runnable wrapperCommand = () -> {
             try{
-                command.run();
+                toMdcRunnable(parentTraceId, command).run();
             }finally {
                 semaphore.release();
             }
@@ -227,5 +245,35 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
         log.info("Closing virtual thread executor service: {}", this.virtualThreadName);
         ExecutorService.super.close();
         log.info("Finish closing virtual thread executor service: {}", this.virtualThreadName);
+    }
+
+    public static String genSubThreadTraceId(String parentThreadTraceId){
+        if(StringUtils.hasText(parentThreadTraceId)){
+            return String.format("%s:%s", parentThreadTraceId, MdcUtil.genNewTraceId());
+        }else{
+            return String.format(":%s", MdcUtil.genNewTraceId());
+        }
+    }
+
+    public static <T> Callable<T> toMdcCallable(String parentTraceId, Callable<T> callable){
+        return () -> {
+            try{
+                MdcUtil.setTraceId(genSubThreadTraceId(parentTraceId));
+                return callable.call();
+            }finally {
+                MdcUtil.removeTraceId();
+            }
+        };
+    }
+
+    public static Runnable toMdcRunnable(String parentTraceId, Runnable runnable){
+        return () -> {
+            try{
+                MdcUtil.setTraceId(genSubThreadTraceId(parentTraceId));
+                runnable.run();
+            }finally {
+                MdcUtil.removeTraceId();
+            }
+        };
     }
 }
