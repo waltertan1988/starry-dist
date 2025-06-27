@@ -8,6 +8,7 @@ import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.service.RoleService;
 import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -39,8 +40,9 @@ public class InfraPulsarListener {
         subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).TEST_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )
-    public void testBroadcastChange(String message){
-        log.info("pulsar TEST_BROADCAST message: {}", message);
+    public void testBroadcastChange(Message<String> message){
+        String messageData = new String(message.getData());
+        log.info("pulsar TEST_BROADCAST messageData: {}", messageData);
     }
 
     /**
@@ -52,11 +54,12 @@ public class InfraPulsarListener {
         subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).ROLE_CHANGE_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )
-    public void onRoleChange(String message){
-        log.info("pulsar RoleChangeMessage message: {}", message);
+    public void onRoleChange(Message<String> message){
+        String messageData = new String(message.getData());
+        log.info("pulsar RoleChangeMessage messageData: {}", messageData);
 
         try{
-            List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+            List<RoleChangeMessage> messageList = JsonUtil.toList(messageData, new TypeReference<>() {});
 
             // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
             roleService.tryRefreshLocalCaches(messageList);
@@ -74,11 +77,12 @@ public class InfraPulsarListener {
         subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).RESOURCE_CHANGE_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )
-    public void onResourceChange(String message){
-        log.info("Pulsar ResourceChangeMessage message: {}", message);
+    public void onResourceChange(Message<String> message){
+        String messageData = new String(message.getData());
+        log.info("Pulsar ResourceChangeMessage messageData: {}", messageData);
 
         try{
-            List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+            List<ResourceChangeMessage> messageList = JsonUtil.toList(messageData, new TypeReference<>() {});
 
             // 检查并尝试刷新本地缓存（资源与权限的关联关系）
             resourceGroupService.tryRefreshLocalCaches(messageList);

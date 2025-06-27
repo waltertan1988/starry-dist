@@ -1,8 +1,9 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.message.MdcMessageWrapper;
 import com.walter.starry.security.base.config.properties.AppMsgProps;
-import jakarta.annotation.Nullable;
+import com.walter.starry.security.base.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 
@@ -21,11 +22,26 @@ public abstract class AbstractInfraMessageService implements Ordered {
     }
 
     /**
+     * 转换为带有MDC信息的消息并发送广播消息
+     * @param messageTopicEnum
+     * @param msgObj
+     * @return
+     * @param <T>
+     */
+    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) throws Exception {
+        String message = JsonUtil.toJson(new MdcMessageWrapper(JsonUtil.toJson(msgObj)));
+        try{
+            return this.sendBroadcastMessage(messageTopicEnum, message);
+        }catch (Throwable t){
+            throw new Exception(String.format("sendBroadcastMessage fail. topic: %s, message: %s", messageTopicEnum.name(), message), t);
+        }
+    }
+
+    /**
      * 发送广播消息
      * @param messageTopicEnum
      * @param message
      * @return
      */
-    @Nullable
     public abstract String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message);
 }
