@@ -53,7 +53,7 @@
     </el-container>
 
     <!--ajax请求无权限时的登录框-->
-    <el-dialog v-model="store.state.ajaxLoginFormDialog.visible" title="统一认证平台"
+    <el-dialog v-model="store.state.ajaxLoginFormDialog.visible" title="系统提示"
                center align-center width="300" :close-on-click-modal="false" :show-close="false">
         <div class="alert alert-danger" role="alert">你的会话已过期，请重新登录</div>
 
