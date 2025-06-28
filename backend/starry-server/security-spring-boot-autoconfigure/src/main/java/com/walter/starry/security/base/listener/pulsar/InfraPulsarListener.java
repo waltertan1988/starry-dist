@@ -42,7 +42,7 @@ public class InfraPulsarListener {
     )
     public void testBroadcastChange(Message<String> message){
         String messageData = new String(message.getData());
-        log.info("pulsar TEST_BROADCAST messageData: {}", messageData);
+        log.info("pulsar TEST_BROADCAST messageId: {}, messageData: {}", message.getMessageId(), messageData);
     }
 
     /**
@@ -56,7 +56,7 @@ public class InfraPulsarListener {
     )
     public void onRoleChange(Message<String> message){
         String messageData = new String(message.getData());
-        log.info("pulsar RoleChangeMessage messageData: {}", messageData);
+        log.info("pulsar RoleChangeMessage messageId: {},  messageData: {}", message.getMessageId(), messageData);
 
         try{
             List<RoleChangeMessage> messageList = JsonUtil.toList(messageData, new TypeReference<>() {});
@@ -79,7 +79,7 @@ public class InfraPulsarListener {
     )
     public void onResourceChange(Message<String> message){
         String messageData = new String(message.getData());
-        log.info("Pulsar ResourceChangeMessage messageData: {}", messageData);
+        log.info("pulsar ResourceChangeMessage messageId: {},  messageData: {}", message.getMessageId(), messageData);
 
         try{
             List<ResourceChangeMessage> messageList = JsonUtil.toList(messageData, new TypeReference<>() {});
@@ -87,7 +87,7 @@ public class InfraPulsarListener {
             // 检查并尝试刷新本地缓存（资源与权限的关联关系）
             resourceGroupService.tryRefreshLocalCaches(messageList);
         }catch (Exception ex){
-            log.error("Pulsar ResourceChangeMessage fail", ex);
+            log.error("pulsar ResourceChangeMessage fail", ex);
         }
     }
 }

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author: walter.tan
@@ -44,9 +44,7 @@ public class JsonUtil {
     }
 
     public static String toJson(Object object){
-        if(Objects.isNull(object)){
-            return null;
-        }
+        Assert.notNull(object, "object cannot be null");
 
         try {
             return objectMapper.writeValueAsString(object);

@@ -1,7 +1,9 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.message.RedisMessage;
 import com.walter.starry.security.base.config.RedisConfig;
+import com.walter.starry.security.base.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 /**
  * 基础应用的Redis消息发送服务（兜底服务）
@@ -35,9 +35,16 @@ public class InfraMessageRedisService extends AbstractInfraMessageService {
     }
 
     @Override
-    public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
+    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) {
         String channelName = redisConfig.getChannelName(namespace, messageTopicEnum.name());
-        Long receivedClientNum = stringRedisTemplate.convertAndSend(channelName, Objects.requireNonNull(message));
-        return Objects.toString(receivedClientNum, null);
+        RedisMessage redisMessage = new RedisMessage(JsonUtil.toJson(msgObj));
+        String message = JsonUtil.toJson(redisMessage);
+        try{
+            stringRedisTemplate.convertAndSend(channelName, message);
+            return redisMessage.getMsgId();
+        }catch (Throwable t){
+            throw new RuntimeException(String.format("sendBroadcastMessage fail. channelName: %s, topic: %s, message: %s",
+                    channelName, messageTopicEnum.name(), message), t);
+        }
     }
 }

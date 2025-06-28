@@ -2,6 +2,7 @@ package com.walter.starry.security.base.listener.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.message.RedisMessage;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.util.JsonUtil;
@@ -26,9 +27,9 @@ public class ResourceChangeRedisListener extends AbstractMdcRedisMessageListener
     private ResourceGroupService resourceGroupService;
 
     @Override
-    public void handle(String message, byte[] pattern) {
-        log.info("redis ResourceChangeMessage message: {}", message);
-        List<ResourceChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+    public void handle(RedisMessage message, byte[] pattern) {
+        log.info("redis ResourceChangeMessage msgId: {}, body: {}", message.getMsgId(), message.getBody());
+        List<ResourceChangeMessage> messageList = JsonUtil.toList(message.getBody(), new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（资源与权限的关联关系）
         resourceGroupService.tryRefreshLocalCaches(messageList);

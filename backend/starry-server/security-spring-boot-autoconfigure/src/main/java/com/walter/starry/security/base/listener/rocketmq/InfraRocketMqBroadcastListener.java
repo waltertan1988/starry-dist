@@ -37,8 +37,9 @@ public class InfraRocketMqBroadcastListener extends AbstractMdcRocketMqMessageLi
     private ResourceGroupService resourceGroupService;
 
     @Override
-    public void handle(String message, MessageExt messageExt) {
+    public void handle(MessageExt messageExt) {
         String tags = messageExt.getTags();
+        String message = new String(messageExt.getBody());
 
         log.info("rocketmq messageExt received. tags: {}, msgId: {}, message: {}", tags, messageExt.getMsgId(), message);
 

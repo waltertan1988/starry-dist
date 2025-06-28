@@ -2,6 +2,7 @@ package com.walter.starry.security.base.listener.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.message.RedisMessage;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.service.RoleService;
 import com.walter.starry.security.base.util.JsonUtil;
@@ -26,9 +27,9 @@ public class RoleChangeRedisListener extends AbstractMdcRedisMessageListener {
     private RoleService roleService;
 
     @Override
-    public void handle(String message, byte[] pattern) {
-        log.info("redis RoleChangeMessage message: {}", message);
-        List<RoleChangeMessage> messageList = JsonUtil.toList(message, new TypeReference<>() {});
+    public void handle(RedisMessage message, byte[] pattern) {
+        log.info("redis RoleChangeMessage msgId: {}, body: {}", message.getMsgId(), message.getBody());
+        List<RoleChangeMessage> messageList = JsonUtil.toList(message.getBody(), new TypeReference<>() {});
 
         // 检查并尝试刷新本地缓存（包括层次角色、权限与资源的关联关系）
         roleService.tryRefreshLocalCaches(messageList);

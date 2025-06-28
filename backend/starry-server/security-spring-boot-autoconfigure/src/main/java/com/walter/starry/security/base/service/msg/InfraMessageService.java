@@ -23,13 +23,16 @@ public class InfraMessageService {
      * @param msgObj
      * @return
      * @param <T>
-     * @throws Exception
      */
-    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) throws Exception {
-        return infraMessageServiceList
+    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) {
+        String msgId = infraMessageServiceList
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("sendBroadcastMessage not support"))
                 .sendBroadcastMessage(messageTopicEnum, msgObj);
+
+        log.info("sendBroadcastMessage success. msgId: {}", msgId);
+
+        return msgId;
     }
 }

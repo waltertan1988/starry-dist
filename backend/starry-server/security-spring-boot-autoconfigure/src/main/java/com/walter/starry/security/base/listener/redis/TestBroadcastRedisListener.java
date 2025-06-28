@@ -1,6 +1,7 @@
 package com.walter.starry.security.base.listener.redis;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.message.RedisMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
 public class TestBroadcastRedisListener extends AbstractMdcRedisMessageListener {
     @Override
-    public void handle(String message, byte[] pattern) {
-        log.info("redis TEST_BROADCAST message: {}", message);
+    public void handle(RedisMessage message, byte[] pattern) {
+        log.info("redis TEST_BROADCAST msgId: {}, body: {}", message.getMsgId(), message.getBody());
     }
 }

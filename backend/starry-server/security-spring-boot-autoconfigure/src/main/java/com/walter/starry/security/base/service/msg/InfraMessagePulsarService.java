@@ -24,26 +24,23 @@ public class InfraMessagePulsarService extends AbstractInfraMessageService {
     private PulsarTemplate<String> stringPulsarTemplate;
 
     @Override
-    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) throws Exception {
-        String message = JsonUtil.toJson(msgObj);
-        try{
-            return this.sendBroadcastMessage(messageTopicEnum, message);
-        }catch (Throwable t){
-            throw new Exception(String.format("sendBroadcastMessage fail. topic: %s, message: %s", messageTopicEnum.name(), message), t);
-        }
+    public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj){
+        return this.publishToPulsar(messageTopicEnum, appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace(), msgObj);
     }
 
-    @Override
-    public String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, String message) {
-        return this.publishToPulsar(messageTopicEnum, appMsgProps.getPulsar().getBaseReg().getTenant(), appMsgProps.getPulsar().getBaseReg().getNamespace(), message);
-    }
-
-    public String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, String message) {
+    public <T> String publishToPulsar(MessageTopicEnum messageTopicEnum, String tenant, String namespace, T msgObj) {
         String topic = String.format(messageTopicEnum.getPulsar().getTopic(), tenant, namespace);
-        MessageId messageId = stringPulsarTemplate.newMessage(message)
-                .withMessageCustomizer(c -> c.property(MdcUtil.ATTR_TRACE_ID, MdcUtil.getTraceId()))
-                .withTopic(topic)
-                .send();
-        return messageId.toString();
+        String message = JsonUtil.toJson(msgObj);
+
+        try{
+            MessageId messageId = stringPulsarTemplate
+                    .newMessage(message)
+                    .withTopic(topic)
+                    .withMessageCustomizer(c -> c.property(MdcUtil.ATTR_TRACE_ID, MdcUtil.getTraceId()))
+                    .send();
+            return messageId.toString();
+        }catch (Throwable t){
+            throw new RuntimeException(String.format("publishToPulsar fail. topic: %s, message: %s", messageTopicEnum.name(), message), t);
+        }
     }
 }

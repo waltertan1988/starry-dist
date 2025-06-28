@@ -4,19 +4,25 @@ import com.walter.starry.security.base.util.MdcUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * @Author: walter.tan
  * @DateTime: 2025-06-27 15:37:47
  */
 @Data
 @NoArgsConstructor
-public class MdcMessageWrapper {
+public class RedisMessage {
+
+    private String msgId;
+
     private String traceId;
 
-    private String message;
+    private String body;
 
-    public MdcMessageWrapper(String message) {
+    public RedisMessage(String body) {
+        this.msgId = UUID.randomUUID().toString().replace("-", "");
         this.traceId = MdcUtil.getTraceId();
-        this.message = message;
+        this.body = body;
     }
 }

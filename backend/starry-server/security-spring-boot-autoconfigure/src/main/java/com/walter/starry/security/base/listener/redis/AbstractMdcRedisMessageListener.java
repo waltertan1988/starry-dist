@@ -1,6 +1,6 @@
 package com.walter.starry.security.base.listener.redis;
 
-import com.walter.starry.security.base.common.message.MdcMessageWrapper;
+import com.walter.starry.security.base.common.message.RedisMessage;
 import com.walter.starry.security.base.util.JsonUtil;
 import com.walter.starry.security.base.util.MdcUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +21,16 @@ public abstract class AbstractMdcRedisMessageListener implements MessageListener
     public void onMessage(Message message, byte[] pattern){
         String body = new String(message.getBody());
 
-        MdcMessageWrapper mdcMessageWrapper = JsonUtil.toBean(body, MdcMessageWrapper.class);
+        RedisMessage redisMessage = JsonUtil.toBean(body, RedisMessage.class);
 
-        if(Objects.isNull(mdcMessageWrapper)){
+        if(Objects.isNull(redisMessage)){
             log.info("cannot resolve redis message: {}", body);
             return;
         }
 
         try{
-            MdcUtil.setTraceId(mdcMessageWrapper.getTraceId());
-            this.handle(mdcMessageWrapper.getMessage(), pattern);
+            MdcUtil.setTraceId(redisMessage.getTraceId());
+            this.handle(redisMessage, pattern);
         }finally {
             MdcUtil.removeTraceId();
         }
@@ -41,5 +41,5 @@ public abstract class AbstractMdcRedisMessageListener implements MessageListener
      * @param message
      * @param pattern
      */
-    public abstract void handle(String message, byte[] pattern);
+    public abstract void handle(RedisMessage message, byte[] pattern);
 }

@@ -47,6 +47,8 @@ public class MdcPulsarMessageListenerAspect {
         } catch (Throwable ex) {
             log.error("handleMdcPulsarMessageListener fail", ex);
             throw ex;
+        } finally {
+            MdcUtil.removeTraceId();
         }
     }
 }
