@@ -6,7 +6,11 @@ import com.walter.starry.security.base.component.security.filter.CompositeLogout
 import com.walter.starry.security.base.config.properties.AppSecurityProperties;
 import com.walter.starry.security.base.mapper.AclUserMapper;
 import com.walter.starry.security.base.mapper.AclUserOidcMapper;
-import com.walter.starry.security.base.repository.*;
+import com.walter.starry.security.base.repository.AclAuthorityItemRepository;
+import com.walter.starry.security.base.repository.AclAuthorityRepository;
+import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
+import com.walter.starry.security.base.repository.AclResourceItemRepository;
+import com.walter.starry.security.base.util.MdcUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.web.SecurityFilterChain;
@@ -130,6 +135,15 @@ public class SecurityConfig {
                 oauth2.userInfoEndpoint(userInfo ->
                     userInfo.oidcUserService(applicationContext.getBean(OidcUserService.class))
                 );
+
+                // 重定向到授权服务器登录页面时，请求参数带上MDC信息
+                if(clientRegistrationRepository instanceof InMemoryClientRegistrationRepository repo){
+                    DefaultOAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver = new DefaultOAuth2AuthorizationRequestResolver(repo, OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI);
+                    oAuth2AuthorizationRequestResolver.setAuthorizationRequestCustomizer(c -> c.parameters(params -> params.put(MdcUtil.ATTR_TRACE_ID, MdcUtil.getTraceId())));
+                    oauth2.authorizationEndpoint(c -> c.authorizationRequestResolver(oAuth2AuthorizationRequestResolver));
+                }else{
+                    throw new RuntimeException();
+                }
             });
         }
 

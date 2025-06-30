@@ -2,11 +2,10 @@ package com.walter.starry.security.service;
 
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.config.properties.AppPulsarProperties;
-import com.walter.starry.security.base.service.MessageService;
-import org.apache.pulsar.client.api.PulsarClientException;
-import org.junit.jupiter.api.Nested;
+import com.walter.starry.security.base.service.msg.InfraMessageService;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,20 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @SpringBootTest(classes = AuthorizationServerApplication.class)
 public class MessageServiceTest {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private MessageService messageService;
-    @Autowired
-    private AppPulsarProperties appPulsarProperties;
+    private InfraMessageService infraMessageService;
 
-    @Nested
-    class PulsarTest {
-
-        @Test
-        void publishToPulsar() throws PulsarClientException {
-            String tenant = appPulsarProperties.getBaseReg().getTenant();
-            String namespace = appPulsarProperties.getBaseReg().getNamespace();
-            String messageId = messageService.publishToPulsar(MessageTopicEnum.ROLE_CHANGE_BROADCAST, tenant, namespace, "Hello Pulsar!");
-            System.out.println(">>>>>>messageId: " + messageId);
-        }
+    @Test
+    void sendBroadcastMessage() throws Exception {
+        String resp = infraMessageService.sendBroadcastMessage(MessageTopicEnum.TEST_BROADCAST, "Hello World!");
+        log.info("resp: {}", resp);
     }
 }

@@ -8,11 +8,16 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-  pulsar:
-    # 本应用所需的pulsar注册信息
-    base-reg:
-      tenant: starry
-      namespace: ${spring.application.name}
+#  message:
+#    redis:
+#      # 启用redis消息
+#      enabled: true
+#      namespace: ${spring.application.name}
+#    pulsar:
+#      # 本应用所需的pulsar注册信息
+#      base-reg:
+#        tenant: starry
+#        namespace: ${spring.application.name}
 
   security:
     enable-front-back-seperated: true
@@ -61,7 +66,7 @@ app:
 
 logging:
   pattern:
-    console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
+    console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{starry-traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
   level:
     org.springframework.security: trace
 
@@ -106,11 +111,11 @@ spring:
       timeout: 3000ms
 
   # Pulsar配置
-  pulsar:
-    client:
-      service-url: pulsar://${app.middleware-host}:6650
-    admin:
-      service-url: http://${app.middleware-host}:8080
+#  pulsar:
+#    client:
+#      service-url: pulsar://${app.middleware-host}:6650
+#    admin:
+#      service-url: http://${app.middleware-host}:8080
 
   # ES
   elasticsearch:
@@ -134,3 +139,10 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
+
+# RocketMQ配置
+rocketmq:
+  name-server: ${app.middleware-host}:9876
+  producer:
+    group: ${spring.application.name}
+    namespace: ${spring.application.name}

@@ -1,16 +1,16 @@
 # Authorization-Server
-一套基于Spring-Authorization-Server、MySQL、Redis、Pulsar的后端应用平台。
+一套基于Spring-Authorization-Server、MySQL、Redis、MQ的后端应用平台。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
 #### 必须中间件
-* JDK 21
-* MySql 8.0.36
-* Redis 7.2.0-v9
-* Pulsar 3.2.1
+* JDK-21
+* MySql-8.0.36
+* Redis-7.2.0-v9
+* Pulsar-3.2.1或RocketMQ-5.3.3
 #### 可选中间件
 * Docker Compose
-* Elasticsearch(v8.12.1) + IK分词器插件
+* Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明
 * security-spring-boot-autoconfigure  
@@ -478,7 +478,7 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ### 2.1 启动Mysql和Elasticsearch
 在本示例中，Elasticsearch分别独立部署
 
-### 2.2 Docker Compose启动其他中间件（如：MySQL、Redis-Stack、Pulsar等）
+### 2.2 Docker Compose启动其他中间件（如：MySQL、Redis-Stack、Pulsar、RocketMQ等）
 docker compose的主文件为compose.yml
 
 #### 2.2.1 宿主机上准备待挂载的目录
@@ -491,6 +491,11 @@ sudo mkdir -p ./data/redis
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
 sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
+# RocketMQ相关目录
+sudo mkdir -p ./data/rocketmq/namesrv/logs
+sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
+sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
+sudo chmod 777 -R ./data/rocketmq
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```
@@ -567,7 +572,7 @@ gtid_mode=ON
 enforce-gtid-consistency=ON
 #skip_replica_start=ON
 ```
-#### 2.2.3 配置主从异步复制的步骤：
+#### 2.2.3 配置MySQL主从异步复制的步骤：
 ```text
 主库master：
 	CREATE USER 'repl'@'%' IDENTIFIED BY 'replpassword';
@@ -594,7 +599,44 @@ enforce-gtid-consistency=ON
 >（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
 >（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
 
-#### 2.2.4 按需修改以下中间件配置（假设中间件的宿主机IP是192.168.10.131）
+#### 2.2.4 消息队列配置
+假设中间件的宿主机IP是192.168.10.131
+
+#### 2.2.4.1 如果消息队列采用Redis，还需要修改以下部署配置
+* application.yml:
+```yaml
+app:
+  message:
+    redis:
+      # 启用redis消息
+      enabled: true
+      namespace: ${spring.application.name}
+```
+
+#### 2.2.4.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
+cat ./data/rocketmq/broker/conf/broker.conf
+```properties
+brokerClusterName = DefaultCluster
+brokerName = broker-a
+brokerId = 0
+deleteWhen = 04
+fileReservedTime = 48
+brokerRole = ASYNC_MASTER
+flushDiskType = ASYNC_FLUSH
+
+# 需按宿主机IP修改此配置
+brokerIP1 = 192.168.10.131
+# 是否自动创建主题，生产环境建议禁用
+autoCreateTopicEnable = true
+```
+
+* application.yml:
+```yaml
+rocketmq:
+  name-server: ${app.middleware-host}:9876
+```
+
+#### 2.2.4.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
 ```yaml
 services: 
@@ -602,6 +644,7 @@ services:
     environment: 
       - advertisedListeners=external:pulsar://192.168.10.131:6650
 ```
+> 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
 #### 2.2.5 启动中间件服务
 参考：
@@ -614,7 +657,7 @@ sudo docker compose up -d
 #sudo docker compose down
 ```
 
-#### 2.2.6 Pulsar配置
+#### 2.2.6 如果消息队列采用Pulsar，还需要配置PulsarManager
 （1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
 ```shell
 # 登录账密设置的说明参看：https://github.com/apache/pulsar-manager

@@ -1,15 +1,18 @@
 package com.walter.starry.security.base.config;
 
-import com.walter.starry.security.base.listener.annotation.RedisSubscribeTopic;
+import com.walter.starry.security.base.listener.redis.RedisSubscribe;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -31,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class RedisConfig {
     @Autowired
+    private ConfigurableEnvironment environment;
+    @Autowired
     private List<MessageListener> messageListenerList;
 
     @Bean("stringRedisTemplate")
@@ -41,27 +46,41 @@ public class RedisConfig {
     }
 
     /**
-     * 配置Redis消息监听（不建议使用Redis的PUB/SUB模式，建议使用Pulsar）
+     * 配置Redis消息监听
      * @param connectionFactory
      * @param executor
      * @return
      */
     @Bean
+    @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
     RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, @Qualifier("redisSubscribeVirtualThreadTaskExecutor") ExecutorService executor) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setTaskExecutor(executor);
 
         for (MessageListener messageListener : messageListenerList) {
-            RedisSubscribeTopic redisSubscribeTopic = AnnotationUtils.findAnnotation(messageListener.getClass(), RedisSubscribeTopic.class);
-            if(Objects.isNull(redisSubscribeTopic)){
-                log.warn("@RedisSubscribeTopic is missing and skip adding MessageListener: {}", messageListener.getClass().getName());
+            RedisSubscribe redisSubscribe = AnnotationUtils.findAnnotation(messageListener.getClass(), RedisSubscribe.class);
+            if(Objects.isNull(redisSubscribe)){
+                log.warn("@{} is missing and skip adding MessageListener: {}", RedisSubscribe.class.getSimpleName(), messageListener.getClass().getName());
                 continue;
             }
-            container.addMessageListener(messageListener, ChannelTopic.of(redisSubscribeTopic.value().name()));
+
+            String topic = redisSubscribe.topic().name();
+            String namespace = environment.resolvePlaceholders(redisSubscribe.namespace());
+            container.addMessageListener(messageListener, ChannelTopic.of(this.getChannelName(namespace, topic)));
         }
 
         return container;
+    }
+
+    /**
+     * 获取订阅消息的channel名称
+     * @param namespace
+     * @param topic
+     * @return
+     */
+    public String getChannelName(String namespace, String topic){
+        return StringUtils.isBlank(namespace) ? topic : String.format("%s:%s", namespace, topic);
     }
 
     /**

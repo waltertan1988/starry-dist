@@ -3,6 +3,11 @@ package com.walter.starry.security.base.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.security.base.common.enums.MessageTopicEnum;
+import com.walter.starry.security.base.common.exception.BizException;
+import com.walter.starry.security.base.common.message.ResourceChangeMessage;
+import com.walter.starry.security.base.component.redis.InfraRedisKeys;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
 import com.walter.starry.security.base.entity.AclAuthorityResource;
 import com.walter.starry.security.base.entity.AclResourceGroup;
@@ -10,13 +15,9 @@ import com.walter.starry.security.base.entity.AclResourceItem;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
 import com.walter.starry.security.base.repository.AclResourceGroupRepository;
 import com.walter.starry.security.base.repository.AclResourceItemRepository;
-import com.walter.starry.security.base.vo.response.ApiResponse;
-import com.walter.starry.security.base.common.concurrent.ExtendedVirtualThreadExecutorService;
-import com.walter.starry.security.base.component.redis.InfraRedisKeys;
-import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.common.exception.BizException;
-import com.walter.starry.security.base.common.message.ResourceChangeMessage;
+import com.walter.starry.security.base.service.msg.InfraMessageService;
 import com.walter.starry.security.base.util.JsonUtil;
+import com.walter.starry.security.base.vo.response.ApiResponse;
 import com.walter.starry.security.base.vo.response.resource.ResourceGroupVo;
 import com.walter.starry.security.base.vo.response.resource.ResourceItemVo;
 import jakarta.annotation.Resource;
@@ -24,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -53,7 +53,7 @@ public class ResourceGroupService {
     @Autowired
     private InfraRedisKeys infraRedisKeys;
     @Autowired
-    private MessageService messageService;
+    private InfraMessageService infraMessageService;
     @Autowired
     private OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager;
     @Autowired
@@ -313,11 +313,11 @@ public class ResourceGroupService {
         adminCommonVirtualThreadTaskExecutor.execute(() -> {
             // 新增的资源项，其顺序值可能会影响本地缓存里的排序
             ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(req.getCode(), req.getName(), req.getHttpMethodList(), req.getPattern(), req.getSeq(), now);
-            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofCreate(after)));
+            List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofCreate(after));
             try {
-                messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
+            } catch (Throwable ex) {
+                log.error("send MQ fail", ex);
             }
         });
     }
@@ -352,11 +352,11 @@ public class ResourceGroupService {
                 // 资源项编码、模式路径、请求方法类型或顺序发生变化，刷新本地缓存
                 ResourceChangeMessage.ResourceData before = new ResourceChangeMessage.ResourceData(oldItem.getCode(), oldItem.getName(), oldItem.getHttpMethodList(), oldItem.getPattern(), oldItem.getSeq(), now);
                 ResourceChangeMessage.ResourceData after = new ResourceChangeMessage.ResourceData(item.getCode(), item.getName(), item.getHttpMethodList(), item.getPattern(), item.getSeq(), now);
-                String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after)));
+                List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofUpdate(before, after));
                 try {
-                    messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-                } catch (PulsarClientException ex) {
-                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
+                } catch (Throwable ex) {
+                    log.error("send MQ fail", ex);
                 }
 
                 // 修改资源编码，需要剔除Redis缓存
@@ -465,15 +465,14 @@ public class ResourceGroupService {
 
             adminCommonVirtualThreadTaskExecutor.execute(() -> {
                 // 刷新本地缓存
-                List<ResourceChangeMessage> messageList = itemCodes.stream()
+                List<ResourceChangeMessage> msgObj = itemCodes.stream()
                     .map(code -> ResourceChangeMessage.ofDelete(
                         new ResourceChangeMessage.ResourceData(code, null, null, null, null, now)
                     )).toList();
-                String message = JsonUtil.toJson(messageList);
                 try {
-                    messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-                } catch (PulsarClientException ex) {
-                    log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                    infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
+                } catch (Throwable ex) {
+                    log.error("send MQ fail", ex);
                 }
 
                 // 剔除Redis缓存
@@ -522,11 +521,11 @@ public class ResourceGroupService {
             // 刷新本地缓存
             ResourceChangeMessage.ChangeAuthorityData changeAuthorityData = new ResourceChangeMessage.ChangeAuthorityData(
                     resourceItemCode, newRoleCodeList, removeRoleCodeList);
-            String message = JsonUtil.toJson(Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData)));
+            List<ResourceChangeMessage> msgObj = Lists.newArrayList(ResourceChangeMessage.ofChangeAuthority(now, changeAuthorityData));
             try {
-                messageService.publishToPulsar(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, message);
-            } catch (PulsarClientException ex) {
-                log.error("send MQ fail. topic: {}, message: {}", MessageTopicEnum.RESOURCE_CHANGE_BROADCAST.name(), message, ex);
+                infraMessageService.sendBroadcastMessage(MessageTopicEnum.RESOURCE_CHANGE_BROADCAST, msgObj);
+            } catch (Throwable ex) {
+                log.error("send MQ fail", ex);
             }
 
             // 剔除Redis缓存
@@ -598,6 +597,10 @@ public class ResourceGroupService {
      * @param messageList
      */
     public void tryRefreshLocalCaches(List<ResourceChangeMessage> messageList) {
+        if(CollectionUtils.isEmpty(messageList)){
+            return;
+        }
+
         boolean needRefreshRequestMatcherEntryHolder = false;
 
         for (ResourceChangeMessage changeMessage : messageList) {

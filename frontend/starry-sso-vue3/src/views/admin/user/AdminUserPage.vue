@@ -1,41 +1,42 @@
 <template>
   <AdminLayout>
-    <div class="blank5"></div>
-    <el-row justify="start">
-      <el-col :span="6">
-        <el-text tag="b">账号：</el-text>
-        <el-input name="username" v-model="usernameRef" style="width: 200px;" placeholder="请输入账号" clearable/>
-      </el-col>
+    <div style="text-align: left; margin: 10px 10px 0 10px">
+      <div class="blank5"></div>
+      <el-row justify="start">
+        <el-col :span="6">
+          <el-text tag="b">账号：</el-text>
+          <el-input name="username" v-model="usernameRef" style="width: 200px;" placeholder="请输入账号" clearable/>
+        </el-col>
+  
+        <el-col :span="6">
+          <el-text tag="b">昵称：</el-text>
+          <el-input name="nickname" v-model="nicknameRef" style="width: 200px;" placeholder="请输入昵称" clearable/>
+        </el-col>
 
-      <el-col :span="6">
-        <el-text tag="b">昵称：</el-text>
-        <el-input name="nickname" v-model="nicknameRef" style="width: 200px;" placeholder="请输入昵称" clearable/>
-      </el-col>
+        <el-col :span="4">
+          <el-text tag="b">启用：</el-text>
+          <el-select v-model="enabledRef" style="width: 100px;" placeholder="请选择">
+            <el-option v-for="item in [{value: '', label: '全部'}, {value: true, label: '是'}, {value: false, label: '否'}]"
+                       :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-col>
+      </el-row>
 
-      <el-col :span="4">
-        <el-text tag="b">启用：</el-text>
-        <el-select v-model="enabledRef" style="width: 100px;" placeholder="请选择">
-          <el-option v-for="item in [{value: '', label: '全部'}, {value: true, label: '是'}, {value: false, label: '否'}]"
-                     :key="item.value" :label="item.label" :value="item.value"/>
-        </el-select>
-      </el-col>
-    </el-row>
+      <div class="blank5"></div>
+      <el-row justify="start">
+        <el-col :span="12">
+          <el-text tag="b">创建时间：</el-text>
+          <el-date-picker type="datetime" v-model="createTimeBeginRef" placeholder="开始时间" format="YYYY-MM-DD HH:mm:ss" clearable
+                          :disabled-date="d => d.getTime() > Date.now()"/>
+          <el-date-picker type="datetime" v-model="createTimeEndRef" placeholder="结束时间" format="YYYY-MM-DD HH:mm:ss" clearable
+                          :disabled-date="d => d.getTime() > Date.now()"/>
+        </el-col>
 
-    <div class="blank5"></div>
-    <el-row justify="start">
-      <el-col :span="12">
-        <el-text tag="b">创建时间：</el-text>
-        <el-date-picker type="datetime" v-model="createTimeBeginRef" placeholder="开始时间" format="YYYY-MM-DD HH:mm:ss" clearable
-                        :disabled-date="d => d.getTime() > Date.now()"/>
-        <el-date-picker type="datetime" v-model="createTimeEndRef" placeholder="结束时间" format="YYYY-MM-DD HH:mm:ss" clearable
-                        :disabled-date="d => d.getTime() > Date.now()"/>
-      </el-col>
-
-      <el-col :span="2">
-        <el-button type="primary" :icon="Search" @click="searchUserList">查询</el-button>
-      </el-col>
-    </el-row>
-
+        <el-col :span="2">
+          <el-button type="primary" :icon="Search" @click="searchUserList">查询</el-button>
+        </el-col>
+      </el-row>
+    </div>
     <div class="blank10"></div>
     <el-row justify="start">
       <el-col :span="2">
@@ -56,7 +57,7 @@
                        :doSearch="searchUserList" :on-selection-change="onTableSelectionChange">
         <el-table-column type="selection" width="40" fixed/>
         <el-table-column prop="id" label="ID" width="80" fixed/>
-        <el-table-column prop="username" label="账号" width="280" fixed/>
+        <el-table-column prop="username" label="账号" fixed/>
         <el-table-column prop="nickname" label="昵称" width="180" fixed/>
         <el-table-column prop="enabled" label="启用" width="60" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>
         <el-table-column prop="accountExpired" label="已过期" width="70" :formatter="(row, column, cellValue) => cellValue ? '是':'否'"/>

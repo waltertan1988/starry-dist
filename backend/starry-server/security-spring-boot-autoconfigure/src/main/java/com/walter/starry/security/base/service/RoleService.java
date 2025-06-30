@@ -2,6 +2,7 @@ package com.walter.starry.security.base.service;
 
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.component.security.OpenPolicyAgentAuthorizationManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,10 @@ public class RoleService {
      * @param messageList
      */
     public void tryRefreshLocalCaches(List<RoleChangeMessage> messageList) {
+        if(CollectionUtils.isEmpty(messageList)){
+            return;
+        }
+
         boolean needRefreshRoleHierarchy = false;
         boolean needRefreshRequestMatcherEntryHolder = false;
 
