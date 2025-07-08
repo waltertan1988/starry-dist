@@ -8,14 +8,13 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
-	<artifactId>starry-business-app</artifactId>
-	<name>starry-business-app</name>
+	<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
+	<name>starry-authorization-server-spring-boot-autoconfigure</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
 		</dependency>
 
 		<dependency>
@@ -23,21 +22,4 @@
 			<artifactId>starry-security-spring-boot-autoconfigure</artifactId>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

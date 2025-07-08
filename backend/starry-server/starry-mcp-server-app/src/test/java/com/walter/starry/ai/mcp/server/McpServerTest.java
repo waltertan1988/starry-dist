@@ -60,21 +60,22 @@ public class McpServerTest {
 
             client.initialize();
 
-            client.ping();
+//            var ping = client.ping();
+//            System.out.println("Ping: " + ping);
 
-            // List and demonstrate tools
-            McpSchema.ListToolsResult toolsList = client.listTools();
-            System.out.println("Available Tools = " + toolsList);
-            toolsList.tools().forEach(tool -> {
-                System.out.println("Tool: " + tool.name() + ", description: " + tool.description() + ", schema: " + tool.inputSchema());
-            });
+//            // List and demonstrate tools
+//            McpSchema.ListToolsResult toolsList = client.listTools();
+//            System.out.println("Available Tools = " + toolsList);
+//            toolsList.tools().forEach(tool -> {
+//                System.out.println("Tool: " + tool.name() + ", description: " + tool.description() + ", schema: " + tool.inputSchema());
+//            });
 
             McpSchema.CallToolResult weatherForcastResult = client.callTool(new McpSchema.CallToolRequest("getWeatherForecastByLocation",
                     Map.of("latitude", "47.6062", "longitude", "-122.3321")));
             System.out.println("Weather Forcast: " + weatherForcastResult);
 
-            McpSchema.CallToolResult alertResult = client.callTool(new McpSchema.CallToolRequest("getAlerts", Map.of("state", "NY")));
-            System.out.println("Alert Response = " + alertResult);
+//            McpSchema.CallToolResult alertResult = client.callTool(new McpSchema.CallToolRequest("getAlerts", Map.of("state", "NY")));
+//            System.out.println("Alert Response = " + alertResult);
 
             client.closeGracefully();
         }

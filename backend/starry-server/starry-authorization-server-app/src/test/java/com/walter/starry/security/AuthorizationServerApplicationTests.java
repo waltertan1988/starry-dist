@@ -1,9 +1,9 @@
 package com.walter.starry.security;
 
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
+import com.walter.starry.common.util.IdUtil;
 import com.walter.starry.security.base.bo.AclUserBo;
 import com.walter.starry.security.base.component.security.JpaUserDetailsService;
-import com.walter.starry.security.base.util.IdUtil;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Disabled;

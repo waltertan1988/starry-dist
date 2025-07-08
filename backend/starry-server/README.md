@@ -13,17 +13,20 @@
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明
-* security-spring-boot-autoconfigure  
-提供用户、角色、菜单、权限等Spring Security认证与授权功能的基础模块。
+* starry-common-lib  
+集成全局的公共基础类的内嵌模块，由其他模块所依赖
 
-* authorization-server-spring-boot-autoconfigure  
-在security-spring-boot-autoconfigure的基础上，补充提供OAuth2授权服务器特性的基础模块。
-
-* starry-authorization-server-app  
-OAuth2授权服务器进程，为其他业务系统提供统一单点登录的认证服务
+* starry-security-spring-boot-autoconfigure  
+提供用户、角色、菜单、权限等Spring Security认证与授权功能的基础配置模块。其中认证能力包括本地登录和作为OAuth2资源服务器的单点登录。
 
 * starry-business-app  
-OAuth2资源服务器业务应用，支持本地登录和单点登录
+一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用
+
+* starry-authorization-server-spring-boot-autoconfigure  
+在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
+
+* starry-authorization-server-app  
+一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用
 
 ### 1.3 mysql初始化数据
 #### DDL

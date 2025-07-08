@@ -20,7 +20,7 @@
 
 		<dependency>
 			<groupId>com.walter.starry</groupId>
-			<artifactId>authorization-server-spring-boot-autoconfigure</artifactId>
+			<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
 		</dependency>
 	</dependencies>
 
