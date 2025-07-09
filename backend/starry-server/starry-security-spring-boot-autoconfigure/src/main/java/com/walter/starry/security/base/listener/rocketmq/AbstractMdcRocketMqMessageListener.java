@@ -31,7 +31,7 @@ public abstract class AbstractMdcRocketMqMessageListener implements RocketMQList
             this.handle(messageExt);
         }finally {
             if(CollectionUtils.isNotEmpty(messageListenerPostProcessorList)){
-                for (MessageListenerPostProcessor processor : messageListenerPostProcessorList) {
+                for (MessageListenerPostProcessor processor : messageListenerPostProcessorList.reversed()) {
                     try{
                         processor.postHandle(messageExt);
                     }catch (Throwable t){
