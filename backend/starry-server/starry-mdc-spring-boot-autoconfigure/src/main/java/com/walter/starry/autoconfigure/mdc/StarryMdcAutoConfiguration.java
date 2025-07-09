@@ -44,4 +44,8 @@ public class StarryMdcAutoConfiguration {
         filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return filterRegistrationBean;
     }
+
+    // TODO 注册MQ监听器
+
+    // TODO 注册虚拟线程池
 }
