@@ -1,26 +1,40 @@
 package com.walter.starry.ai.mcp.server;
 
+import com.walter.starry.common.util.MdcUtil;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.ServerParameters;
 import io.modelcontextprotocol.client.transport.StdioClientTransport;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 参考：https://github.com/spring-projects/spring-ai-examples/tree/main/model-context-protocol/weather/starter-webmvc-server
  */
+@Slf4j
 @SpringBootTest(classes = McpServerApplication.class)
 public class McpServerTest {
     @Value("${app.version}")
     private String appVersion;
+
+    @BeforeEach
+    public void beforeEach(){
+        MdcUtil.setTraceId(MdcUtil.genNewTraceId());
+    }
+
+    @AfterEach
+    public void afterEach(){
+        MdcUtil.removeTraceId();
+    }
 
     @Test
     void stdioTest(){
@@ -43,7 +57,7 @@ public class McpServerTest {
     void sseTest(){
         var transport = HttpClientSseClientTransport
                 .builder("http://localhost:8090")
-                .customizeRequest(c -> c.header("starryTraceId", UUID.randomUUID().toString().replace("-", "")))
+                .customizeRequest(c -> c.header(MdcUtil.ATTR_TRACE_ID, MdcUtil.getTraceId()))
                 .build();
         new SampleClient(transport).run();
     }
@@ -56,26 +70,27 @@ public class McpServerTest {
         }
 
         public void run() {
+            log.info("SampleClient start to run. traceId: {}", MdcUtil.getTraceId());
             var client = McpClient.sync(this.transport).build();
 
             client.initialize();
 
-//            var ping = client.ping();
-//            System.out.println("Ping: " + ping);
+            var ping = client.ping();
+            System.out.println("Ping: " + ping);
 
-//            // List and demonstrate tools
-//            McpSchema.ListToolsResult toolsList = client.listTools();
-//            System.out.println("Available Tools = " + toolsList);
-//            toolsList.tools().forEach(tool -> {
-//                System.out.println("Tool: " + tool.name() + ", description: " + tool.description() + ", schema: " + tool.inputSchema());
-//            });
+            // List and demonstrate tools
+            McpSchema.ListToolsResult toolsList = client.listTools();
+            System.out.println("Available Tools = " + toolsList);
+            toolsList.tools().forEach(tool -> {
+                System.out.println("Tool: " + tool.name() + ", description: " + tool.description() + ", schema: " + tool.inputSchema());
+            });
 
             McpSchema.CallToolResult weatherForcastResult = client.callTool(new McpSchema.CallToolRequest("getWeatherForecastByLocation",
                     Map.of("latitude", "47.6062", "longitude", "-122.3321")));
             System.out.println("Weather Forcast: " + weatherForcastResult);
 
-//            McpSchema.CallToolResult alertResult = client.callTool(new McpSchema.CallToolRequest("getAlerts", Map.of("state", "NY")));
-//            System.out.println("Alert Response = " + alertResult);
+            McpSchema.CallToolResult alertResult = client.callTool(new McpSchema.CallToolRequest("getAlerts", Map.of("state", "NY")));
+            System.out.println("Alert Response = " + alertResult);
 
             client.closeGracefully();
         }

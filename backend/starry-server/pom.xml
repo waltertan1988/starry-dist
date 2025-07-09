@@ -45,6 +45,11 @@
 				<artifactId>starry-security-spring-boot-autoconfigure</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
@@ -63,6 +68,7 @@
 
 		<module>starry-authorization-server-spring-boot-autoconfigure</module>
 		<module>starry-security-spring-boot-autoconfigure</module>
+		<module>starry-mdc-spring-boot-autoconfigure</module>
 
 		<module>starry-common-lib</module>
 

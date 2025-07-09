@@ -1,4 +1,4 @@
-package com.walter.starry.security.base.component.mvc;
+package com.walter.starry.autoconfigure.mdc.web;
 
 import com.walter.starry.common.util.MdcUtil;
 import jakarta.servlet.FilterChain;
@@ -11,11 +11,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * MDC过滤器，用于设置每个请求的traceId
+ * MDC的Web过滤器，用于设置每个请求的traceId
  * @Author: walter.tan
  * @DateTime: 2025-06-26 16:28:33
  */
-public class MdcFilter extends OncePerRequestFilter {
+public class MdcWebFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{

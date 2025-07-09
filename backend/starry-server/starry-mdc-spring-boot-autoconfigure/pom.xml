@@ -8,49 +8,24 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
-	<artifactId>starry-mcp-server-app</artifactId>
-	<name>starry-mcp-server-app</name>
+	<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
+	<name>starry-mdc-spring-boot-autoconfigure</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.walter.starry</groupId>
 			<artifactId>starry-common-lib</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.walter.starry</groupId>
-			<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

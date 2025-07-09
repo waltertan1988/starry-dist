@@ -2,6 +2,8 @@ package com.walter.starry.ai.mcp.server.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.walter.starry.common.util.MdcUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * @author walter.tan
  */
+@Slf4j
 @Service
 public class WeatherService {
     private static final String BASE_URL = "https://api.weather.gov";
@@ -77,6 +80,7 @@ public class WeatherService {
      */
     @Tool(description = "Get weather forecast for a specific latitude/longitude")
     public String getWeatherForecastByLocation(double latitude, double longitude) {
+        log.info("getWeatherForecastByLocation start. latitude: {}, longitude: {}, traceId: {}", latitude, longitude, MdcUtil.getTraceId());
 
         var points = restClient.get()
                 .uri("/points/{latitude},{longitude}", latitude, longitude)
@@ -106,6 +110,8 @@ public class WeatherService {
      */
     @Tool(description = "Get weather alerts for a US state. Input is Two-letter US state code (e.g. CA, NY)")
     public String getAlerts(String state) {
+        log.info("getAlerts start. state: {}, traceId: {}", state, MdcUtil.getTraceId());
+
         Alert alert = restClient.get().uri("/alerts/active/area/{state}", state).retrieve().body(Alert.class);
 
         return alert.features()
