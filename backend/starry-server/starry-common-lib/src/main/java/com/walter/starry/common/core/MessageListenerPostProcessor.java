@@ -13,7 +13,7 @@ public interface MessageListenerPostProcessor {
     void preHandle(Object... objects);
 
     /**
-     * 消费消息的后置处理
+     * 消费消息的后置处理。如果前置处理方法{@link MessageListenerPostProcessor#preHandle(Object...)}抛出异常，则此方法将不会执行
      * @param objects
      */
     void postHandle(Object... objects);

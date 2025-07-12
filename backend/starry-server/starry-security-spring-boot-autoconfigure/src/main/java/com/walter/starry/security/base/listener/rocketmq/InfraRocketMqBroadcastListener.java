@@ -29,7 +29,7 @@ import java.util.List;
     consumerGroup = "${spring.application.name}", messageModel = MessageModel.BROADCASTING
 )
 @ConditionalOnBean(InfraMessageRocketMqService.class)
-public class InfraRocketMqBroadcastListener extends AbstractMdcRocketMqMessageListener {
+public class InfraRocketMqBroadcastListener extends AbstractRocketMqMessageListener {
     public static final String TOPIC = "INFRA_BROADCAST";
     @Autowired
     private RoleService roleService;
