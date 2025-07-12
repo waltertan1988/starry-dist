@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import java.util.stream.Stream;
 
 /**
- * Pulsar消费者的MDC切面类
+ * Pulsar消费者的切面类
  * @author walter.tan
  * @date 2023-06-16 9:08
  */
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @Aspect
 @Component
 @ConditionalOnBean(PulsarTopicConfig.class)
-public class MdcPulsarMessageListenerAspect {
+public class PulsarMessageListenerAspect {
 
     @Pointcut("@annotation(org.springframework.pulsar.annotation.PulsarListener)")
     public void annotationPointcut4MdcPulsarMessageListener() { }

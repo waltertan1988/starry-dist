@@ -3,7 +3,7 @@ package com.walter.starry.security.base.listener.redis;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.common.message.RedisMessage;
+import com.walter.starry.common.vo.RedisMessage;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.List;
 @Component
 @RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.RESOURCE_CHANGE_BROADCAST)
 @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
-public class ResourceChangeRedisListener extends AbstractMdcRedisMessageListener {
+public class ResourceChangeRedisListener extends AbstractRedisMessageListener {
     @Autowired
     private ResourceGroupService resourceGroupService;
 

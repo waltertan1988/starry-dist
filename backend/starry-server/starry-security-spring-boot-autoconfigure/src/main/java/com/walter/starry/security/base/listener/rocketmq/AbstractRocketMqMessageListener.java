@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.CastUtils;
 
 /**
- * Redis MDC 监听器
+ * RocketMq消息监听器
  * @Author: walter.tan
  * @DateTime: 2025-06-27 16:29:59
  */
@@ -30,7 +30,7 @@ public abstract class AbstractRocketMqMessageListener implements RocketMQListene
     }
 
     /**
-     * 处理MDC解包后的消息体
+     * 处理消息体
      * @param messageExt
      */
     public abstract void handle(MessageExt messageExt);

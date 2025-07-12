@@ -1,4 +1,4 @@
-package com.walter.starry.security.base.common.message;
+package com.walter.starry.common.vo;
 
 import com.walter.starry.common.util.MdcUtil;
 import lombok.Data;

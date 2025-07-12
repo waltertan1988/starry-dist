@@ -45,7 +45,5 @@ public class StarryMdcAutoConfiguration {
         return filterRegistrationBean;
     }
 
-    // TODO 注册MQ监听器
-
     // TODO 注册虚拟线程池
 }
