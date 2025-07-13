@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.config;
 
-import com.walter.starry.common.core.MessageListenerPostProcessor;
-import com.walter.starry.common.core.MessageListenerPostProcessorChain;
+import com.walter.starry.common.core.message.MessageListenerPostProcessor;
+import com.walter.starry.common.core.message.MessageListenerPostProcessorChain;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

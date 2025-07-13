@@ -1,4 +1,4 @@
-package com.walter.starry.common.core;
+package com.walter.starry.common.core.message;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

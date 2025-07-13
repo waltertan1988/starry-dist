@@ -1,4 +1,4 @@
-package com.walter.starry.common.concurrent;
+package com.walter.starry.common.core.concurrent;
 
 import com.walter.starry.common.util.MdcUtil;
 import jakarta.annotation.Nonnull;

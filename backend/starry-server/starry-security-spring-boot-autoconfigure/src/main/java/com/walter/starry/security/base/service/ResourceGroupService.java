@@ -3,7 +3,7 @@ package com.walter.starry.security.base.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.walter.starry.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorService;
 import com.walter.starry.common.exception.BizException;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.vo.ApiResponse;

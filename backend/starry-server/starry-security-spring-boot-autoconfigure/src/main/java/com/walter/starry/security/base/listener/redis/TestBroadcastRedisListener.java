@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.listener.redis;
 
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.common.vo.RedisMessage;
+import com.walter.starry.common.core.message.RedisMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

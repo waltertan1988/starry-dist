@@ -1,6 +1,6 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
-import com.walter.starry.common.core.MessageListenerPostProcessor;
+import com.walter.starry.common.core.message.MessageListenerPostProcessor;
 import com.walter.starry.common.util.MdcUtil;
 
 /**

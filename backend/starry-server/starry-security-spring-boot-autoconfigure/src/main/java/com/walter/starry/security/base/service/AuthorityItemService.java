@@ -1,7 +1,7 @@
 package com.walter.starry.security.base.service;
 
 import com.google.common.collect.Lists;
-import com.walter.starry.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorService;
 import com.walter.starry.common.exception.BizException;
 import com.walter.starry.common.vo.ApiResponse;
 import com.walter.starry.security.base.bo.AuthorityItemBo;

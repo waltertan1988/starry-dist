@@ -1,6 +1,6 @@
 package com.walter.starry.security.base.config;
 
-import com.walter.starry.common.concurrent.ExtendedVirtualThreadExecutorService;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

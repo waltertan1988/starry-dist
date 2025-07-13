@@ -1,7 +1,7 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
 import com.walter.starry.common.util.MdcUtil;
-import com.walter.starry.common.vo.RedisMessage;
+import com.walter.starry.common.core.message.RedisMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

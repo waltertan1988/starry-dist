@@ -1,6 +1,6 @@
 package com.walter.starry.security.base.listener.rocketmq;
 
-import com.walter.starry.common.core.MessageListenerPostProcessorChain;
+import com.walter.starry.common.core.message.MessageListenerPostProcessorChain;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.core.RocketMQListener;

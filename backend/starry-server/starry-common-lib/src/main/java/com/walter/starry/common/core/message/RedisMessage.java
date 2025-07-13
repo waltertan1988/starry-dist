@@ -1,4 +1,4 @@
-package com.walter.starry.common.vo;
+package com.walter.starry.common.core.message;
 
 import com.walter.starry.common.util.MdcUtil;
 import lombok.Data;

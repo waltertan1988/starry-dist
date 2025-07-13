@@ -1,4 +1,4 @@
-package com.walter.starry.common.core;
+package com.walter.starry.common.core.message;
 
 /**
  * 消息队列监听器的后处理器
