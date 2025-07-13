@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * 消息队列监听器的后处理器调用链
@@ -34,15 +34,15 @@ public class MessageListenerPostProcessorChain {
         this.head = lastNext;
     }
 
-    public <T> T handle(Function< Object[], T> function, Object... objects) throws MessageListenerPostProcessorChainException {
+    public <T> T handle(Supplier<T> supplier, Object... objects) throws MessageListenerPostProcessorChainException {
         if(Objects.isNull(this.head)){
-            return function.apply(objects);
+            return supplier.get();
         }
 
         String failProcessorId = null;
         try {
             this.head.preHandle(objects);
-            return function.apply(objects);
+            return supplier.get();
         } catch (MessageListenerPostProcessorChainException e) {
             failProcessorId = e.getProcessorId();
             throw e;

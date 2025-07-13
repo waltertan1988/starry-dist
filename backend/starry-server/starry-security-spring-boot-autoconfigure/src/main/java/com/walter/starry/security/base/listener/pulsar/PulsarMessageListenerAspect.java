@@ -1,18 +1,15 @@
 package com.walter.starry.security.base.listener.pulsar;
 
-import com.walter.starry.common.util.MdcUtil;
+import com.walter.starry.common.core.MessageListenerPostProcessorChain;
 import com.walter.starry.security.base.component.pulsar.PulsarTopicConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pulsar.client.api.Message;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import java.util.stream.Stream;
 
 /**
  * Pulsar消费者的切面类
@@ -24,9 +21,11 @@ import java.util.stream.Stream;
 @Component
 @ConditionalOnBean(PulsarTopicConfig.class)
 public class PulsarMessageListenerAspect {
+    @Autowired
+    private MessageListenerPostProcessorChain messageListenerPostProcessorChain;
 
     @Pointcut("@annotation(org.springframework.pulsar.annotation.PulsarListener)")
-    public void annotationPointcut4MdcPulsarMessageListener() { }
+    public void annotationPointcut4PulsarMessageListener() { }
 
     /**
      * 处理MDC信息和消息体
@@ -34,21 +33,19 @@ public class PulsarMessageListenerAspect {
      * @return
      * @throws Throwable
      */
-    @Around("annotationPointcut4MdcPulsarMessageListener()")
+    @Around("annotationPointcut4PulsarMessageListener()")
     public Object handleMdcPulsarMessageListener(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
-            Stream.of(joinPoint.getArgs()).filter(a -> a instanceof Message<?>).findFirst().ifPresent(message -> {
-                String traceId = ((Message<?>)message).getProperty(MdcUtil.ATTR_TRACE_ID);
-                if(StringUtils.hasText(traceId)){
-                    MdcUtil.setTraceId(traceId);
+            return messageListenerPostProcessorChain.handle(() -> {
+                try {
+                    return joinPoint.proceed(joinPoint.getArgs());
+                } catch (Throwable e) {
+                    log.error("handleMdcPulsarMessageListener fail", e);
+                    throw new RuntimeException(e);
                 }
-            });
-            return joinPoint.proceed(joinPoint.getArgs());
-        } catch (Throwable ex) {
-            log.error("handleMdcPulsarMessageListener fail", ex);
-            throw ex;
-        } finally {
-            MdcUtil.removeTraceId();
+            }, joinPoint.getArgs());
+        } catch (MessageListenerPostProcessorChain.MessageListenerPostProcessorChainException e) {
+            throw new RuntimeException(e);
         }
     }
 }

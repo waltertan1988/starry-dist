@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.CastUtils;
 
 /**
  * RocketMq消息监听器
@@ -20,8 +19,8 @@ public abstract class AbstractRocketMqMessageListener implements RocketMQListene
     @Override
     public void onMessage(MessageExt messageExt) {
         try {
-            messageListenerPostProcessorChain.handle(objects -> {
-                AbstractRocketMqMessageListener.this.handle(CastUtils.cast(objects[0]));
+            messageListenerPostProcessorChain.handle(() -> {
+                AbstractRocketMqMessageListener.this.handle(messageExt);
                 return null;
             }, messageExt);
         } catch (MessageListenerPostProcessorChain.MessageListenerPostProcessorChainException e) {

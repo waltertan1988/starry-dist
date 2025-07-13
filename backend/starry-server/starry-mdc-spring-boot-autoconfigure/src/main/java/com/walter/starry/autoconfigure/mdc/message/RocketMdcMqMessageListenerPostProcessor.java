@@ -1,6 +1,5 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
-import com.walter.starry.common.core.MessageListenerPostProcessor;
 import com.walter.starry.common.util.MdcUtil;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,16 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ConditionalOnProperty(name = {"rocketmq.name-server"})
-public class RocketMqMessageListenerPostProcessor implements MessageListenerPostProcessor {
+public class RocketMdcMqMessageListenerPostProcessor implements MdcMessageListenerPostProcessor {
 
     @Override
     public void preHandle(Object... object) {
         MessageExt messageExt = (MessageExt) object[0];
         MdcUtil.setTraceId(messageExt.getUserProperty(MdcUtil.ATTR_TRACE_ID));
-    }
-
-    @Override
-    public void postHandle(Object... objects) {
-        MdcUtil.removeTraceId();
     }
 }

@@ -1,5 +1,5 @@
 # Starry后端服务系统
-一套基于Spring-Security, Spring-Authorization-Server、MySQL、Redis、MQ的后端应用平台。
+一套基于Spring Security, Spring Authorization Server、MySQL、Redis、MQ的后端应用平台基座。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
@@ -13,20 +13,33 @@
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明
-* starry-common-lib  
-集成全局的公共基础类的内嵌模块，由其他模块所依赖。
+1. starry-security-spring-boot-autoconfigure  
+   Spring Security认证与授权相关的基础配置模块，核心功能包括：
+   * 身份认证，包括：本地登录、OAuth2的单点登录、登出
+   * 提供了用户、角色、菜单、权限等管理功能端点
 
-* starry-security-spring-boot-autoconfigure  
-提供用户、角色、菜单、权限等Spring Security认证与授权功能的基础配置模块。其中认证能力包括本地登录和作为OAuth2资源服务器的单点登录。
 
-* starry-business-app  
-一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用。
+2. starry-business-app  
+   一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用。
 
-* starry-authorization-server-spring-boot-autoconfigure  
-在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
-* starry-authorization-server-app  
-一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用。
+3. starry-authorization-server-spring-boot-autoconfigure  
+   在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
+
+
+4. starry-authorization-server-app  
+   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用。
+
+
+5. starry-common-lib  
+   集成全局的公共基础类的内嵌模块，被其他模块所依赖。
+
+
+6. starry-mdc-spring-boot-autoconfigure
+   提供日志调用链路的跟踪能力。已支持的组件有：
+   * Web过滤器
+   * Reactor内置线程池。与之相关组件包括WebFlux、SpringAI的MCP服务（SSE方式）
+   * MQ消费者（包括Redis、Pulsar、RocketMQ）
 
 ### 1.3 mysql初始化数据
 #### DDL

@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.util.CastUtils;
 
 import java.util.Objects;
 
@@ -33,8 +32,8 @@ public abstract class AbstractRedisMessageListener implements MessageListener {
         }
 
         try {
-            messageListenerPostProcessorChain.handle(objects -> {
-                AbstractRedisMessageListener.this.handle(CastUtils.cast(objects[0]), CastUtils.cast(objects[1]));
+            messageListenerPostProcessorChain.handle(() -> {
+                AbstractRedisMessageListener.this.handle(redisMessage, pattern);
                 return null;
             }, redisMessage, pattern);
         } catch (MessageListenerPostProcessorChain.MessageListenerPostProcessorChainException e) {
