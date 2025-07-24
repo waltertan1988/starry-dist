@@ -78,7 +78,11 @@ public class MessageListenerPostProcessorChain {
                 next.postHandle(stopFromProcessorId, objects);
             }
 
-            curr.postHandle(objects);
+            try{
+                curr.postHandle(objects);
+            }catch (Throwable t){
+                log.error("MessageListenerPostProcessor postHandle fail for {}", curr.getClass().getName(), t);
+            }
         }
     }
 
