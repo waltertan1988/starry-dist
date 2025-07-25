@@ -38,8 +38,9 @@
 6. starry-mdc-spring-boot-autoconfigure
    提供日志调用链路的跟踪能力。已支持的组件有：
    * Web过滤器
-   * Reactor内置线程池。与之相关组件包括WebFlux、SpringAI的MCP服务（SSE方式）
+   * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
    * MQ消费者（包括Redis、Pulsar、RocketMQ）
+   * Reactor内置线程池。与之相关组件包括WebFlux、SpringAI的MCP服务（SSE方式）
 
 ### 1.3 mysql初始化数据
 #### DDL

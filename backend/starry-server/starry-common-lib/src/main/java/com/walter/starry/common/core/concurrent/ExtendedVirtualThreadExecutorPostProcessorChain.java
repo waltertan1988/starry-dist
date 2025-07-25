@@ -36,7 +36,7 @@ public class ExtendedVirtualThreadExecutorPostProcessorChain {
         this.head = lastNext;
     }
 
-    public Runnable proxy(Runnable task) {
+    public Runnable createChainedProxy(Runnable task) {
         if(Objects.isNull(this.head)){
             return task;
         }
@@ -57,7 +57,7 @@ public class ExtendedVirtualThreadExecutorPostProcessorChain {
         };
     }
 
-    public <T> Callable<T> proxy(Callable<T> task){
+    public <T> Callable<T> createChainedProxy(Callable<T> task){
         if(Objects.isNull(this.head)){
             return task;
         }

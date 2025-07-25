@@ -95,7 +95,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        Callable<T> proxyTask = postProcessorChain.proxy(task);
+        Callable<T> proxyTask = postProcessorChain.createChainedProxy(task);
         Callable<T> wrapperTask = this.toReleaseSemaphoreProxy(proxyTask);
         return executorService.submit(wrapperTask);
     }
@@ -107,7 +107,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.proxy(task));
+        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.createChainedProxy(task));
         return executorService.submit(proxyTask, result);
     }
 
@@ -118,7 +118,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.proxy(task));
+        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.createChainedProxy(task));
         return executorService.submit(proxyTask);
     }
 
@@ -131,7 +131,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::proxy).map(this::toReleaseSemaphoreProxy).toList();
+        List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::createChainedProxy).map(this::toReleaseSemaphoreProxy).toList();
         return executorService.invokeAll(proxyTasks);
     }
 
@@ -144,7 +144,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::proxy).map(this::toReleaseSemaphoreProxy).toList();
+        List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::createChainedProxy).map(this::toReleaseSemaphoreProxy).toList();
         return executorService.invokeAll(proxyTasks, timeout, unit);
     }
 
@@ -158,7 +158,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
         }
 
         try{
-            List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::proxy).toList();
+            List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::createChainedProxy).toList();
             return executorService.invokeAny(proxyTasks);
         }finally {
             semaphore.release(tasks.size());
@@ -175,7 +175,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
         }
 
         try{
-            List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::proxy).toList();
+            List<Callable<T>> proxyTasks = tasks.stream().map(postProcessorChain::createChainedProxy).toList();
             return executorService.invokeAny(proxyTasks, timeout, unit);
         }finally {
             semaphore.release(tasks.size());
@@ -188,7 +188,7 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.proxy(task));
+        Runnable proxyTask = this.toReleaseSemaphoreProxy(postProcessorChain.createChainedProxy(task));
         executorService.execute(proxyTask);
     }
 
