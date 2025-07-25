@@ -1,6 +1,5 @@
 package com.walter.starry.common.core.concurrent;
 
-import com.walter.starry.common.util.MdcUtil;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -16,9 +15,12 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public class ExtendedVirtualThreadExecutorService implements ExecutorService {
+
     private Semaphore semaphore;
 
     private String virtualThreadName;
+
+    private ExtendedVirtualThreadExecutorPostProcessorChain postProcessorChain;
 
     private ExecutorService executorService;
 
@@ -28,10 +30,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
      * 构造一个虚拟线程服务实例。提交执行的虚拟线程数量超出maxVirtualThreads，将抛出RejectedExecutionException
      * @param maxVirtualThreads 允许最大的虚拟线程数量
      * @param virtualThreadName 虚拟线程名称的前缀
-     * @return
+     * @param postProcessorChain 后处理调用链
+     * @return 虚拟线程池实例
      */
-    public static ExtendedVirtualThreadExecutorService of(int maxVirtualThreads, String virtualThreadName){
-        return ExtendedVirtualThreadExecutorService.of(maxVirtualThreads, virtualThreadName,
+    public static ExtendedVirtualThreadExecutorService of(int maxVirtualThreads, String virtualThreadName, ExtendedVirtualThreadExecutorPostProcessorChain postProcessorChain){
+        return ExtendedVirtualThreadExecutorService.of(maxVirtualThreads, virtualThreadName, postProcessorChain,
                 (thread, throwable) -> log.error("Virtual thread {}", thread.getName(), throwable));
     }
 
@@ -39,16 +42,19 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
      * 构造一个虚拟线程服务实例。提交执行的虚拟线程数量超出maxVirtualThreads，将抛出RejectedExecutionException
      * @param maxVirtualThreads 允许最大的虚拟线程数量
      * @param virtualThreadName 虚拟线程名称的前缀
+     * @param postProcessorChain 后处理调用链
      * @param ueh 未捕获异常的处理器
-     * @return
+     * @return 虚拟线程池实例
      */
-    public static ExtendedVirtualThreadExecutorService of(int maxVirtualThreads, String virtualThreadName, Thread.UncaughtExceptionHandler ueh){
+    public static ExtendedVirtualThreadExecutorService of(int maxVirtualThreads, String virtualThreadName, ExtendedVirtualThreadExecutorPostProcessorChain postProcessorChain, Thread.UncaughtExceptionHandler ueh){
         Assert.isTrue(maxVirtualThreads >= 0, "maxVirtualThreads cannot be negative");
+        Assert.notNull(postProcessorChain, "postProcessorChain cannot be null");
         Assert.notNull(ueh, "ueh cannot be null");
 
         ExtendedVirtualThreadExecutorService es = new ExtendedVirtualThreadExecutorService();
         es.semaphore = new Semaphore(maxVirtualThreads);
         es.virtualThreadName = virtualThreadName;
+        es.postProcessorChain = postProcessorChain;
         es.executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
                 .name(virtualThreadName, 1)
                 .uncaughtExceptionHandler(ueh)
@@ -89,11 +95,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        Callable<T> proxyTask = postProcessorChain.proxy(task);
 
         Callable<T> wrapperTask = () -> {
             try{
-                return MdcUtil.toMdcCallable(parentTraceId, task).call();
+                return proxyTask.call();
             }finally {
                 semaphore.release();
             }
@@ -108,11 +114,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        Runnable proxyTask = postProcessorChain.proxy(task);
 
         Runnable wrapperTask = () -> {
             try{
-                MdcUtil.toMdcRunnable(parentTraceId, task).run();
+                proxyTask.run();
             }finally {
                 semaphore.release();
             }
@@ -127,11 +133,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        Runnable proxyTask = postProcessorChain.proxy(task);
 
         Runnable wrapperTask = () -> {
             try{
-                MdcUtil.toMdcRunnable(parentTraceId, task).run();
+                proxyTask.run();
             }finally {
                 semaphore.release();
             }
@@ -148,11 +154,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        List<Callable<T>> proxyTasks = tasks.stream().map(t -> postProcessorChain.proxy(t)).toList();
 
-        Collection<? extends Callable<T>> wrapperTasks = tasks.stream().map(task -> (Callable<T>) () -> {
+        Collection<? extends Callable<T>> wrapperTasks = proxyTasks.stream().map(task -> (Callable<T>) () -> {
             try{
-                return MdcUtil.toMdcCallable(parentTraceId, task).call();
+                return task.call();
             }finally {
                 semaphore.release();
             }
@@ -170,11 +176,11 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        List<Callable<T>> proxyTasks = tasks.stream().map(task -> postProcessorChain.proxy(task)).toList();
 
-        Collection<? extends Callable<T>> wrapperTasks = tasks.stream().map(task -> (Callable<T>) () -> {
+        Collection<? extends Callable<T>> wrapperTasks = proxyTasks.stream().map(task -> (Callable<T>) () -> {
             try{
-                return MdcUtil.toMdcCallable(parentTraceId, task).call();
+                return task.call();
             }finally {
                 semaphore.release();
             }
@@ -192,10 +198,10 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        List<Callable<T>> proxyTasks = tasks.stream().map(task -> postProcessorChain.proxy(task)).toList();
 
         try{
-            return executorService.invokeAny(tasks.stream().map(t -> MdcUtil.toMdcCallable(parentTraceId, t)).toList());
+            return executorService.invokeAny(proxyTasks);
         }finally {
             semaphore.release(tasks.size());
         }
@@ -210,32 +216,31 @@ public class ExtendedVirtualThreadExecutorService implements ExecutorService {
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        List<Callable<T>> proxyTasks = tasks.stream().map(task -> postProcessorChain.proxy(task)).toList();
 
         try{
-            return executorService.invokeAny(tasks.stream().map(t -> MdcUtil.toMdcCallable(parentTraceId, t)).toList(), timeout, unit);
+            return executorService.invokeAny(proxyTasks, timeout, unit);
         }finally {
             semaphore.release(tasks.size());
         }
     }
 
     @Override
-    public void execute(@Nonnull Runnable command) {
+    public void execute(@Nonnull Runnable task) {
         if(!semaphore.tryAcquire()){
             throw new RejectedExecutionException("permits are exhausted");
         }
 
-        String parentTraceId = MdcUtil.getTraceId();
+        Runnable proxyTask = postProcessorChain.proxy(task);
 
-        Runnable wrapperCommand = () -> {
+        Runnable wrapperTask = () -> {
             try{
-                MdcUtil.toMdcRunnable(parentTraceId, command).run();
+                proxyTask.run();
             }finally {
                 semaphore.release();
             }
         };
-
-        executorService.execute(wrapperCommand);
+        executorService.execute(wrapperTask);
     }
 
     @Override

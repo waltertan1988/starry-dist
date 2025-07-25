@@ -1,6 +1,9 @@
 package com.walter.starry.autoconfigure.mdc;
 
+import com.walter.starry.autoconfigure.mdc.concurrent.MdcExtendedVirtualThreadExecutorPostProcessor;
 import com.walter.starry.autoconfigure.mdc.web.MdcWebFilter;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorPostProcessor;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorService;
 import com.walter.starry.common.util.MdcUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -9,6 +12,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 import reactor.core.scheduler.Schedulers;
 
@@ -45,5 +49,14 @@ public class StarryMdcAutoConfiguration {
         return filterRegistrationBean;
     }
 
-    // TODO 注册虚拟线程池
+    /**
+     * 注册虚拟线程池的MDC后处理器
+     * @return
+     */
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @ConditionalOnClass(ExtendedVirtualThreadExecutorService.class)
+    public ExtendedVirtualThreadExecutorPostProcessor<?> mdcExtendedVirtualThreadExecutorPostProcessor(){
+        return new MdcExtendedVirtualThreadExecutorPostProcessor();
+    }
 }

@@ -1,12 +1,16 @@
 package com.walter.starry.security.base.config;
 
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorPostProcessor;
+import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorPostProcessorChain;
 import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author: walter.tan
@@ -17,12 +21,22 @@ import java.util.concurrent.Executors;
 public class VirtualThreadExecutorServiceConfig {
 
     /**
+     * 默认的虚拟线程后处理器链
+     * @param processorList
+     * @return
+     */
+    @Bean
+    public ExtendedVirtualThreadExecutorPostProcessorChain defaultExtendedVirtualThreadExecutorPostProcessorChain(List<ExtendedVirtualThreadExecutorPostProcessor<Object>> processorList){
+        return new ExtendedVirtualThreadExecutorPostProcessorChain(Objects.isNull(processorList) ? Collections.emptyList() : processorList);
+    }
+
+    /**
      * 后台系统默认的公共虚拟线程服务
      * @return
      */
     @Bean
-    public ExtendedVirtualThreadExecutorService adminCommonVirtualThreadTaskExecutor(){
-        return ExtendedVirtualThreadExecutorService.of(200, "admin-common-virtual-thread-");
+    public ExtendedVirtualThreadExecutorService adminCommonVirtualThreadTaskExecutor(@Qualifier("defaultExtendedVirtualThreadExecutorPostProcessorChain") ExtendedVirtualThreadExecutorPostProcessorChain chain){
+        return ExtendedVirtualThreadExecutorService.of(200, "admin-common-virtual-thread-", chain);
     }
 
     /**
@@ -30,8 +44,8 @@ public class VirtualThreadExecutorServiceConfig {
      * @return
      */
     @Bean
-    public ExtendedVirtualThreadExecutorService redisSubscribeVirtualThreadTaskExecutor(){
-        return ExtendedVirtualThreadExecutorService.of(200, "redis-message-listener-virtual-thread-");
+    public ExtendedVirtualThreadExecutorService redisSubscribeVirtualThreadTaskExecutor(@Qualifier("defaultExtendedVirtualThreadExecutorPostProcessorChain") ExtendedVirtualThreadExecutorPostProcessorChain chain){
+        return ExtendedVirtualThreadExecutorService.of(200, "redis-message-listener-virtual-thread-", chain);
     }
 
     /**
@@ -39,10 +53,7 @@ public class VirtualThreadExecutorServiceConfig {
      * @return
      */
     @Bean
-    public ExecutorService unboundedVirtualThreadTaskExecutor(){
-        return Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
-                .name("unbounded-virtual-thread-", 1)
-                .uncaughtExceptionHandler((thread, throwable) -> log.error("Virtual thread {}", thread.getName(), throwable))
-                .factory());
+    public ExtendedVirtualThreadExecutorService unboundedVirtualThreadTaskExecutor(@Qualifier("defaultExtendedVirtualThreadExecutorPostProcessorChain") ExtendedVirtualThreadExecutorPostProcessorChain chain){
+        return ExtendedVirtualThreadExecutorService.of(Integer.MAX_VALUE, "unbounded-virtual-thread-",  chain);
     }
 }

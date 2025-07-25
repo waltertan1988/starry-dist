@@ -5,7 +5,6 @@ import org.slf4j.MDC;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 /**
  * @Author: walter.tan
@@ -35,17 +34,6 @@ public class MdcUtil {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
-    public static <T> Callable<T> toMdcCallable(String parentTraceId, Callable<T> callable){
-        return () -> {
-            try{
-                MdcUtil.setTraceId(MdcUtil.genSubThreadTraceId(parentTraceId));
-                return callable.call();
-            }finally {
-                MdcUtil.removeTraceId();
-            }
-        };
-    }
-
     public static Runnable toMdcRunnable(String parentTraceId, Runnable runnable){
         return () -> {
             try{
@@ -57,7 +45,7 @@ public class MdcUtil {
         };
     }
 
-    private static String genSubThreadTraceId(String parentThreadTraceId){
+    public static String genSubThreadTraceId(String parentThreadTraceId){
         if(StringUtils.hasText(parentThreadTraceId)){
             return String.format("%s:%s", parentThreadTraceId, MdcUtil.genNewTraceId());
         }else{
