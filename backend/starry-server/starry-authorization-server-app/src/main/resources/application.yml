@@ -34,8 +34,8 @@ app:
 logging:
   pattern:
     console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{starry-traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
-  level:
-    org.springframework.security: trace
+#  level:
+#    org.springframework.security: trace
 
 server:
   port: 9000
