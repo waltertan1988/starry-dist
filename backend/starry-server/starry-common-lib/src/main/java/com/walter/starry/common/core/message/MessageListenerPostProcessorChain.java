@@ -20,7 +20,7 @@ public class MessageListenerPostProcessorChain {
     private MessageListenerPostProcessorNode head;
 
     public MessageListenerPostProcessorChain(List<MessageListenerPostProcessor> processors) {
-        if(Objects.isNull(processors)){
+        if(Objects.isNull(processors) || processors.isEmpty()){
             return;
         }
 

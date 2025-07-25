@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Author: walter.tan
@@ -27,7 +25,7 @@ public class VirtualThreadExecutorServiceConfig {
      */
     @Bean
     public ExtendedVirtualThreadExecutorPostProcessorChain defaultExtendedVirtualThreadExecutorPostProcessorChain(List<ExtendedVirtualThreadExecutorPostProcessor<Object>> processorList){
-        return new ExtendedVirtualThreadExecutorPostProcessorChain(Objects.isNull(processorList) ? Collections.emptyList() : processorList);
+        return new ExtendedVirtualThreadExecutorPostProcessorChain(processorList);
     }
 
     /**

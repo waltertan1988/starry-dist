@@ -22,7 +22,7 @@ public class ExtendedVirtualThreadExecutorPostProcessorChain {
     private ExtendedVirtualThreadExecutorPostProcessorNode head;
 
     public ExtendedVirtualThreadExecutorPostProcessorChain(List<ExtendedVirtualThreadExecutorPostProcessor<Object>> processors) {
-        if(Objects.isNull(processors)){
+        if(Objects.isNull(processors) || processors.isEmpty()){
             return;
         }
 
