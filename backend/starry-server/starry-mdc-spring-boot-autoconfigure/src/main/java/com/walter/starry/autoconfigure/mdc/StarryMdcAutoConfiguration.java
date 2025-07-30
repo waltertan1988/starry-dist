@@ -12,7 +12,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 import reactor.core.scheduler.Schedulers;
 
@@ -54,7 +53,6 @@ public class StarryMdcAutoConfiguration {
      * @return
      */
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnClass(ExtendedVirtualThreadExecutorService.class)
     public ExtendedVirtualThreadExecutorPostProcessor<?> mdcExtendedVirtualThreadExecutorPostProcessor(){
         return new MdcExtendedVirtualThreadExecutorPostProcessor();

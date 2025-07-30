@@ -51,6 +51,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
+			<!--AI相关-->
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>

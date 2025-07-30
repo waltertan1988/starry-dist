@@ -1,10 +1,12 @@
 package com.walter.starry.common.core.message;
 
+import org.springframework.core.Ordered;
+
 /**
  * 消息队列监听器的后处理器
  * @author walter.tan
  */
-public interface MessageListenerPostProcessor {
+public interface MessageListenerPostProcessor extends Ordered {
 
     /**
      * 消费消息的前置处理。如果该方法在执行过程中出现异常，请在本方法内自行处理反向逻辑
@@ -17,4 +19,13 @@ public interface MessageListenerPostProcessor {
      * @param objects
      */
     void postHandle(Object... objects);
+
+    /**
+     * 定义该处理器在调用链中的位置
+     * @return 负数一般用定义系统内置的处理器，具体的业务处理器建议使用非负数
+     */
+    @Override
+    default int getOrder() {
+        return 0;
+    }
 }

@@ -1,10 +1,12 @@
 package com.walter.starry.common.core.concurrent;
 
+import org.springframework.core.Ordered;
+
 /**
  * 扩展虚拟线程执行的后处理器
  * @author walter.tan
  */
-public interface ExtendedVirtualThreadExecutorPostProcessor<T> {
+public interface ExtendedVirtualThreadExecutorPostProcessor<T> extends Ordered {
 
     /**
      * 池内线程执行业务的前置处理。如果该方法在执行过程中出现异常，请在本方法内自行处理反向逻辑

@@ -4,6 +4,7 @@ import com.walter.starry.common.core.concurrent.ExtendedVirtualThreadExecutorPos
 import com.walter.starry.common.util.MdcUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.core.Ordered;
 
 /**
  * 虚拟线程池的MDC后处理器
@@ -30,5 +31,10 @@ public class MdcExtendedVirtualThreadExecutorPostProcessor implements ExtendedVi
     @AllArgsConstructor
     public static class MdcContext {
         private String parentTraceId;
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }
