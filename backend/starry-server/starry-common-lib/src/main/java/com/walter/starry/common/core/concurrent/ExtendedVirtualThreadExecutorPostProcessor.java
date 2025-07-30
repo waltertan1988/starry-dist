@@ -8,6 +8,8 @@ import org.springframework.core.Ordered;
  */
 public interface ExtendedVirtualThreadExecutorPostProcessor<T> extends Ordered {
 
+    int DEFAULT_ORDER = 0;
+
     /**
      * 池内线程执行业务的前置处理。如果该方法在执行过程中出现异常，请在本方法内自行处理反向逻辑
      * @param context
@@ -25,4 +27,13 @@ public interface ExtendedVirtualThreadExecutorPostProcessor<T> extends Ordered {
      * @return
      */
     T getContext();
+
+    /**
+     * 定义该处理器在调用链中的位置
+     * @return 负数一般用定义系统内置的处理器，具体的业务处理器建议使用非负数
+     */
+    @Override
+    default int getOrder() {
+        return DEFAULT_ORDER;
+    }
 }
