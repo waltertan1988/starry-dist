@@ -8,6 +8,8 @@ import org.springframework.core.Ordered;
  */
 public interface MessageListenerPostProcessor extends Ordered {
 
+    int DEFAULT_ORDER = 0;
+
     /**
      * 消费消息的前置处理。如果该方法在执行过程中出现异常，请在本方法内自行处理反向逻辑
      * @param objects
@@ -26,6 +28,6 @@ public interface MessageListenerPostProcessor extends Ordered {
      */
     @Override
     default int getOrder() {
-        return 0;
+        return DEFAULT_ORDER;
     }
 }
