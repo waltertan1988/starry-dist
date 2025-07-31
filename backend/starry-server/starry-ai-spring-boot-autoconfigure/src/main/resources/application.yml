@@ -1,0 +1,13 @@
+spring:
+  ai:
+    openai:
+      api-key: "XXX"
+      audio:
+        transcription:
+          base-url: "XXX"
+          options:
+            model: "XXX"
+      chat:
+        base-url: "XXX"
+        options:
+          model: "XXX"

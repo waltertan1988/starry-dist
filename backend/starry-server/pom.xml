@@ -50,6 +50,11 @@
 				<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-ai-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<!--AI相关-->
 			<dependency>
@@ -70,6 +75,7 @@
 		<module>starry-authorization-server-spring-boot-autoconfigure</module>
 		<module>starry-security-spring-boot-autoconfigure</module>
 		<module>starry-mdc-spring-boot-autoconfigure</module>
+		<module>starry-ai-spring-boot-autoconfigure</module>
 
 		<module>starry-common-lib</module>
 
