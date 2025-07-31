@@ -11,3 +11,10 @@ spring:
         base-url: "XXX"
         options:
           model: "XXX"
+    mcp:
+      client:
+        type: SYNC
+        sse:
+          connections:
+            server1:
+              url: http://127.0.0.1:8090

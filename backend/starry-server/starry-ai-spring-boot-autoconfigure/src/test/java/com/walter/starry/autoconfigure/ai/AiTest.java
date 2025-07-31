@@ -1,12 +1,14 @@
 package com.walter.starry.autoconfigure.ai;
 
 import com.walter.starry.common.util.JsonUtil;
+import io.modelcontextprotocol.client.McpSyncClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -92,6 +94,26 @@ public class AiTest {
                     .prompt()
                     .user(u -> u.text("描述一下在以下图片中看到了什么？")
                             .media(MimeTypeUtils.IMAGE_PNG, UrlResource.from(picUrl)))
+                    .stream()
+                    .content()
+                    .doOnNext(System.out::print)
+                    .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
+                    .blockLast();
+        }
+    }
+
+    @Nested
+    class McpClientTest {
+        @Autowired
+        private OpenAiChatModel openAiChatModel;
+        @Autowired
+        private List<McpSyncClient> mcpSyncClients;
+
+        @Test
+        void stream(){
+            ChatClient.create(openAiChatModel)
+                    .prompt("我叫walter，请为我提供Starry系统的基本介绍")
+                    .toolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
                     .stream()
                     .content()
                     .doOnNext(System.out::print)

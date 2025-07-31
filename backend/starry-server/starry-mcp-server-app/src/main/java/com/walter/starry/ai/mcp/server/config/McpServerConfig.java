@@ -1,5 +1,6 @@
 package com.walter.starry.ai.mcp.server.config;
 
+import com.walter.starry.ai.mcp.server.service.StarryMcpService;
 import com.walter.starry.ai.mcp.server.service.WeatherService;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -14,12 +15,15 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class McpServerConfig {
+
+    @Bean
+    public ToolCallbackProvider starryTools(StarryMcpService starryMcpService) {
+        return MethodToolCallbackProvider.builder().toolObjects(starryMcpService).build();
+    }
+
     @Bean
     public ToolCallbackProvider weatherTools(WeatherService weatherService) {
         return MethodToolCallbackProvider.builder().toolObjects(weatherService).build();
-    }
-
-    public record TextInput(String input) {
     }
 
     @Bean
@@ -29,4 +33,6 @@ public class McpServerConfig {
                 .description("Put the text to upper case")
                 .build();
     }
+
+    public record TextInput(String input) {}
 }
