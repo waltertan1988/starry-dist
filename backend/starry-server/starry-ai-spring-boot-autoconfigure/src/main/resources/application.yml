@@ -18,3 +18,7 @@ spring:
           connections:
             server1:
               url: http://127.0.0.1:8090
+        # 以下配置，在不需要mcp时加上，否则应用进程启动时，如果mcp服务停用就会无法启动
+        initialized: false
+        toolcallback:
+          enabled: false
