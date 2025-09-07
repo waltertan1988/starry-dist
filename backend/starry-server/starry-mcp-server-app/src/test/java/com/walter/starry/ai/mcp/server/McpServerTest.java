@@ -57,7 +57,6 @@ public class McpServerTest {
     void sseTest(){
         var transport = HttpClientSseClientTransport
                 .builder("http://localhost:8090")
-                .customizeRequest(c -> c.header(MdcUtil.ATTR_TRACE_ID, MdcUtil.getTraceId()))
                 .build();
         new SampleClient(transport).run();
     }
@@ -70,7 +69,6 @@ public class McpServerTest {
         }
 
         public void run() {
-            log.info("SampleClient start to run. traceId: {}", MdcUtil.getTraceId());
             var client = McpClient.sync(this.transport).build();
 
             client.initialize();

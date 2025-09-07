@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.MimeTypeUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -108,6 +111,27 @@ public class AiTest {
         private OpenAiChatModel openAiChatModel;
         @Autowired
         private List<McpSyncClient> mcpSyncClients;
+        @Autowired
+        private ChatClient.Builder builder;
+
+        @Test
+        void mdcCall(){
+            OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
+                    .httpHeaders(Collections.emptyMap())
+                    .build();
+
+            Prompt prompt = Prompt.builder()
+                    .content("我叫walter，请为我提供Starry系统的基本介绍。另外，本次调用的starryTraceId为12345678。")
+                    .chatOptions(openAiChatOptions)
+                    .build();
+
+            String content = ChatClient.create(openAiChatModel)
+                    .prompt(prompt)
+                    .toolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
+                    .call()
+                    .content();
+            System.out.println(content);
+        }
 
         @Test
         void stream(){
