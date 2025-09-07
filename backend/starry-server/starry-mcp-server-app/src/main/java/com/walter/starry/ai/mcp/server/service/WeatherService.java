@@ -2,6 +2,7 @@ package com.walter.starry.ai.mcp.server.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.walter.starry.common.core.ai.AiTool;
 import com.walter.starry.common.util.MdcUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class WeatherService {
+public class WeatherService implements AiTool {
     private static final String BASE_URL = "https://api.weather.gov";
 
     private final RestClient restClient;
