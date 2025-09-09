@@ -1,5 +1,6 @@
 package com.walter.starry.autoconfigure.ai;
 
+import com.walter.starry.autoconfigure.ai.core.StarryMcpToolCallbackProvider;
 import com.walter.starry.common.util.JsonUtil;
 import io.modelcontextprotocol.client.McpSyncClient;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -23,6 +23,7 @@ import org.springframework.util.MimeTypeUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @SpringBootTest(classes = AiApplication.class)
@@ -127,7 +128,7 @@ public class AiTest {
 
             String content = ChatClient.create(openAiChatModel)
                     .prompt(prompt)
-                    .toolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
+                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo")))
                     .call()
                     .content();
             System.out.println(content);
@@ -137,7 +138,7 @@ public class AiTest {
         void stream(){
             ChatClient.create(openAiChatModel)
                     .prompt("我叫walter，请为我提供Starry系统的基本介绍")
-                    .toolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
+                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo")))
                     .stream()
                     .content()
                     .doOnNext(System.out::print)
