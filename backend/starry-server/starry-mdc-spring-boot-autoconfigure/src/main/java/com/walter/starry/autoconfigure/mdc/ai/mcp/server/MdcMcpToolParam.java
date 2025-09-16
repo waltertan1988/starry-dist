@@ -12,7 +12,10 @@ import java.io.Serializable;
  */
 @Getter
 public class MdcMcpToolParam implements Serializable {
-    @ToolParam(description = "调用本方法的starryTraceId", required = false)
+
+    public static final String TRACE_ID_DESC = "the starryTraceId for this MCP tool calling";
+
+    @ToolParam(description = TRACE_ID_DESC, required = false)
     private String starryTraceId;
 
     public void setStarryTraceId(String starryTraceId) {

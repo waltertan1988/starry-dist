@@ -1,7 +1,10 @@
 package com.walter.starry.autoconfigure.ai;
 
+import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.ai.core.StarryMcpToolCallbackProvider;
+import com.walter.starry.autoconfigure.mdc.ai.advisor.MdcMcpAdvisor;
 import com.walter.starry.common.util.JsonUtil;
+import com.walter.starry.common.util.MdcUtil;
 import io.modelcontextprotocol.client.McpSyncClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +18,7 @@ import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.FileSystemResource;
@@ -23,6 +27,7 @@ import org.springframework.util.MimeTypeUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -117,17 +122,21 @@ public class AiTest {
 
         @Test
         void mdcCall(){
+            MdcUtil.setTraceId(MdcUtil.genNewTraceId());
+
             OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
                     .httpHeaders(Collections.emptyMap())
                     .build();
 
             Prompt prompt = Prompt.builder()
-                    .content("我叫walter，请为我提供Starry系统的基本介绍。另外，本次调用的starryTraceId为12345678。")
+                    .content("请为我介绍Starry系统的基本信息")
                     .chatOptions(openAiChatOptions)
                     .build();
 
+            log.info("开始执行.");
             String content = ChatClient.create(openAiChatModel)
                     .prompt(prompt)
+                    .advisors(new MdcMcpAdvisor())
                     .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo")))
                     .call()
                     .content();
@@ -135,15 +144,49 @@ public class AiTest {
         }
 
         @Test
-        void stream(){
+        void mdcStream(){
             ChatClient.create(openAiChatModel)
-                    .prompt("我叫walter，请为我提供Starry系统的基本介绍")
-                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo")))
+                    .prompt("请提供ID为123456的用户的个人简介")
+                    .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, "12345678"))
+                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getUserInfo")))
                     .stream()
                     .content()
                     .doOnNext(System.out::print)
                     .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
                     .blockLast();
+        }
+    }
+
+    @Nested
+    class Agent{
+        @Autowired
+        private OpenAiChatModel openAiChatModel;
+        @Autowired
+        private List<McpSyncClient> mcpSyncClients;
+
+        @Test
+        void getStarryAuthorInfoAgent1(){
+            MdcUtil.setTraceId(MdcUtil.genNewTraceId());
+            log.info("getStarryAuthorInfoAgent start.");
+
+            ToolCallback[] toolCallBacks = new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo", "getUserInfo")).getToolCallbacks();
+
+            StarryInfoRes starryInfoRes = ChatClient.create(openAiChatModel)
+                    .prompt("请提供Starry系统的基本信息。要求：不存在的数据用null填充，禁止胡乱编造。")
+                    .advisors(new MdcMcpAdvisor())
+                    .toolCallbacks(toolCallBacks)
+                    .call()
+                    .entity(StarryInfoRes.class);
+            log.info("starryInfoRes: {}", JsonUtil.toJson(starryInfoRes));
+
+            String content = ChatClient.create(openAiChatModel)
+                    .prompt().user(u -> u.text("请提供ID为{uid}的用户的个人简介。")
+                            .param("uid", Optional.ofNullable(starryInfoRes).map(StarryInfoRes::authorUid).orElse("")))
+                    .advisors(new MdcMcpAdvisor())
+                    .toolCallbacks(toolCallBacks)
+                    .call()
+                    .content();
+            System.out.println(content);
         }
     }
 

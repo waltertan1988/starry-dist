@@ -30,6 +30,7 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Starry系统的核心依赖 -->
 			<dependency>
 				<groupId>com.walter.starry</groupId>
 				<artifactId>starry-common-lib</artifactId>
@@ -56,6 +57,13 @@
 				<version>${project.version}</version>
 			</dependency>
 
+			<!-- Starry二方API依赖 -->
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-mcp-server-remote</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<!--AI相关-->
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
@@ -68,17 +76,17 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>starry-business-app</module>
-		<module>starry-authorization-server-app</module>
-		<module>starry-mcp-server-app</module>
-
+		<module>mybatis-generator</module>
+		<module>starry-common-lib</module>
+		<module>starry-mcp-server-remote</module>
+		
 		<module>starry-authorization-server-spring-boot-autoconfigure</module>
 		<module>starry-security-spring-boot-autoconfigure</module>
 		<module>starry-mdc-spring-boot-autoconfigure</module>
 		<module>starry-ai-spring-boot-autoconfigure</module>
-
-		<module>starry-common-lib</module>
-
-		<module>mybatis-generator</module>
+	
+		<module>starry-business-app</module>
+		<module>starry-authorization-server-app</module>
+		<module>starry-mcp-server-app</module>
 	</modules>
 </project>

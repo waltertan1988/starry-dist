@@ -16,6 +16,16 @@
 			<groupId>com.walter.starry</groupId>
 			<artifactId>starry-common-lib</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.walter.starry</groupId>
+			<artifactId>starry-mcp-server-remote</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.walter.starry</groupId>
+			<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
