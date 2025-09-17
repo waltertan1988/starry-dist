@@ -21,14 +21,14 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.MimeTypeUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest(classes = AiApplication.class)
@@ -164,6 +164,9 @@ public class AiTest {
         @Autowired
         private List<McpSyncClient> mcpSyncClients;
 
+        /**
+         * 手动编排
+         */
         @Test
         void getStarryAuthorInfoAgent1(){
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
@@ -187,6 +190,47 @@ public class AiTest {
                     .call()
                     .content();
             System.out.println(content);
+        }
+
+        /**
+         * 全自动编排
+         */
+        @Test
+        void getStarryAuthorInfoAgent2(){
+            MdcUtil.setTraceId(MdcUtil.genNewTraceId());
+            log.info("getStarryAuthorInfoAgent2 start.");
+
+            ToolCallback[] toolCallBacks = new StarryMcpToolCallbackProvider(mcpSyncClients).getToolCallbacks();
+
+            String result = ChatClient.create(openAiChatModel)
+                    .prompt("我要获取Starry系统的作者的用户信息，请依次调用合适的工具方法给我返回最终答案。要求：调用工具的过程中，不存在的数据用null填充，严禁胡乱编造。")
+                    .advisors(new MdcMcpAdvisor())
+                    .toolCallbacks(toolCallBacks)
+                    .call()
+                    .content();
+            log.info("result: {}", result);
+        }
+
+        /**
+         * 半自动编排
+         */
+        @Test
+        void getStarryAuthorInfoAgent3(){
+            MdcUtil.setTraceId(MdcUtil.genNewTraceId());
+            log.info("getStarryAuthorInfoAgent3 start.");
+
+            Map<String, ToolCallback> toolCallbackMap = Arrays.stream(new StarryMcpToolCallbackProvider(mcpSyncClients).getToolCallbacks())
+                    .collect(Collectors.toMap(tcb -> tcb.getToolDefinition().name(), Function.identity()));
+
+            List<String> plannedToolCallbackList = ChatClient.create(openAiChatModel)
+                    .prompt("我要获取Starry系统的作者的用户信息，需要依次调用哪些工具？最后请把工具的名称以数组形式按需要调用的顺序返回。")
+                    .advisors(new MdcMcpAdvisor())
+                    .toolCallbacks(toolCallbackMap.values().stream().toList())
+                    .call()
+                    .entity(new ParameterizedTypeReference<>() {});
+
+            Objects.requireNonNull(plannedToolCallbackList).forEach(System.out::println);
+            // TODO tyx 半自动编排
         }
     }
 
