@@ -37,17 +37,17 @@ public class MdcMcpAdvisor implements BaseAdvisor {
     @Override
     public ChatClientRequest before(ChatClientRequest chatClientRequest, AdvisorChain advisorChain) {
         Map<String, Object> varMap = new HashMap<>(2);
-        varMap.put("input_query", chatClientRequest.prompt().getUserMessage().getText());
+        varMap.put("input_query", chatClientRequest.prompt().getSystemMessage().getText());
         String traceId = ObjectUtils.firstNonNull(chatClientRequest.context().get(MdcUtil.ATTR_TRACE_ID), MdcUtil.getTraceId(), StringUtils.EMPTY).toString();
         varMap.put("starryTraceId", traceId);
 
-        String augmentedUserText = PromptTemplate.builder()
+        String augmentedText = PromptTemplate.builder()
                 .template(this.mdcTemplate)
                 .variables(varMap)
                 .build()
                 .render();
         return chatClientRequest.mutate()
-                .prompt(chatClientRequest.prompt().augmentUserMessage(augmentedUserText))
+                .prompt(chatClientRequest.prompt().augmentSystemMessage(augmentedText))
                 .build();
     }
 
