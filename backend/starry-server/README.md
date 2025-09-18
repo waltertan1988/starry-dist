@@ -513,6 +513,10 @@ sudo mkdir -p ./data/rocketmq/namesrv/logs
 sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
 sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
 sudo chmod 777 -R ./data/rocketmq
+# Minio相关目录
+sudo mkdir -p ./data/minio
+# Milvus相关目录
+sudo mkdir -p ./data/etcd ./data/milvus
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```

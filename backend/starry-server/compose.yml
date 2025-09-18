@@ -15,3 +15,7 @@ include:
     ## MQ子网网段：172.18.3.0/24
   - compose-rocketmq.yml
 #  - compose-pulsar.yml
+    ## minio子网网段：172.18.4.0/24
+  - compose-minio.yml
+    ## milvus子网网段：172.18.5.0/24
+  - compose-milvus.yml
