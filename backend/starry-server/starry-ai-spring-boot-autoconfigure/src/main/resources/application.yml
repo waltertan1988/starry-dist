@@ -20,7 +20,7 @@ spring:
         type: SYNC
         sse:
           connections:
-            server1:
+            starry:
               url: http://127.0.0.1:8090
         # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
         initialized: false
