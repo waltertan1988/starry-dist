@@ -217,12 +217,10 @@ public class AiTest {
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
             log.info("getStarryAuthorInfoAgent2 start.");
 
-            ToolCallback[] toolCallBacks = new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()).getToolCallbacks();
-
             String result = ChatClient.create(openAiChatModel)
                     .prompt("我要获取Starry系统的作者的用户信息，请依次调用合适的工具方法给我返回最终答案。要求：调用工具的过程中，不存在的数据用null填充，严禁胡乱编造。")
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(toolCallBacks)
+                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()))
                     .call()
                     .content();
             log.info("result: {}", result);

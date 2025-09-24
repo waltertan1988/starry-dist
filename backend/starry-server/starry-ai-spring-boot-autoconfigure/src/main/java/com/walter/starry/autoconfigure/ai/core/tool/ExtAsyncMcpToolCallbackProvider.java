@@ -1,48 +1,49 @@
 package com.walter.starry.autoconfigure.ai.core.tool;
 
-import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.McpAsyncClient;
 import io.modelcontextprotocol.spec.McpSchema;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.lang.NonNull;
 
 import java.util.Collection;
 import java.util.function.BiPredicate;
 
 /**
+ * 自定义的异步MCP工具回调提供者
  * @author walter.tan
  */
-@Slf4j
 public class ExtAsyncMcpToolCallbackProvider implements ToolCallbackProvider {
 
-    private final McpSyncClient mcpClient;
+    private final McpAsyncClient mcpClient;
 
-    private final BiPredicate<McpSyncClient, McpSchema.Tool> toolFilter;
+    private final BiPredicate<McpAsyncClient, McpSchema.Tool> toolFilter;
 
-    public ExtAsyncMcpToolCallbackProvider(McpSyncClient mcpClient) {
+    public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient) {
         this(mcpClient, (c, t) -> true);
     }
 
-    public ExtAsyncMcpToolCallbackProvider(McpSyncClient mcpClient, Collection<String> toolNames){
+    public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient, Collection<String> toolNames){
         this(mcpClient, (c, t) -> toolNames.contains(t.name()));
     }
 
-    public ExtAsyncMcpToolCallbackProvider(McpSyncClient mcpClient, BiPredicate<Object, McpSchema.Tool> toolFilter) {
+    public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient, BiPredicate<Object, McpSchema.Tool> toolFilter) {
         this.mcpClient = mcpClient;
         this.toolFilter = toolFilter::test;
     }
 
+    @NonNull
     @Override
     public ToolCallback[] getToolCallbacks() {
         if(!mcpClient.isInitialized()){
             synchronized (ExtAsyncMcpToolCallbackProvider.class){
                 if(!mcpClient.isInitialized()){
-                    mcpClient.initialize();
+                    mcpClient.initialize().block();
                 }
             }
         }
         
-        return new SyncMcpToolCallbackProvider(toolFilter, mcpClient).getToolCallbacks();
+        return new AsyncMcpToolCallbackProvider(toolFilter, mcpClient).getToolCallbacks();
     }
 }
