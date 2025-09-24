@@ -1,6 +1,6 @@
 package com.walter.starry.autoconfigure.mdc.ai.advisor;
 
-import com.walter.starry.autoconfigure.mdc.ai.mcp.server.MdcMcpToolParam;
+import com.walter.starry.autoconfigure.mdc.ai.mcp.server.MdcMcpToolRequest;
 import com.walter.starry.common.util.MdcUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +22,7 @@ public class MdcMcpAdvisor implements BaseAdvisor {
     private static final String DEFAULT_MDC_TEMPLATE = """
 			{input_query}
 			In addition, %s is {starryTraceId}.
-			""".formatted(MdcMcpToolParam.TRACE_ID_DESC);
+			""".formatted(MdcMcpToolRequest.TRACE_ID_DESC);
 
     private final String mdcTemplate;
 

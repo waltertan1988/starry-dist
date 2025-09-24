@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author walter.tan
  */
 @Getter
-public class MdcMcpToolParam implements Serializable {
+public class MdcMcpToolRequest implements Serializable {
 
     public static final String TRACE_ID_DESC = "the starryTraceId for this MCP tool calling";
 

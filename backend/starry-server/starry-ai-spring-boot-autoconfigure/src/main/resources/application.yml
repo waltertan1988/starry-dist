@@ -6,13 +6,15 @@ spring:
   ai:
     openai:
       api-key: "XXX"
+      base-url: "XXX"
       audio:
         transcription:
-          base-url: "XXX"
           options:
             model: "XXX"
       chat:
+        api-key: "XXX"
         base-url: "XXX"
+        completions-path: "XXX"
         options:
           model: "XXX"
     mcp:

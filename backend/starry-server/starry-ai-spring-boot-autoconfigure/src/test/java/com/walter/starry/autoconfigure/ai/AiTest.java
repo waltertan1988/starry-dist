@@ -1,8 +1,8 @@
 package com.walter.starry.autoconfigure.ai;
 
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
-import com.walter.starry.autoconfigure.ai.core.ChineseTokenTextSplitter;
-import com.walter.starry.autoconfigure.ai.core.StarryMcpToolCallbackProvider;
+import com.walter.starry.autoconfigure.ai.core.rag.ChineseTokenTextSplitter;
+import com.walter.starry.autoconfigure.ai.core.tool.ExtSyncMcpToolCallbackProvider;
 import com.walter.starry.autoconfigure.mdc.ai.advisor.MdcMcpAdvisor;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.util.MdcUtil;
@@ -154,7 +154,7 @@ public class AiTest {
             String content = ChatClient.create(openAiChatModel)
                     .prompt(prompt)
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo")))
+                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getStarryInfo")))
                     .call()
                     .content();
             System.out.println(content);
@@ -165,7 +165,7 @@ public class AiTest {
             ChatClient.create(openAiChatModel)
                     .prompt("请提供ID为123456的用户的个人简介")
                     .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, "12345678"))
-                    .toolCallbacks(new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getUserInfo")))
+                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getUserInfo")))
                     .stream()
                     .content()
                     .doOnNext(System.out::print)
@@ -189,7 +189,7 @@ public class AiTest {
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
             log.info("getStarryAuthorInfoAgent start.");
 
-            ToolCallback[] toolCallBacks = new StarryMcpToolCallbackProvider(mcpSyncClients, Set.of("getStarryInfo", "getUserInfo")).getToolCallbacks();
+            ToolCallback[] toolCallBacks = new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getStarryInfo", "getUserInfo")).getToolCallbacks();
 
             StarryInfoRes starryInfoRes = ChatClient.create(openAiChatModel)
                     .prompt("请提供Starry系统的基本信息。要求：不存在的数据用null填充，禁止胡乱编造。")
@@ -217,7 +217,7 @@ public class AiTest {
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
             log.info("getStarryAuthorInfoAgent2 start.");
 
-            ToolCallback[] toolCallBacks = new StarryMcpToolCallbackProvider(mcpSyncClients).getToolCallbacks();
+            ToolCallback[] toolCallBacks = new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()).getToolCallbacks();
 
             String result = ChatClient.create(openAiChatModel)
                     .prompt("我要获取Starry系统的作者的用户信息，请依次调用合适的工具方法给我返回最终答案。要求：调用工具的过程中，不存在的数据用null填充，严禁胡乱编造。")
@@ -236,7 +236,7 @@ public class AiTest {
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
             log.info("getStarryAuthorInfoAgent3 start.");
 
-            Map<String, ToolCallback> toolCallbackMap = Arrays.stream(new StarryMcpToolCallbackProvider(mcpSyncClients).getToolCallbacks())
+            Map<String, ToolCallback> toolCallbackMap = Arrays.stream(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()).getToolCallbacks())
                     .collect(Collectors.toMap(tcb -> tcb.getToolDefinition().name(), Function.identity()));
 
             List<String> plannedToolCallbackList = ChatClient.create(openAiChatModel)

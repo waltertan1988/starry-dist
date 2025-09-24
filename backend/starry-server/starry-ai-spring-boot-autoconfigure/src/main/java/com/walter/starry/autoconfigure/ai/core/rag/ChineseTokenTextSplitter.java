@@ -1,4 +1,4 @@
-package com.walter.starry.autoconfigure.ai.core;
+package com.walter.starry.autoconfigure.ai.core.rag;
 
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;

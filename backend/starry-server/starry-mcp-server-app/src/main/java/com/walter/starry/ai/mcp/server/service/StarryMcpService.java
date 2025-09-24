@@ -1,7 +1,7 @@
 package com.walter.starry.ai.mcp.server.service;
 
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
-import com.walter.starry.autoconfigure.mdc.ai.mcp.server.MdcMcpToolParam;
+import com.walter.starry.autoconfigure.mdc.ai.mcp.server.MdcMcpToolRequest;
 import com.walter.starry.common.core.ai.AiTool;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +20,7 @@ public class StarryMcpService implements AiTool {
     private static final String STARRY_AUTHOR_UID = "123456";
 
     @Tool(description = "提供Starry系统的基本信息")
-    public StarryInfoRes getStarryInfo(MdcMcpToolParam param) {
+    public StarryInfoRes getStarryInfo(MdcMcpToolRequest req) {
         log.info("getStarryInfo start");
         return new StarryInfoRes(STARRY_AUTHOR_UID, "Starry系统是一个基于Java和Vue3的综合性系统基座");
     }
@@ -38,7 +38,7 @@ public class StarryMcpService implements AiTool {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class UserInfoReq extends MdcMcpToolParam {
+    public static class UserInfoReq extends MdcMcpToolRequest {
         @ToolParam(description = "用户ID")
         private String uid;
     }
