@@ -1,3 +1,7 @@
+app:
+  # 中间件所在主机（仅用于集中管理本配置文件上下文的配置，非必须）
+  middleware-host: 192.168.10.23
+
 logging:
   pattern:
     console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{starry-traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
@@ -17,6 +21,9 @@ spring:
         completions-path: "XXX"
         options:
           model: "XXX"
+      embedding:
+        options:
+          model: "XXX"
     mcp:
       client:
         type: SYNC
@@ -26,3 +33,12 @@ spring:
               url: http://127.0.0.1:8090
         # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
         initialized: false
+    vectorstore:
+      milvus:
+        auto-id: true
+        client:
+          host: ${app.middleware-host}
+          port: 19530
+        database-name: "starry"
+#        initialize-schema: true
+        embedding-dimension: 1024

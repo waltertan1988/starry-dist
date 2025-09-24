@@ -1,5 +1,6 @@
 package com.walter.starry.autoconfigure.ai;
 
+import com.google.common.collect.Lists;
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.ai.core.rag.ChineseTokenTextSplitter;
 import com.walter.starry.autoconfigure.ai.core.tool.ExtSyncMcpToolCallbackProvider;
@@ -15,10 +16,7 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.TextReader;
@@ -29,6 +27,8 @@ import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
@@ -251,6 +251,9 @@ public class AiTest {
 
     @Nested
     class RagTest{
+        @Autowired
+        private OpenAiEmbeddingModel openAiEmbeddingModel;
+
         @Nested
         class EtlTest{
             @Test
@@ -326,6 +329,76 @@ public class AiTest {
                 for (Document document : documents) {
                     System.out.println(document.getText());
                 }
+            }
+        }
+
+        @Nested
+        class VectorStoreTest{
+            @Autowired
+            private VectorStore vectorStore;
+
+            private static final String TAG_JIN_YONG = "金庸武侠小说";
+            private static final String TAG_STARRY = "Starry系统";
+
+            @Test
+            void embedding(){
+                float[] embeds = openAiEmbeddingModel.embed("你好");
+                System.out.println(embeds.length);
+                System.out.println(Arrays.toString(embeds));
+            }
+
+            @Test
+            void addMarkdown(){
+                // 读取Markdown文档
+                final String fileName = "C:/projects/mine/starry-dist/backend/starry-server/README.md";
+                MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
+                        .withHorizontalRuleCreateDocument(true)
+                        .withIncludeCodeBlock(false)
+                        .withIncludeBlockquote(false)
+                        .withAdditionalMetadata("tag", TAG_STARRY)
+                        .build();
+
+                MarkdownDocumentReader reader = new MarkdownDocumentReader(new PathResource(fileName), config);
+                List<Document> documents = new ChineseTokenTextSplitter().apply(reader.read());
+                int remainDoc = documents.size();
+                for (List<Document> documentSubList : Lists.partition(documents, 10)) {
+                    vectorStore.add(documentSubList);
+                    remainDoc -= documentSubList.size();
+                    System.out.println("remain docs: " + remainDoc);
+                }
+            }
+
+            @Test
+            void addText(){
+                // 读取文本文档
+                final String fileName = "C:/Users/walter.tan/Downloads/天龙八部.txt";
+                TextReader reader = new TextReader(new PathResource(fileName));
+                reader.getCustomMetadata().put("tag", TAG_JIN_YONG);
+                List<Document> documentList = new ChineseTokenTextSplitter().apply(reader.read());
+                int remainDoc = documentList.size();
+                for (List<Document> documentSubList : Lists.partition(documentList, 10)) {
+                    vectorStore.add(documentSubList);
+                    remainDoc -= documentSubList.size();
+                    System.out.println("remain docs: " + remainDoc);
+                }
+            }
+
+            @Test
+            void search(){
+                List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
+                        .filterExpression(String.format("tag == '%s'", TAG_JIN_YONG))
+                        .query("谁会降龙十八掌？")
+                        .topK(3)
+                        .build());
+                for (Document document : documents) {
+                    System.out.println(document.getText());
+                    System.out.println("---------------------------");
+                }
+            }
+
+            @Test
+            void delete(){
+                vectorStore.delete(String.format("source == '%s'", "天龙八部.txt"));
             }
         }
     }
