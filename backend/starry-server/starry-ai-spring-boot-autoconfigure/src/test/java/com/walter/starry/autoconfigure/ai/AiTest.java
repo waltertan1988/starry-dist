@@ -14,10 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
@@ -333,7 +338,9 @@ public class AiTest {
         }
 
         @Nested
-        class VectorStoreTest{
+        class RagSearchTest{
+            @Autowired
+            private OpenAiChatModel openAiChatModel;
             @Autowired
             private VectorStore vectorStore;
 
@@ -384,10 +391,10 @@ public class AiTest {
             }
 
             @Test
-            void search(){
+            void similaritySearch(){
                 List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                         .filterExpression(String.format("tag == '%s'", TAG_JIN_YONG))
-                        .query("谁会降龙十八掌？")
+                        .query("神木王鼎有什么作用？")
                         .topK(3)
                         .build());
                 for (Document document : documents) {
@@ -399,6 +406,31 @@ public class AiTest {
             @Test
             void delete(){
                 vectorStore.delete(String.format("source == '%s'", "天龙八部.txt"));
+            }
+
+            @Test
+            void ragSearch(){
+                Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                        .documentRetriever(VectorStoreDocumentRetriever.builder()
+                                .similarityThreshold(0.50)
+                                .vectorStore(vectorStore)
+                                .build())
+                        .queryAugmenter(ContextualQueryAugmenter.builder()
+                                .allowEmptyContext(false)
+                                .emptyContextPromptTemplate(PromptTemplate.builder().template("直接用以下句子的原文回复用户，且不要补充任何文字：“抱歉，这个问题已超出我的能力范围了。”").build())
+                                .build())
+                        .build();
+
+                ChatClient.builder(openAiChatModel).build()
+                        .prompt()
+                        .advisors(retrievalAugmentationAdvisor)
+                        .advisors(a -> a.param(VectorStoreDocumentRetriever.FILTER_EXPRESSION, String.format("source == '%s'", "天龙八部.txt")))
+                        .user("神木王鼎有什么作用?")
+                        .stream()
+                        .content()
+                        .doOnNext(System.out::print)
+                        .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
+                        .blockLast();
             }
         }
     }
