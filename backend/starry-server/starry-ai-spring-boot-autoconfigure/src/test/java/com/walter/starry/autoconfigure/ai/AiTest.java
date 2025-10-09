@@ -14,7 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
@@ -342,6 +346,8 @@ public class AiTest {
             @Autowired
             private OpenAiChatModel openAiChatModel;
             @Autowired
+            private JdbcChatMemoryRepository jdbcChatMemoryRepository;
+            @Autowired
             private VectorStore vectorStore;
 
             private static final String TAG_JIN_YONG = "金庸武侠小说";
@@ -409,7 +415,12 @@ public class AiTest {
             }
 
             @Test
-            void ragSearch(){
+            void ragSearchWithJdbcChatMemory(){
+                // 聊天记忆的advisor
+                ChatMemory chatMemory = MessageWindowChatMemory.builder().chatMemoryRepository(jdbcChatMemoryRepository).maxMessages(5).build();
+                Advisor promptChatMemoryAdvisor = PromptChatMemoryAdvisor.builder(chatMemory).build();
+
+                // RAG的advisor
                 Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                         .documentRetriever(VectorStoreDocumentRetriever.builder()
                                 .similarityThreshold(0.50)
@@ -423,9 +434,12 @@ public class AiTest {
 
                 ChatClient.builder(openAiChatModel).build()
                         .prompt()
-                        .advisors(retrievalAugmentationAdvisor)
-                        .advisors(a -> a.param(VectorStoreDocumentRetriever.FILTER_EXPRESSION, String.format("source == '%s'", "天龙八部.txt")))
-                        .user("神木王鼎有什么作用?")
+                        .advisors(retrievalAugmentationAdvisor, promptChatMemoryAdvisor)
+                        .advisors(a -> a.params(Map.of(
+                                VectorStoreDocumentRetriever.FILTER_EXPRESSION, String.format("source == '%s'", "天龙八部.txt"),
+                                ChatMemory.CONVERSATION_ID, 1759996851659L
+                        )))
+                        .user("神木王鼎有什么作用？")
                         .stream()
                         .content()
                         .doOnNext(System.out::print)

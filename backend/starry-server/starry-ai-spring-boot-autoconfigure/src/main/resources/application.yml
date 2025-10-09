@@ -8,6 +8,11 @@ logging:
 
 spring:
   ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: never
     openai:
       api-key: "XXX"
       base-url: "XXX"
