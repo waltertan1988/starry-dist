@@ -37,6 +37,14 @@ logging:
 #  level:
 #    org.springframework.security: trace
 
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露health端点，可供Nginx或容器探针进行健康检查，实现无损上下线
+#        include: "health"
+        include: "*"
+
 server:
   port: 9000
   shutdown: graceful
