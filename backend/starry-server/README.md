@@ -219,6 +219,8 @@ CREATE TABLE oauth2_authorized_client (
     PRIMARY KEY (client_registration_id, principal_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '客户端用户获得授权后的令牌记录表';
 ```
+> OAuth2的相关表字段和DAO相关定义，可参考：  
+> https://docs.spring.io/spring-authorization-server/docs/current/reference/html/guides/how-to-jpa.html#registered-client-repository
 
 ##### Spring AI相关
 ```mysql
@@ -231,9 +233,6 @@ CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='LLM聊天记忆表';
 ```
-
-> OAuth2的相关表字段和DAO相关定义，可参考：  
-> https://docs.spring.io/spring-authorization-server/docs/current/reference/html/guides/how-to-jpa.html#registered-client-repository
 
 #### DML
 ##### 初始化用户数据
