@@ -343,6 +343,7 @@ insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('21','function_admin_function_group','功能管理','2','1200','system_admin_function_group','{\"icon\":\"Key\"}','2020-11-07 08:36:34.000','2020-11-07 08:36:43.000');
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('22','shop_admin_menu_group','电商管理','1','1100','root_menu_group','{\"defaultOpen\":false,\"icon\":\"Goods\"}','2020-12-23 16:29:54.200','2020-12-23 16:44:40.151');
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('23','product_admin_menu_group','商品管理','1','1000','shop_admin_menu_group','{\"defaultOpen\":false,\"icon\":\"GoodsFilled\"}','2020-12-23 16:35:04.821','2020-12-23 16:35:04.821');
+insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('24','actuator_endpoint_group','Actuator端点','2','900','root_function_group','{\"icon\":\"Histogram\"}','2020-12-23 15:13:18.762','2020-12-23 15:35:49.685');
 ```
 
 ##### 初始化资源项（包括菜单项和功能项）
@@ -362,6 +363,7 @@ insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('30','admin_function_operation','POST','/admin/function/**','功能管理操作','1000','function_admin_function_group','{\"icon\":null}','2020-11-07 08:39:36.000','2020-11-07 08:39:36.000');
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('31','admin_function_has','POST','/admin/function/has','判断当前登录用户是否拥有指定的功能权限','900','function_admin_function_group','{\"icon\":null}','2020-11-09 06:20:39.000','2020-11-09 06:20:39.000');
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('32','AdminProductSpuPage','GET','/admin/product/spu','SPU管理','1000','product_admin_menu_group','{\"icon\":\"Goods\"}','2020-12-23 16:31:26.931','2020-12-23 16:35:13.602');
+insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('34','actuator_endpoint_health','GET','/actuator/health','健康检查端点','1000','actuator_endpoint_group','{\"icon\":null}','2020-12-23 15:19:22.819','2020-12-23 16:01:29.556');
 ```
 
 ##### 初始化资源项所需的角色或权限
@@ -383,6 +385,7 @@ insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_co
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('23','admin_function_has','ROLE_ANONYMOUS','2020-11-09 06:26:26.000','2020-11-09 06:26:26.000');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('24','admin_function_has','ROLE_USER','2020-11-09 06:26:26.000','2020-11-09 06:26:26.000');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('25','AdminProductSpuPage','ROLE_BIZ_MANAGER','2020-12-23 16:32:18.345','2020-12-23 16:32:18.345');
+insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('31','actuator_endpoint_health','ROLE_ANONYMOUS','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
 ```
 
 ##### 初始化OAuth2的Client配置数据
