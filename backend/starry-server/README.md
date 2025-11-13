@@ -386,6 +386,7 @@ insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_co
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('24','admin_function_has','ROLE_USER','2020-11-09 06:26:26.000','2020-11-09 06:26:26.000');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('25','AdminProductSpuPage','ROLE_BIZ_MANAGER','2020-12-23 16:32:18.345','2020-12-23 16:32:18.345');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('31','actuator_endpoint_health','ROLE_ANONYMOUS','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
+insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('32','actuator_endpoint_health','ROLE_USER','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
 ```
 
 ##### 初始化OAuth2的Client配置数据
