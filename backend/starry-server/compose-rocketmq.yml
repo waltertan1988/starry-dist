@@ -6,6 +6,8 @@ services:
       - 9876:9876
     volumes:
       - ./data/rocketmq/namesrv/logs:/home/rocketmq/logs
+    environment:
+      HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
     networks:
       starry:
         ipv4_address: 172.18.3.1
@@ -22,7 +24,8 @@ services:
       - ./data/rocketmq/broker/logs:/home/rocketmq/logs
       - ./data/rocketmq/broker/store:/home/rocketmq/store
     environment:
-      - NAMESRV_ADDR=rmqnamesrv:9876
+      NAMESRV_ADDR: rmqnamesrv:9876
+      HEAP_OPTS: -Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m
     depends_on:
       - rmq-namesrv
     networks:
@@ -45,7 +48,8 @@ services:
       - ./data/rocketmq/proxy/.rocketmq_offsets:/home/rocketmq/.rocketmq_offsets
     restart: on-failure
     environment:
-      - NAMESRV_ADDR=rmqnamesrv:9876
+      NAMESRV_ADDR: rmqnamesrv:9876
+      HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
     command: sh mqproxy
   rmq-dashboard:
     image: apacherocketmq/rocketmq-dashboard:2.0.1
@@ -57,6 +61,6 @@ services:
         ipv4_address: 172.18.3.4
     restart: always
     environment:
-      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876"
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Xms128m -Xmx128m -Xmn64m"
     depends_on:
       - rmq-proxy

@@ -692,6 +692,10 @@ services:
 sudo docker compose up -d
 # 停止
 #sudo docker compose down
+# 查看各个容器的运行状态
+#sudo docker compose stats
+# 查看容器日志
+#sudo docker logs <容器id或名称>
 ```
 
 #### 2.2.6 如果消息队列采用Pulsar，还需要配置PulsarManager
