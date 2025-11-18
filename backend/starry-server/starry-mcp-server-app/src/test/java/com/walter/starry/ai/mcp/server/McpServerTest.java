@@ -1,10 +1,12 @@
 package com.walter.starry.ai.mcp.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.walter.starry.common.util.MdcUtil;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.ServerParameters;
 import io.modelcontextprotocol.client.transport.StdioClientTransport;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +43,14 @@ public class McpServerTest {
         String currDir = new File(".").getAbsolutePath();
         String jarPath = String.format("%s/target/starry-mcp-server-app-%s.jar", currDir, appVersion);
 
-        var stdioParams = ServerParameters.builder("java")
+        ServerParameters stdioParams = ServerParameters.builder("java")
                 .args("-Dspring.ai.mcp.server.stdio=true",
                         "-Dspring.main.web-application-type=none",
                         "-Dlogging.pattern.console=",
                         "-jar", jarPath)
                 .build();
 
-        var transport = new StdioClientTransport(stdioParams);
+        var transport = new StdioClientTransport(stdioParams, new JacksonMcpJsonMapper(new ObjectMapper()));
 
         new SampleClient(transport).run();
     }

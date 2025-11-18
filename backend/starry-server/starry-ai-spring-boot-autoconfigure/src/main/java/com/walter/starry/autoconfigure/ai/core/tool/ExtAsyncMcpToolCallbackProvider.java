@@ -1,14 +1,13 @@
 package com.walter.starry.autoconfigure.ai.core.tool;
 
 import io.modelcontextprotocol.client.McpAsyncClient;
-import io.modelcontextprotocol.spec.McpSchema;
 import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
+import org.springframework.ai.mcp.McpToolFilter;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
-import java.util.function.BiPredicate;
 
 /**
  * 自定义的异步MCP工具回调提供者
@@ -18,7 +17,7 @@ public class ExtAsyncMcpToolCallbackProvider implements ToolCallbackProvider {
 
     private final McpAsyncClient mcpClient;
 
-    private final BiPredicate<McpAsyncClient, McpSchema.Tool> toolFilter;
+    private final McpToolFilter toolFilter;
 
     public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient) {
         this(mcpClient, (c, t) -> true);
@@ -28,9 +27,9 @@ public class ExtAsyncMcpToolCallbackProvider implements ToolCallbackProvider {
         this(mcpClient, (c, t) -> toolNames.contains(t.name()));
     }
 
-    public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient, BiPredicate<Object, McpSchema.Tool> toolFilter) {
+    public ExtAsyncMcpToolCallbackProvider(McpAsyncClient mcpClient, McpToolFilter toolFilter) {
         this.mcpClient = mcpClient;
-        this.toolFilter = toolFilter::test;
+        this.toolFilter = toolFilter;
     }
 
     @NonNull
@@ -43,7 +42,7 @@ public class ExtAsyncMcpToolCallbackProvider implements ToolCallbackProvider {
                 }
             }
         }
-        
-        return new AsyncMcpToolCallbackProvider(toolFilter, mcpClient).getToolCallbacks();
+
+        return AsyncMcpToolCallbackProvider.builder().toolFilter(toolFilter).mcpClients(mcpClient).build().getToolCallbacks();
     }
 }

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
-import org.springframework.ai.mcp.client.autoconfigure.properties.McpClientCommonProperties;
+import org.springframework.ai.mcp.client.common.autoconfigure.properties.McpClientCommonProperties;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
@@ -28,7 +28,7 @@ import java.util.List;
 @ComponentScan(basePackages = {"com.walter.starry.autoconfigure.ai"})
 public class StarryAiAutoConfiguration {
     /**
-     * 原生的ToolCallbackResolver存在问题：如果MCP服务不可用，MCP客户端启动时将会失败。因此重新定义此Bean来解决。参考：
+     * SpringAi-1.0.0原生的ToolCallbackResolver存在问题：如果MCP服务不可用，MCP客户端启动时将会失败。因此重新定义此Bean来解决。参考：
      * {@link org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration#toolCallbackResolver(org.springframework.context.support.GenericApplicationContext, java.util.List, java.util.List)}
      * @param mcpClientCommonProperties
      * @param applicationContext

@@ -45,5 +45,14 @@ spring:
           host: ${app.middleware-host}
           port: 19530
         database-name: "starry"
-#        initialize-schema: true
+        #        initialize-schema: true
         embedding-dimension: 1024
+  datasource:
+    # 此数据源用于实现jdbc聊天记忆
+    username: root
+    password: ''
+    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    hikari:
+      minimum-idle: 50
+      maximum-pool-size: 150
+      connection-test-query: SELECT 1

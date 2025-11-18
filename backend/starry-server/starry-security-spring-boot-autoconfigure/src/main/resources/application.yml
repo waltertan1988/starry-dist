@@ -77,6 +77,9 @@ management:
         # 暴露health端点，可供Nginx或容器探针进行健康检查，实现无损上下线
 #        include: "health"
         include: "*"
+#  endpoint:
+#    shutdown:
+#      access: unrestricted
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
