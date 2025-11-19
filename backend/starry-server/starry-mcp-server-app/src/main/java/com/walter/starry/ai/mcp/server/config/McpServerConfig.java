@@ -1,12 +1,6 @@
 package com.walter.starry.ai.mcp.server.config;
 
-import com.walter.starry.common.core.ai.AiTool;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.method.MethodToolCallbackProvider;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 /**
  * @Author: walter.tan
@@ -35,8 +29,8 @@ public class McpServerConfig {
 //
 //    public record TextInput(String input) {}
 
-    @Bean
-    public ToolCallbackProvider starryAiTools(List<AiTool> aiTools) {
-        return MethodToolCallbackProvider.builder().toolObjects(aiTools.toArray(new Object[0])).build();
-    }
+//    @Bean
+//    public ToolCallbackProvider starryAiTools(List<AiTool> aiTools) {
+//        return MethodToolCallbackProvider.builder().toolObjects(aiTools.toArray(new Object[0])).build();
+//    }
 }

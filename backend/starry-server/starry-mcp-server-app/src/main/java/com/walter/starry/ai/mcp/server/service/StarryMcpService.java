@@ -2,12 +2,12 @@ package com.walter.starry.ai.mcp.server.service;
 
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.mdc.ai.mcp.server.MdcMcpToolRequest;
-import com.walter.starry.common.core.ai.AiTool;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
+import org.springaicommunity.mcp.annotation.McpTool;
+import org.springaicommunity.mcp.annotation.McpToolParam;
+import org.springaicommunity.mcp.context.McpSyncRequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class StarryMcpService implements AiTool {
+public class StarryMcpService {
 
     private static final String STARRY_AUTHOR_UID = "123456";
 
-    @Tool(description = "提供Starry系统的基本信息")
-    public StarryInfoRes getStarryInfo(MdcMcpToolRequest req) {
+    @McpTool(description = "提供Starry系统的基本信息")
+    public StarryInfoRes getStarryInfo(McpSyncRequestContext context, MdcMcpToolRequest req) {
         log.info("getStarryInfo start");
         return new StarryInfoRes(STARRY_AUTHOR_UID, "Starry系统是一个基于Java和Vue3的综合性系统基座");
     }
 
-    @Tool(description = "根据用户ID获取该用户的简介信息")
-    public String getUserInfo(UserInfoReq req){
+    @McpTool(description = "根据用户ID获取该用户的简介信息")
+    public String getUserInfo(McpSyncRequestContext context, UserInfoReq req){
         log.info("getUserInfo start. uid: {}", req.getUid());
 
         if(STARRY_AUTHOR_UID.equals(req.getUid())){
@@ -39,7 +39,7 @@ public class StarryMcpService implements AiTool {
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class UserInfoReq extends MdcMcpToolRequest {
-        @ToolParam(description = "用户ID")
+        @McpToolParam(description = "用户ID")
         private String uid;
     }
 }
