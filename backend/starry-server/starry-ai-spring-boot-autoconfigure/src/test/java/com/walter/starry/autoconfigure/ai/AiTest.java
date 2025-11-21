@@ -148,6 +148,8 @@ public class AiTest {
 
         @Test
         void mdcCall(){
+            final String mcpProgressToken = "wxyz";
+
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
 
             OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
@@ -162,6 +164,9 @@ public class AiTest {
             log.info("开始执行.");
             String content = ChatClient.create(openAiChatModel)
                     .prompt(prompt)
+                    .toolContext(Map.of(
+                            "progressToken", mcpProgressToken // 要使用McpProgress能力，必须传递progressToken
+                    ))
                     .advisors(new MdcMcpAdvisor())
                     .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getStarryInfo")))
                     .call()
@@ -171,9 +176,16 @@ public class AiTest {
 
         @Test
         void mdcStream(){
+            final String mcpProgressToken = "abcd";
+            final String mcpTraceId = "12345678";
+
             ChatClient.create(openAiChatModel)
                     .prompt("请提供ID为123456的用户的个人简介")
-                    .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, "12345678"))
+                    .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
+                    .toolContext(Map.of(
+                            "progressToken", mcpProgressToken, // 要使用McpProgress能力，必须传递progressToken
+                            MdcUtil.ATTR_TRACE_ID, mcpTraceId
+                    ))
                     .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getUserInfo")))
                     .stream()
                     .content()
