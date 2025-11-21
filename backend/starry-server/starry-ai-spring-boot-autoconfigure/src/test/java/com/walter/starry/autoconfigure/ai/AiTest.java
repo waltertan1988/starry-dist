@@ -178,9 +178,10 @@ public class AiTest {
         void mdcStream(){
             final String mcpProgressToken = "abcd";
             final String mcpTraceId = "12345678";
+            final String uid = "PC9527";
 
             ChatClient.create(openAiChatModel)
-                    .prompt("请提供ID为123456的用户的个人简介")
+                    .prompt("请提供ID为%s的用户的个人简介".formatted(uid))
                     .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
                     .toolContext(Map.of(
                             "progressToken", mcpProgressToken, // 要使用McpProgress能力，必须传递progressToken

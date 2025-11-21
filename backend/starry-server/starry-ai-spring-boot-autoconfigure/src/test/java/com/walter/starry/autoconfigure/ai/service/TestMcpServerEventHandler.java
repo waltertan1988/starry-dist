@@ -22,7 +22,6 @@ public class TestMcpServerEventHandler {
     @McpLogging(clients = "starry")
     @McpServerEventMdcHandler
     public void handleLogs(McpSchema.LoggingMessageNotification notification) {
-//        Optional.ofNullable(notification.meta()).map(meta -> meta.get(MdcUtil.ATTR_TRACE_ID)).map(Object::toString).ifPresent(MdcUtil::setTraceId);
         log.info("接收到的Server端Logging信息：level: {}, data: {}", notification.level(), notification.data());
     }
 
@@ -33,7 +32,6 @@ public class TestMcpServerEventHandler {
     @McpProgress(clients = "starry")
     @McpServerEventMdcHandler
     public void handleProgress(McpSchema.ProgressNotification notification) {
-//        Optional.ofNullable(notification.meta()).map(meta -> meta.get(MdcUtil.ATTR_TRACE_ID)).map(Object::toString).ifPresent(MdcUtil::setTraceId);
         double percentage = notification.progress() * 100;
         log.info("接收到的Server端Progress信息：percentage: {}, message: {}", percentage, notification.message());
     }

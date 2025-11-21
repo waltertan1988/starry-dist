@@ -24,7 +24,7 @@ import java.util.Map;
 @Service
 public class StarryMcpService {
 
-    private static final String STARRY_AUTHOR_UID = "123456";
+    private static final String STARRY_AUTHOR_UID = "PC9527";
 
     @McpTool(description = "提供Starry系统的基本信息")
     public StarryInfoRes getStarryInfo(McpSyncServerExchange exchange, @McpProgressToken String progressToken, MdcMcpToolRequest req) {
