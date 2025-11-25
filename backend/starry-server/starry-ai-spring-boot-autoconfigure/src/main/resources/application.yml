@@ -32,10 +32,14 @@ spring:
     mcp:
       client:
         type: SYNC
-        sse:
+        streamable-http:
           connections:
             starry:
               url: http://127.0.0.1:8090
+#        sse:
+#          connections:
+#            starry:
+#              url: http://127.0.0.1:8090
         # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
         initialized: false
     vectorstore:
@@ -45,7 +49,7 @@ spring:
           host: ${app.middleware-host}
           port: 19530
         database-name: "starry"
-        #        initialize-schema: true
+#        initialize-schema: true
         embedding-dimension: 1024
   datasource:
     # 此数据源用于实现jdbc聊天记忆
