@@ -14,6 +14,8 @@ spring:
   ai:
     mcp:
       server:
+#        annotation-scanner:
+#          enabled: true
         name: starry-mcp-server
         version: 1.0.0
 #        type: SYNC
@@ -24,7 +26,12 @@ spring:
 #          resource: true
 #          prompt: true
 #          completion: true
+        protocol: streamable
+#        request-timeout: 20s
 #        stdio: false
+        streamable-http:
+          keep-alive-interval: 30m
+#          mcp-endpoint: /mcp
 #        resource-change-notification: true
 #        tool-change-notification: true
 #        prompt-change-notification: true
