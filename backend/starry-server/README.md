@@ -5,11 +5,11 @@
 ### 1.1 依赖中间件
 #### 必须中间件
 * JDK-21
-* MySql-8.0.36
-* Redis-7.2.0-v9
+* MySql-8.0.45
+* Redis-7.4.0-v8
 #### 可选中间件
 * Docker Compose（建议本地开发时使用）
-* Pulsar-3.2.1或RocketMQ-5.3.3
+* Pulsar-3.2.1或RocketMQ-5.4.0
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明

@@ -1,6 +1,6 @@
 services:
   mysql-master:
-    image: mysql:8.0.36
+    image: mysql:8.0.45
     container_name: mysql-master
     hostname: mysql-master
     # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
@@ -23,7 +23,7 @@ services:
           cpus: '0.20'
 
   mysql-slave1:
-    image: mysql:8.0.36
+    image: mysql:8.0.45
     container_name: mysql-slave1
     hostname: mysql-slave1
     command: --default-authentication-plugin=mysql_native_password
@@ -46,7 +46,7 @@ services:
           cpus: '0.20'
 
   mysql-slave2:
-    image: mysql:8.0.36
+    image: mysql:8.0.45
     container_name: mysql-slave2
     hostname: mysql-slave2
     command: --default-authentication-plugin=mysql_native_password
