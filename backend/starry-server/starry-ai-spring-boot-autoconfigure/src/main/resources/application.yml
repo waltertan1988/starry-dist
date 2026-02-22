@@ -15,20 +15,25 @@ spring:
             initialize-schema: never
     openai:
       api-key: "XXX"
-      base-url: "XXX"
+      base-url: "https://api.siliconflow.cn"
       audio:
         transcription:
           options:
-            model: "XXX"
+            model: "TeleAI/TeleSpeechASR"
+        speech:
+          options:
+            model: "fnlp/MOSS-TTSD-v0.5"
+            voice: "fnlp/MOSS-TTSD-v0.5:claire"
+            response-format: mp3
+            speed: 0.75
       chat:
-        api-key: "XXX"
-        base-url: "XXX"
-        completions-path: "XXX"
+        base-url: "https://api.siliconflow.cn"
+        completions-path: "/v1/chat/completions"
         options:
-          model: "XXX"
+          model: "THUDM/GLM-4.1V-9B-Thinking"
       embedding:
         options:
-          model: "XXX"
+          model: "BAAI/bge-m3"
     mcp:
       client:
         type: SYNC
@@ -48,6 +53,7 @@ spring:
         client:
           host: ${app.middleware-host}
           port: 19530
+        collection-name: "dev"
         database-name: "starry"
 #        initialize-schema: true
         embedding-dimension: 1024

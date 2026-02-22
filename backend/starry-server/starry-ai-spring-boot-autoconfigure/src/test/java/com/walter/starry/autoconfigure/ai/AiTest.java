@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.audio.tts.TextToSpeechPrompt;
+import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -24,6 +26,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.openai.metadata.audio.OpenAiAudioSpeechResponseMetadata;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
@@ -46,6 +49,9 @@ import org.springframework.core.io.PathResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.MimeTypeUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -60,6 +66,8 @@ public class AiTest {
         class AudioModelTest {
             @Autowired
             private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
+            @Autowired
+            private OpenAiAudioSpeechModel openAiAudioSpeechModel;
 
             @Test
             void asr(){
@@ -67,10 +75,29 @@ public class AiTest {
                         .responseFormat(OpenAiAudioApi.TranscriptResponseFormat.TEXT)
                         .temperature(0f)
                         .build();
-                FileSystemResource audioFile = new FileSystemResource("C:/Users/walter.tan/Downloads/普通话27_20s.mp3");
+                FileSystemResource audioFile = new FileSystemResource("E:/Download/《海滨仲夏夜》示范朗读.mp3");
                 AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
                 AudioTranscriptionResponse response = openAiAudioTranscriptionModel.call(transcriptionRequest);
                 System.out.println(response.getResult().getOutput());
+            }
+
+            @Test
+            void tts() throws IOException {
+                File outputFile = new File("E:/Download/tts.mp3");
+                if(outputFile.exists()){
+                    outputFile.delete();
+                }
+
+                var speechPrompt = new TextToSpeechPrompt("你站在桥上看风景，看风景的人在楼上看你。明月装饰了你的窗子，你装饰了别人的梦");
+                TextToSpeechResponse response = openAiAudioSpeechModel.call(speechPrompt);
+
+                byte[] responseAsBytes = response.getResult().getOutput();
+                try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                    fos.write(responseAsBytes);
+                }
+
+                OpenAiAudioSpeechResponseMetadata metadata = (OpenAiAudioSpeechResponseMetadata) response.getMetadata();
+                System.out.println(metadata);
             }
         }
 
@@ -397,7 +424,7 @@ public class AiTest {
             @Test
             void addText(){
                 // 读取文本文档
-                final String fileName = "C:/Users/walter.tan/Downloads/天龙八部.txt";
+                final String fileName = "C:/Users/think/Downloads/神雕侠侣.txt";
                 TextReader reader = new TextReader(new PathResource(fileName));
                 reader.getCustomMetadata().put("tag", TAG_JIN_YONG);
                 List<Document> documentList = new ChineseTokenTextSplitter().apply(reader.read());
