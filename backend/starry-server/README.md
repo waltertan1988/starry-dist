@@ -633,8 +633,9 @@ enforce-gtid-consistency=ON
 > 注：关于搭建MYSQL主从环境：   
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
 >（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
->（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
+>（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
+>（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html  
+>（5）设置数据源为只读并备份数据：https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html  
 
 #### 2.2.4 消息队列配置
 假设中间件的宿主机IP是192.168.10.131
@@ -749,7 +750,7 @@ java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-
 ```
 > 注：在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 
-### 2.4 如何访问
+### 2.4 关于OAuth2的授权登录流程
 * Step1: 用户未登录，客户端请求获取授权码
 > 浏览器地址栏输入：  
 > http://127.0.0.1:8080/oauth2/authorize?client_id=oidc-client&response_type=code&scope=openid+profile+email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client
