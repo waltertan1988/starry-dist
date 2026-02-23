@@ -9,7 +9,7 @@
 * Redis-7.4.0-v8
 #### 可选中间件
 * Docker Compose（建议本地开发时使用）
-* Pulsar-3.2.1或RocketMQ-5.4.0
+* Pulsar-3.2.1或RocketMQ-5.3.4
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明

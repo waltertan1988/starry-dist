@@ -1,6 +1,6 @@
 services:
   rmq-namesrv:
-    image: apache/rocketmq:5.4.0
+    image: apache/rocketmq:5.3.4
     container_name: rmqnamesrv
     ports:
       - 9876:9876
@@ -13,7 +13,7 @@ services:
         ipv4_address: 172.18.3.1
     command: sh mqnamesrv
   rmq-broker:
-    image: apache/rocketmq:5.4.0
+    image: apache/rocketmq:5.3.4
     container_name: rmqbroker
     ports:
       - 10909:10909
@@ -33,7 +33,7 @@ services:
         ipv4_address: 172.18.3.2
     command: ["sh","mqbroker","-c","/home/rocketmq/conf/broker.conf"]
   rmq-proxy:
-    image: apache/rocketmq:5.4.0
+    image: apache/rocketmq:5.3.4
     container_name: rmqproxy
     networks:
       starry:
@@ -52,7 +52,7 @@ services:
       HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
     command: sh mqproxy
   rmq-dashboard:
-    image: apacherocketmq/rocketmq-dashboard:2.1.0
+    image: apacherocketmq/rocketmq-dashboard:2.0.1
     container_name: rmqdashboard
     ports:
       - 18080:8080
