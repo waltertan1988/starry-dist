@@ -187,16 +187,19 @@
 
     // 初始化弹窗位置
     onMounted(() => {
-        // 设置弹窗初始位置为页面右下方，距离右侧边框10px
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const iconWidth = 60;
-        const rightMargin = 10;
-        popupPosition.value = {
-            left: windowWidth - iconWidth - rightMargin,
-            top: windowHeight - iconWidth - 80
-        };
+        // 设置弹窗初始位置为页面右下方，距离右侧边框10px，距离底部边框80px
+        initPopupPosition();
     });
+
+function initPopupPosition() {
+    const iconWidth = 60;
+    const rightMargin = 10;
+    const bottomMargin = 80;
+    popupPosition.value = {
+        left: window.innerWidth - iconWidth - rightMargin,
+        top: window.innerHeight - iconWidth - bottomMargin
+    };
+}
 
     // 开始拖拽
     function startDrag(event) {
@@ -260,6 +263,7 @@
     // 关闭弹窗
     function closePopup() {
         popupVisible.value = false;
+        initPopupPosition();
     }
 
     // 显示弹窗
