@@ -11,8 +11,10 @@
         </div>
         <div class="popup-content">
             <div class="content-section">
-                <div class="scrollable-content">
-                    hello world
+                <div class="scrollable-content" ref="scrollContainer">
+                    <div v-for="(message, index) in messages" :key="index" class="message-item">
+                        {{ message }}
+                    </div>
                 </div>
             </div>
             <div class="content-section">
@@ -71,6 +73,7 @@
     const hasMoved = ref(false); // 是否有移动，用于区分点击和拖拽
     const dragThreshold = 5; // 拖拽阈值，超过此值视为拖拽
     const inputText = ref(''); // 输入文本内容
+    const messages = ref(['hello world']); // 聊天消息记录
 
     // 开始拖拽
     function startDrag(event) {
@@ -200,8 +203,17 @@
     function sendMessage() {
         if (inputText.value.trim()) {
             console.log('发送消息:', inputText.value);
-            // 这里可以添加实际的消息发送逻辑
-            inputText.value = ''; // 清空输入框
+            // 追加消息到聊天记录
+            messages.value.push(inputText.value);
+            // 清空输入框
+            inputText.value = '';
+            // 滚动到底部
+            setTimeout(() => {
+                const scrollContainer = document.querySelector('.scrollable-content');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }
+            }, 100);
         }
     }
 </script>
@@ -286,6 +298,11 @@
         border-radius: 4px;
         padding: 10px;
         box-sizing: border-box;
+    }
+
+    .message-item {
+        margin-bottom: 10px;
+        line-height: 1.4;
     }
 
     .scrollable-content::-webkit-scrollbar {
