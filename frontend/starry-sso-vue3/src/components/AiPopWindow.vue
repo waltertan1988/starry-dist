@@ -12,8 +12,8 @@
         <div class="popup-content">
             <div class="content-section">
                 <div class="scrollable-content" ref="scrollContainer">
-                    <div v-for="(message, index) in messages" :key="index" class="message-item">
-                        {{ message }}
+                    <div v-for="(message, index) in messages" :key="index" :class="['message-item', message.type === 'user' ? 'user-message' : 'system-message']">
+                        {{ message.content }}
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
     const hasMoved = ref(false); // 是否有移动，用于区分点击和拖拽
     const dragThreshold = 5; // 拖拽阈值，超过此值视为拖拽
     const inputText = ref(''); // 输入文本内容
-    const messages = ref(['hello world']); // 聊天消息记录
+    const messages = ref([{ type: 'system', content: '欢迎使用智能问答功能，请问有什么可以帮到您？' }]); // 聊天消息记录，type: 'user' 或 'system'
 
     // 开始拖拽
     function startDrag(event) {
@@ -202,9 +202,8 @@
     // 发送消息
     function sendMessage() {
         if (inputText.value.trim()) {
-            console.log('发送消息:', inputText.value);
-            // 追加消息到聊天记录
-            messages.value.push(inputText.value);
+            // 追加用户消息到聊天记录
+            messages.value.push({ type: 'user', content: inputText.value });
             // 清空输入框
             inputText.value = '';
             // 滚动到底部
@@ -303,6 +302,23 @@
     .message-item {
         margin-bottom: 10px;
         line-height: 1.4;
+        max-width: 80%;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .user-message {
+        text-align: right;
+        margin-left: auto;
+        background-color: #e6f7ff;
+        border: 1px solid #91d5ff;
+    }
+
+    .system-message {
+        text-align: left;
+        margin-right: auto;
+        background-color: #f5f5f5;
+        border: 1px solid #e0e0e0;
     }
 
     .scrollable-content::-webkit-scrollbar {
