@@ -180,6 +180,10 @@
     const startY = ref(0); // 拖拽开始的Y坐标
     const hasMoved = ref(false); // 是否有移动，用于区分点击和拖拽
     const dragThreshold = 5; // 拖拽阈值，超过此值视为拖拽
+    
+    // 弹窗尺寸常量
+    const POPUP_WIDTH = 300; // 弹窗宽度
+    const POPUP_HEIGHT = 225; // 弹窗高度
 
     // 初始化弹窗位置
     onMounted(() => {
@@ -276,8 +280,6 @@
     function adjustPopupPosition() {
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-        const popupWidth = 300;
-        const popupHeight = 225;
         const minMargin = 5; // 最小边距，确保弹窗边界距离页面视界至少5px
         
         // 计算弹窗的理想位置（基于图标位置）
@@ -285,8 +287,8 @@
         let newTop = popupPosition.value.top;
         
         // 确保弹窗不会超出右侧边界
-        if (newLeft + popupWidth > windowWidth) {
-            newLeft = windowWidth - popupWidth - minMargin;
+        if (newLeft + POPUP_WIDTH > windowWidth) {
+            newLeft = windowWidth - POPUP_WIDTH - minMargin;
         }
         
         // 确保弹窗不会超出左侧边界
@@ -295,8 +297,8 @@
         }
         
         // 确保弹窗不会超出底部边界
-        if (newTop + popupHeight > windowHeight) {
-            newTop = windowHeight - popupHeight - minMargin;
+        if (newTop + POPUP_HEIGHT > windowHeight) {
+            newTop = windowHeight - POPUP_HEIGHT - minMargin;
         }
         
         // 确保弹窗不会超出顶部边界
@@ -306,8 +308,8 @@
         
         // 强制确保弹窗完全在视口内
         // 再次检查并修正，确保计算正确
-        newLeft = Math.max(minMargin, Math.min(newLeft, windowWidth - popupWidth - minMargin));
-        newTop = Math.max(minMargin, Math.min(newTop, windowHeight - popupHeight - minMargin));
+        newLeft = Math.max(minMargin, Math.min(newLeft, windowWidth - POPUP_WIDTH - minMargin));
+        newTop = Math.max(minMargin, Math.min(newTop, windowHeight - POPUP_HEIGHT - minMargin));
         
         // 更新弹窗位置
         popupPosition.value = {
@@ -593,8 +595,8 @@
     /* 可拖拽弹窗样式 */
     #draggablePopup {
         position: fixed;
-        width: 300px;
-        height: 225px;
+        width: v-bind('POPUP_WIDTH + "px"');
+        height: v-bind('POPUP_HEIGHT + "px"');
         background-color: white;
         border: 1px solid #e0e0e0;
         border-radius: 4px;
