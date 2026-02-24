@@ -10,7 +10,24 @@
             <el-icon class="close-icon" @click.stop="closePopup"><Close/></el-icon>
         </div>
         <div class="popup-content">
-            hello world
+            <div class="content-section">
+                <div class="scrollable-content">
+                    hello world
+                </div>
+            </div>
+            <div class="content-section">
+                <el-input
+                    class="inputTextArea"
+                    v-model="inputText"
+                    type="textarea"
+                    :rows="3"
+                    placeholder="请输入您的问题..."
+                    style="width: 100%"
+                />
+            </div>
+            <div class="content-section">
+                <el-button type="primary" @click="sendMessage" style="width: 100px">发送</el-button>
+            </div>
         </div>
     </div>
 
@@ -53,6 +70,7 @@
     const startY = ref(0); // 拖拽开始的Y坐标
     const hasMoved = ref(false); // 是否有移动，用于区分点击和拖拽
     const dragThreshold = 5; // 拖拽阈值，超过此值视为拖拽
+    const inputText = ref(''); // 输入文本内容
 
     // 开始拖拽
     function startDrag(event) {
@@ -177,6 +195,15 @@
             top: newTop
         };
     }
+
+    // 发送消息
+    function sendMessage() {
+        if (inputText.value.trim()) {
+            console.log('发送消息:', inputText.value);
+            // 这里可以添加实际的消息发送逻辑
+            inputText.value = ''; // 清空输入框
+        }
+    }
 </script>
 
 <style scoped>
@@ -220,10 +247,63 @@
     }
 
     .popup-content {
-        padding: 20px;
+        padding: 15px;
         font-size: 14px;
         color: #303133;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: calc(100% - 50px); /* 减去header高度 */
+    }
+
+    .content-section:first-child {
+        flex: 1;
+        min-height: 0;
+    }
+
+    .scrollable-content {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .content-section {
+        width: 100%;
+    }
+
+    .content-section:first-child {
         text-align: center;
+    }
+
+    .scrollable-content {
+        width: 100%;
+        overflow-y: auto;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .scrollable-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
     }
 
     /* 智能客服图标样式 */
