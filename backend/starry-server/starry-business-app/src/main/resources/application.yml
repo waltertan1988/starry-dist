@@ -3,12 +3,12 @@ app:
   middleware-host: 192.168.10.131
 
 server:
-  port: 9000
+  port: 8080
   shutdown: graceful
 
 spring:
   application:
-    name: starry-authorization-server-app
+    name: starry-business-app
 
   config:
     import: classpath:application-security.yml
@@ -30,3 +30,6 @@ management:
         # 暴露health端点，可供Nginx或容器探针进行健康检查，实现无损上下线
         #        include: "health"
         include: "*"
+#  endpoint:
+#    shutdown:
+#      access: unrestricted
