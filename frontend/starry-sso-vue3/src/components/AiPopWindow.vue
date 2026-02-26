@@ -325,6 +325,7 @@
         width: 100%;
         height: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
         border: 1px solid #e0e0e0;
         border-radius: 4px;
         padding: 10px;
@@ -342,6 +343,7 @@
     .scrollable-content {
         width: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
         border: 1px solid #e0e0e0;
         border-radius: 4px;
         padding: 10px;
@@ -354,6 +356,9 @@
         max-width: 80%;
         padding: 8px 12px;
         border-radius: 8px;
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
     }
 
     .user-message {

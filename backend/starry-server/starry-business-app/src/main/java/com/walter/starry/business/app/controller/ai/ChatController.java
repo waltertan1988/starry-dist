@@ -39,7 +39,7 @@ public class ChatController {
         String answer = StringUtils.isBlank(req.getContent()) ? "请先输入您的内容" : generateRandomCharacters(100);
 
         return Flux.fromArray(answer.split(""))
-                .delayElements(Duration.ofMillis(100))
+                .delayElements(Duration.ofMillis(50))
                 .doOnComplete(() -> {
                     log.info("chat call finished. requestId: {}", requestId);
                 });
