@@ -7,7 +7,7 @@
          @touchstart="startDrag">
         <div class="popup-header">
             <span>智能问答</span>
-            <el-icon class="close-icon" @click.stop="closePopup"><Close/></el-icon>
+            <el-icon class="close-icon" @click.stop="closePopup"><Minus/></el-icon>
         </div>
         <div class="popup-content">
             <div class="content-section">
@@ -50,7 +50,7 @@
 <script setup>
     import { ref } from 'vue'
     import { ElMessage } from 'element-plus';
-    import {Close, ChatDotRound} from "@element-plus/icons-vue";
+    import {Minus, ChatDotRound} from "@element-plus/icons-vue";
     import {defineProps} from '@vue/runtime-core';
 
     // 定义组件用于接收外部调用方的参数列表
