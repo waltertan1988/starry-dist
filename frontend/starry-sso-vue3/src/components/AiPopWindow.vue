@@ -28,12 +28,12 @@
                 />
             </div>
             <div class="content-section">
-                <el-button type="primary" @click="sendMessage" style="width: 100px">发送</el-button>
+                <el-button type="primary" @click="sendMessage" style="width: 100px" :disabled="!inputText">发送</el-button>
             </div>
         </div>
     </div>
 
-    <!-- 智能客服图标 -->
+    <!-- 智能问答图标 -->
     <div v-else 
          id="smartServiceIcon"
          :style="{ left: popupPosition.left + 'px', top: popupPosition.top + 'px' }"
@@ -230,6 +230,9 @@
                     throw new Error('服务器返回错误状态: ' + response.status)
                 }
 
+                // 清空输入框
+                inputText.value = '';
+
                 const reader = response.body.getReader()
                 const decoder = new TextDecoder('utf-8')
 
@@ -253,9 +256,6 @@
                     done = result.done;
                     value = result.value;
                 }
-
-                // 清空输入框
-                inputText.value = '';
             } catch (error) {
                 ElMessage.error(error)
                 console.error('Error:', error)
