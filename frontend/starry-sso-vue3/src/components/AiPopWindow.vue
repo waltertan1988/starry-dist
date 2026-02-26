@@ -49,6 +49,7 @@
 
 <script setup>
     import { ref } from 'vue'
+    import { ElMessage } from 'element-plus';
     import {Close, ChatDotRound} from "@element-plus/icons-vue";
     import {defineProps} from '@vue/runtime-core';
 
@@ -74,6 +75,7 @@
     const dragThreshold = 5; // 拖拽阈值，超过此值视为拖拽
     const inputText = ref(''); // 输入文本内容
     const messages = ref([{ type: 'system', content: '欢迎使用智能问答功能，请问有什么可以帮到您？' }]); // 聊天消息记录，type: 'user' 或 'system'
+    const isSubmitting = ref(false); // 是否正在提交中
 
     // 开始拖拽
     function startDrag(event) {
@@ -200,19 +202,66 @@
     }
 
     // 发送消息
-    function sendMessage() {
+    async function sendMessage() {
         if (inputText.value.trim()) {
+            if (isSubmitting.value) {
+                return;
+            }
+
+            isSubmitting.value = true
+
             // 追加用户消息到聊天记录
             messages.value.push({ type: 'user', content: inputText.value });
-            // 清空输入框
-            inputText.value = '';
-            // 滚动到底部
-            setTimeout(() => {
-                const scrollContainer = document.querySelector('.scrollable-content');
-                if (scrollContainer) {
-                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+
+            // 追加系统消息到聊天记录
+            messages.value.push({ type: 'system', content: "" });
+
+            try {
+                const response = await fetch('/api/auth/ai/chat/call', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'text/plain;charset=UTF-8',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({"content": inputText.value})
+                })
+
+                if (!response.ok) {
+                    throw new Error('服务器返回错误状态: ' + response.status)
                 }
-            }, 100);
+
+                const reader = response.body.getReader()
+                const decoder = new TextDecoder('utf-8')
+
+                let { done, value } = await reader.read()
+                while (!done) {
+                    const chunk = decoder.decode(value, { stream: true })
+
+                    for (const char of chunk) {
+                        if (char !== '\n' && char !== '\r') {
+                            messages.value[messages.value.length - 1].content += char
+                        }
+
+                        // 滚动到底部
+                        const scrollContainer = document.querySelector('.scrollable-content');
+                        if (scrollContainer) {
+                            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                        }
+                    }
+
+                    const result = await reader.read();
+                    done = result.done;
+                    value = result.value;
+                }
+
+                // 清空输入框
+                inputText.value = '';
+            } catch (error) {
+                ElMessage.error(error)
+                console.error('Error:', error)
+            } finally {
+                isSubmitting.value = false
+            }
         }
     }
 </script>
