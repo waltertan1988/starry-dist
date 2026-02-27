@@ -214,8 +214,13 @@
             messages.value.push({ type: 'user', content: inputText.value });
 
             // 追加系统消息到聊天记录
-            messages.value.push({ type: 'system', content: "" });
+            messages.value.push({ type: 'system', content: "正在思考中..." });
 
+            const inputString = inputText.value.trim();
+            
+            // 清空输入框
+            inputText.value = '';
+            
             try {
                 const response = await fetch('/api/auth/ai/chat/call', {
                     method: 'POST',
@@ -223,20 +228,18 @@
                         'Accept': 'text/plain;charset=UTF-8',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({"content": inputText.value})
+                    body: JSON.stringify({"content": inputString})
                 })
 
                 if (!response.ok) {
-                    throw new Error('服务器返回错误状态: ' + response.status)
+                    throw new Error('服务器返回错误')
                 }
-
-                // 清空输入框
-                inputText.value = '';
 
                 const reader = response.body.getReader()
                 const decoder = new TextDecoder('utf-8')
 
                 let { done, value } = await reader.read()
+                messages.value[messages.value.length - 1].content = "";
                 while (!done) {
                     const chunk = decoder.decode(value, { stream: true })
 
