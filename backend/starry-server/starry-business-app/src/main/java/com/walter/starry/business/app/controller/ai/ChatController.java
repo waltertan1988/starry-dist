@@ -27,9 +27,6 @@ public class ChatController {
     @Autowired
     private OpenAiChatModel openAiChatModel;
 
-    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private final Random random = new Random();
-
     /**
      * 调用AI的聊天
      * @param req 聊天请求参数
@@ -48,13 +45,5 @@ public class ChatController {
                         .stream()
                         .content()
         ).doOnComplete(() -> log.info("chat call finished. requestId: {}", requestId));
-    }
-
-    private String generateRandomCharacters(int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
-        }
-        return sb.toString();
     }
 }
