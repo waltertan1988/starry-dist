@@ -1,11 +1,3 @@
-app:
-  # 中间件所在主机（仅用于集中管理本配置文件上下文的配置，非必须）
-  middleware-host: 192.168.10.131
-
-logging:
-  pattern:
-    console: "[%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){blue} %clr([%X{starry-traceId}]){yellow} %clr([%thread]){orange} %clr(%logger){cyan}%clr([%L]){yellow} %m%n}"
-
 spring:
   ai:
     chat:
@@ -45,10 +37,6 @@ spring:
           connections:
             starry:
               url: http://127.0.0.1:8090
-#        sse:
-#          connections:
-#            starry:
-#              url: http://127.0.0.1:8090
         # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
         initialized: false
     vectorstore:
@@ -61,12 +49,12 @@ spring:
         database-name: "starry"
 #        initialize-schema: true
         embedding-dimension: 1024
-  datasource:
-    # 此数据源用于实现jdbc聊天记忆
-    username: root
-    password: ''
-    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
-    hikari:
-      minimum-idle: 50
-      maximum-pool-size: 150
-      connection-test-query: SELECT 1
+#  datasource:
+#    # 此数据源用于实现jdbc聊天记忆
+#    username: root
+#    password: ''
+#    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+#    hikari:
+#      minimum-idle: 50
+#      maximum-pool-size: 150
+#      connection-test-query: SELECT 1

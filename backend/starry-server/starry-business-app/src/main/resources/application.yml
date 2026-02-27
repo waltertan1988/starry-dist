@@ -11,7 +11,9 @@ spring:
     name: starry-business-app
 
   config:
-    import: classpath:application-security.yml
+    import:
+      - classpath:application-security.yml
+      - classpath:application-ai.yml
 
   # 优雅停机的宽限期
   lifecycle:

@@ -20,7 +20,6 @@ spring:
         version: 1.0.0
 #        type: SYNC
         instructions: "This server provides weather information tools and resources"
-#        sse-message-endpoint: mcp/message
 #        capabilities:
 #          tool: true
 #          resource: true

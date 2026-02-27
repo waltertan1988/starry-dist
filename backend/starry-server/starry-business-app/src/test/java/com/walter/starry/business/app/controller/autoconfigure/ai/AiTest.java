@@ -1,10 +1,11 @@
-package com.walter.starry.autoconfigure.ai;
+package com.walter.starry.business.app.controller.autoconfigure.ai;
 
 import com.google.common.collect.Lists;
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.ai.core.rag.ChineseTokenTextSplitter;
 import com.walter.starry.autoconfigure.ai.core.tool.ExtSyncMcpToolCallbackProvider;
 import com.walter.starry.autoconfigure.mdc.ai.advisor.MdcMcpAdvisor;
+import com.walter.starry.business.app.BusinessApplication;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.util.MdcUtil;
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -57,7 +58,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@SpringBootTest(classes = AiApplication.class)
+@SpringBootTest(classes = BusinessApplication.class)
 public class AiTest {
 
     @Nested

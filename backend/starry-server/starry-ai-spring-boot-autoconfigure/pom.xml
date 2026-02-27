@@ -20,6 +20,7 @@
 			<groupId>com.walter.starry</groupId>
 			<artifactId>starry-mcp-server-remote</artifactId>
 			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.walter.starry</groupId>
