@@ -4,13 +4,15 @@ import com.walter.starry.business.app.vo.ai.ChatCallReq;
 import com.walter.starry.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import java.time.Duration;
 import java.util.Random;
 import java.util.UUID;
 
@@ -22,6 +24,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/ai/chat")
 public class ChatController {
+    @Autowired
+    private OpenAiChatModel openAiChatModel;
 
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final Random random = new Random();
@@ -36,13 +40,14 @@ public class ChatController {
         String requestId = UUID.randomUUID().toString();
         log.info("chat call start. requestId: {}, req: {}", requestId, JsonUtil.toJson(req));
 
-        String answer = StringUtils.isBlank(req.getContent()) ? "请先输入您的内容" : generateRandomCharacters(100);
-
-        return Flux.fromArray(answer.split(""))
-                .delayElements(Duration.ofMillis(50))
-                .doOnComplete(() -> {
-                    log.info("chat call finished. requestId: {}", requestId);
-                });
+        return (StringUtils.isBlank(req.getContent()) ? Flux.just("请先输入您的内容") :
+                ChatClient
+                        .builder(openAiChatModel)
+                        .build()
+                        .prompt(req.getContent())
+                        .stream()
+                        .content()
+        ).doOnComplete(() -> log.info("chat call finished. requestId: {}", requestId));
     }
 
     private String generateRandomCharacters(int count) {

@@ -1,4 +1,4 @@
-package com.walter.starry.business.app.controller.autoconfigure.ai.service;
+package com.walter.starry.autoconfigure.ai.service;
 
 import com.walter.starry.autoconfigure.mdc.ai.mcp.client.McpServerEventMdcHandler;
 import io.modelcontextprotocol.spec.McpSchema;

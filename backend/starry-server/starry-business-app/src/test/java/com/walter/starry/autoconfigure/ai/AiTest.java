@@ -1,4 +1,4 @@
-package com.walter.starry.business.app.controller.autoconfigure.ai;
+package com.walter.starry.autoconfigure.ai;
 
 import com.google.common.collect.Lists;
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
