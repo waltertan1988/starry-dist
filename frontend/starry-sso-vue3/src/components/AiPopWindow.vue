@@ -28,6 +28,11 @@
                 />
             </div>
             <div class="content-section">
+                <el-text>MCP工具：</el-text>
+                <el-select v-model="mcpToolIdRef" style="width: 100px;">
+                    <el-option v-for="item in [{value: 'no', label: '不使用'}, {value: 'starry', label: 'Starry'}]"
+                            :key="item.value" :label="item.label" :value="item.value"/>
+                </el-select>
                 <el-button type="primary" @click="sendMessage" style="width: 100px" :disabled="!inputText">发送</el-button>
             </div>
         </div>
@@ -76,6 +81,9 @@
     const inputText = ref(''); // 输入文本内容
     const messages = ref([{ type: 'system', content: '欢迎使用智能问答功能，请问有什么可以帮到您？' }]); // 聊天消息记录，type: 'user' 或 'system'
     const isSubmitting = ref(false); // 是否正在提交中
+
+    // MCP工具ID
+    const mcpToolIdRef = ref('no'); // 是否启用MCP工具，默认不使用
 
     // 开始拖拽
     function startDrag(event) {
@@ -228,7 +236,7 @@
                         'Accept': 'text/plain;charset=UTF-8',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({"content": inputString})
+                    body: JSON.stringify({"content": inputString, "mcpToolId": mcpToolIdRef.value})
                 })
 
                 if (!response.ok) {

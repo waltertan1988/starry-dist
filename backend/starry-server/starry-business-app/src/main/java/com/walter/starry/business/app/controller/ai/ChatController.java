@@ -42,13 +42,25 @@ public class ChatController {
         String requestId = UUID.randomUUID().toString();
         log.info("chat call start. requestId: {}, req: {}", requestId, JsonUtil.toJson(req));
 
-        return (StringUtils.isBlank(req.getContent()) ? Flux.just("请先输入您的内容") :
-                ChatClient.create(openAiChatModel)
-                        .prompt(req.getContent())
-                        .advisors(new MdcMcpAdvisor()) // 为MCP请求添加MDC信息
-                        .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()))// 使用第一个MCP服务(starry)
-                        .stream()
-                        .content()
-        ).doOnComplete(() -> log.info("chat call finished. requestId: {}", requestId));
+        Flux<String> resultFlux;
+        if(StringUtils.isBlank(req.getContent())){
+            resultFlux = Flux.just("请先输入您的内容");
+        }else{
+            ChatClient.ChatClientRequestSpec spec = ChatClient.create(openAiChatModel).prompt(req.getContent());
+            if("no".equals(req.getMcpToolId())){
+                resultFlux = spec.stream().content();
+            }else{
+                spec = spec.advisors(new MdcMcpAdvisor()); // 为MCP请求添加MDC信息
+                if ("starry".equals(req.getMcpToolId())){
+                    // 使用第一个MCP服务(starry)
+                    spec = spec.toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()));
+                }else{
+                    throw new IllegalArgumentException("不支持的MCP工具ID");
+                }
+                resultFlux = spec.stream().content();
+            }
+        }
+
+        return resultFlux.doOnComplete(() -> log.info("chat call finished. requestId: {}", requestId));
     }
 }

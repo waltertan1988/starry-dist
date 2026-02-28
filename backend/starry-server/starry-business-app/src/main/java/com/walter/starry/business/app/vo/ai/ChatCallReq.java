@@ -9,4 +9,6 @@ import lombok.Data;
 public class ChatCallReq {
     /** 提问内容 */
     private String content;
+    /** MCP工具的ID */
+    private String mcpToolId;
 }
