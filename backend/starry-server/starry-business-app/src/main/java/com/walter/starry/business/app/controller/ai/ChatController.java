@@ -1,7 +1,10 @@
 package com.walter.starry.business.app.controller.ai;
 
+import com.walter.starry.autoconfigure.ai.core.tool.ExtSyncMcpToolCallbackProvider;
+import com.walter.starry.autoconfigure.mdc.ai.advisor.MdcMcpAdvisor;
 import com.walter.starry.business.app.vo.ai.ChatCallReq;
 import com.walter.starry.common.util.JsonUtil;
+import io.modelcontextprotocol.client.McpSyncClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +29,8 @@ import java.util.UUID;
 public class ChatController {
     @Autowired
     private OpenAiChatModel openAiChatModel;
+    @Autowired
+    private List<McpSyncClient> mcpSyncClients;
 
     /**
      * 调用AI的聊天
@@ -37,10 +43,10 @@ public class ChatController {
         log.info("chat call start. requestId: {}, req: {}", requestId, JsonUtil.toJson(req));
 
         return (StringUtils.isBlank(req.getContent()) ? Flux.just("请先输入您的内容") :
-                ChatClient
-                        .builder(openAiChatModel)
-                        .build()
+                ChatClient.create(openAiChatModel)
                         .prompt(req.getContent())
+                        .advisors(new MdcMcpAdvisor()) // 为MCP请求添加MDC信息
+                        .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()))// 使用第一个MCP服务(starry)
                         .stream()
                         .content()
         ).doOnComplete(() -> log.info("chat call finished. requestId: {}", requestId));

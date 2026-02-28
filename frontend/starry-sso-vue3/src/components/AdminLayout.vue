@@ -106,7 +106,7 @@
     </el-dialog>
 
     <!-- 智能问答弹框组件 -->
-    <AiPopWindow :popupWidth="400" :popupHeight="350" :iconWidth="60"/>
+    <AiPopWindow :popupWidth="600" :popupHeight="550" :iconWidth="60"/>
 </template>
 
 <script setup>
