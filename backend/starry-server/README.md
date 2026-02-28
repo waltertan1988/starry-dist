@@ -1,5 +1,5 @@
 # Starry后端服务系统
-一套基于Spring Security, Spring Authorization Server、MySQL、Redis、MQ的后端应用平台基座。
+一套基于Spring-Security, Spring-Authorization-Server、MySQL、Redis、MQ、Spring-AI的后端应用平台基座。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
