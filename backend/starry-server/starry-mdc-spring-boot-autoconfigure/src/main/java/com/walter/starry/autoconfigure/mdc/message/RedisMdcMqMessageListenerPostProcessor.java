@@ -1,0 +1,20 @@
+package com.walter.starry.autoconfigure.mdc.message;
+
+import com.walter.starry.common.core.message.RedisMessage;
+import com.walter.starry.common.util.MdcUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author walter.tan
+ */
+@Component
+@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+public class RedisMdcMqMessageListenerPostProcessor implements MdcMessageListenerPostProcessor {
+
+    @Override
+    public void preHandle(Object... object) {
+        RedisMessage redisMessage = (RedisMessage) object[0];
+        MdcUtil.setTraceId(redisMessage.getTraceId());
+    }
+}

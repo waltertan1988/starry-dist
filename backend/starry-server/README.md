@@ -1,29 +1,59 @@
-# Authorization-Server
-一套基于Spring-Authorization-Server、MySQL、Redis、MQ的后端应用平台。
+# Starry后端服务系统
+一套基于Spring-Security, Spring-Authorization-Server、MySQL、Redis、MQ、Spring-AI的后端应用平台基座。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
 #### 必须中间件
 * JDK-21
-* MySql-8.0.36
-* Redis-7.2.0-v9
-* Pulsar-3.2.1或RocketMQ-5.3.3
+* MySql-8.0.45
+* Redis-7.4.0-v8
 #### 可选中间件
-* Docker Compose
+* Docker Compose（建议本地开发时使用）
+* Pulsar-3.2.1或RocketMQ-5.3.4
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明
-* security-spring-boot-autoconfigure  
-提供用户、角色、菜单、权限等Spring Security认证与授权功能的基础模块。
+1. starry-security-spring-boot-autoconfigure  
+   Spring Security认证与授权相关的基础配置模块，核心功能包括：
+   * 身份认证，包括：本地登录、OAuth2的单点登录、登出
+   * 提供了用户、角色、菜单、权限等管理功能端点
 
-* authorization-server-spring-boot-autoconfigure  
-在security-spring-boot-autoconfigure的基础上，补充提供OAuth2授权服务器特性的基础模块。
 
-* starry-authorization-server-app  
-OAuth2授权服务器进程，为其他业务系统提供统一单点登录的认证服务
+2. starry-business-app  
+   一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用。
 
-* starry-business-app  
-OAuth2资源服务器业务应用，支持本地登录和单点登录
+
+3. starry-authorization-server-spring-boot-autoconfigure  
+   在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
+
+
+4. starry-authorization-server-app  
+   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用。
+
+
+5. starry-common-lib  
+   集成全局的公共基础类的内嵌模块，被其他模块所依赖。
+
+
+6. starry-ai-spring-boot-autoconfigure  
+   集成Spring AI的基础能力，被其他模块所依赖。
+
+
+7. starry-mcp-server-app
+   一个MCP服务提供者应用
+
+
+8. starry-mcp-server-remote
+   定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
+
+
+9. starry-mdc-spring-boot-autoconfigure
+   提供日志调用链路的跟踪能力。已支持的组件有：
+   * Web过滤器
+   * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
+   * MQ消费者（包括Redis、Pulsar、RocketMQ）
+   * Reactor内置线程池，包括WebFlux任务
+   * SpringAI的MCP服务（streamable-http方式）
 
 ### 1.3 mysql初始化数据
 #### DDL
@@ -201,9 +231,32 @@ CREATE TABLE oauth2_authorized_client (
     PRIMARY KEY (client_registration_id, principal_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '客户端用户获得授权后的令牌记录表';
 ```
-
 > OAuth2的相关表字段和DAO相关定义，可参考：  
 > https://docs.spring.io/spring-authorization-server/docs/current/reference/html/guides/how-to-jpa.html#registered-client-repository
+
+##### Spring AI相关
+```mysql
+CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
+   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `content` text NOT NULL COMMENT '消息内容',
+   `type` varchar(255) NOT NULL COMMENT '消息类型',
+   `timestamp` timestamp(3) NOT NULL COMMENT '消息的系统时间戳',
+   PRIMARY KEY (`id`),
+   KEY `idx_conversationId` (`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LLM聊天记忆表';
+
+CREATE TABLE `user_ai_conversation` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
+   `username` varchar(128) NOT NULL COMMENT '用户账号',
+   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+   PRIMARY KEY (`id`),
+   KEY `uk_username_conversationId` (`username`,`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户对话AI的关联表'
+
+```
 
 #### DML
 ##### 初始化用户数据
@@ -314,6 +367,7 @@ insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('21','function_admin_function_group','功能管理','2','1200','system_admin_function_group','{\"icon\":\"Key\"}','2020-11-07 08:36:34.000','2020-11-07 08:36:43.000');
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('22','shop_admin_menu_group','电商管理','1','1100','root_menu_group','{\"defaultOpen\":false,\"icon\":\"Goods\"}','2020-12-23 16:29:54.200','2020-12-23 16:44:40.151');
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('23','product_admin_menu_group','商品管理','1','1000','shop_admin_menu_group','{\"defaultOpen\":false,\"icon\":\"GoodsFilled\"}','2020-12-23 16:35:04.821','2020-12-23 16:35:04.821');
+insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('24','actuator_endpoint_group','Actuator端点','2','900','root_function_group','{\"icon\":\"Histogram\"}','2020-12-23 15:13:18.762','2020-12-23 15:35:49.685');
 ```
 
 ##### 初始化资源项（包括菜单项和功能项）
@@ -333,6 +387,7 @@ insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('30','admin_function_operation','POST','/admin/function/**','功能管理操作','1000','function_admin_function_group','{\"icon\":null}','2020-11-07 08:39:36.000','2020-11-07 08:39:36.000');
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('31','admin_function_has','POST','/admin/function/has','判断当前登录用户是否拥有指定的功能权限','900','function_admin_function_group','{\"icon\":null}','2020-11-09 06:20:39.000','2020-11-09 06:20:39.000');
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('32','AdminProductSpuPage','GET','/admin/product/spu','SPU管理','1000','product_admin_menu_group','{\"icon\":\"Goods\"}','2020-12-23 16:31:26.931','2020-12-23 16:35:13.602');
+insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('34','actuator_endpoint_health','GET','/actuator/health','健康检查端点','1000','actuator_endpoint_group','{\"icon\":null}','2020-12-23 15:19:22.819','2020-12-23 16:01:29.556');
 ```
 
 ##### 初始化资源项所需的角色或权限
@@ -354,6 +409,8 @@ insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_co
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('23','admin_function_has','ROLE_ANONYMOUS','2020-11-09 06:26:26.000','2020-11-09 06:26:26.000');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('24','admin_function_has','ROLE_USER','2020-11-09 06:26:26.000','2020-11-09 06:26:26.000');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('25','AdminProductSpuPage','ROLE_BIZ_MANAGER','2020-12-23 16:32:18.345','2020-12-23 16:32:18.345');
+insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('31','actuator_endpoint_health','ROLE_ANONYMOUS','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
+insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('32','actuator_endpoint_health','ROLE_USER','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
 ```
 
 ##### 初始化OAuth2的Client配置数据
@@ -496,6 +553,10 @@ sudo mkdir -p ./data/rocketmq/namesrv/logs
 sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
 sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
 sudo chmod 777 -R ./data/rocketmq
+# Minio相关目录
+sudo mkdir -p ./data/minio
+# Milvus相关目录
+sudo mkdir -p ./data/etcd ./data/milvus
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```
@@ -596,8 +657,9 @@ enforce-gtid-consistency=ON
 > 注：关于搭建MYSQL主从环境：   
 >（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
 >（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html
->（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html
+>（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
+>（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html  
+>（5）设置数据源为只读并备份数据：https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html  
 
 #### 2.2.4 消息队列配置
 假设中间件的宿主机IP是192.168.10.131
@@ -709,10 +771,13 @@ java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-business-app.jar
 
 # 启动单点登录服务进程（授权服务器），如果业务应用需要单点登录时必须启动此进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-app.jar
+
+# 启动MCP服务提供者进程
+java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-mcp-server-app.jar
 ```
 > 注：在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 
-### 2.4 如何访问
+### 2.4 关于OAuth2的授权登录流程
 * Step1: 用户未登录，客户端请求获取授权码
 > 浏览器地址栏输入：  
 > http://127.0.0.1:8080/oauth2/authorize?client_id=oidc-client&response_type=code&scope=openid+profile+email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client

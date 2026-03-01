@@ -1,0 +1,60 @@
+spring:
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: never
+    openai:
+      api-key: "XXX"
+      base-url: "https://api.siliconflow.cn"
+      audio:
+        transcription:
+          options:
+            model: "TeleAI/TeleSpeechASR"
+        speech:
+          options:
+            model: "fnlp/MOSS-TTSD-v0.5"
+            voice: "fnlp/MOSS-TTSD-v0.5:claire"
+            response-format: mp3
+            speed: 0.75
+      chat:
+        base-url: "https://open.bigmodel.cn/api/paas"
+        completions-path: "/v4/chat/completions"
+        options:
+          # 支持图片识别
+#          model: "glm-4.6v-flash"
+          # 支持工具调用
+          model: "glm-4.7-flash"
+        api-key: "XXX"
+      embedding:
+        options:
+          model: "BAAI/bge-m3"
+    mcp:
+      client:
+        type: SYNC
+        streamable-http:
+          connections:
+            starry:
+              url: http://127.0.0.1:8090
+        # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
+        initialized: false
+    vectorstore:
+      milvus:
+        auto-id: true
+        client:
+          host: ${app.middleware-host}
+          port: 19530
+        collection-name: "dev"
+        database-name: "starry"
+#        initialize-schema: true
+        embedding-dimension: 1024
+#  datasource:
+#    # 此数据源用于实现jdbc聊天记忆
+#    username: root
+#    password: ''
+#    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+#    hikari:
+#      minimum-idle: 50
+#      maximum-pool-size: 150
+#      connection-test-query: SELECT 1

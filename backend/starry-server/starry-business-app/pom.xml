@@ -12,15 +12,51 @@
 	<name>starry-business-app</name>
 
 	<dependencies>
+		<!-- Starry内置的starter -->
+		<!--集成基础的后台认证和授权功能-->
+		<dependency>
+			<groupId>com.walter.starry</groupId>
+			<artifactId>starry-security-spring-boot-autoconfigure</artifactId>
+		</dependency>
+		<!--集成AI相关功能-->
+		<dependency>
+			<groupId>com.walter.starry</groupId>
+			<artifactId>starry-ai-spring-boot-autoconfigure</artifactId>
+		</dependency>
+
+		<!-- 集成单元测试功能 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
+		<!-- AI相关组件的具体实现 -->
+		<!-- 大模型 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-openai</artifactId>
+		</dependency>
+		<!-- RAG的向量数据库 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-milvus</artifactId>
+		</dependency>
+		<!-- jdbc聊天记忆 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+		</dependency>
+
+		<!-- 集成外部系统的SDK和API -->
 		<dependency>
 			<groupId>com.walter.starry</groupId>
-			<artifactId>security-spring-boot-autoconfigure</artifactId>
+			<artifactId>starry-mcp-server-remote</artifactId>
 		</dependency>
 	</dependencies>
 

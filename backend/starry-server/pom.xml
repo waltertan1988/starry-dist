@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.6</version>
+		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.walter.starry</groupId>
@@ -13,7 +13,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>starry-server-parent</name>
-	<description>Demo project for Spring OAuth2.1 Authorization Server</description>
+	<description>Starry Project</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,28 +25,68 @@
 		<mybatis-spring-boot-starter.version>3.0.4</mybatis-spring-boot-starter.version>
 		<pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
 		<rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
+		<spring-ai.version>1.1.2</spring-ai.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Starry系统的核心依赖 -->
 			<dependency>
 				<groupId>com.walter.starry</groupId>
-				<artifactId>authorization-server-spring-boot-autoconfigure</artifactId>
+				<artifactId>starry-common-lib</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.walter.starry</groupId>
-				<artifactId>security-spring-boot-autoconfigure</artifactId>
+				<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-security-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-mdc-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-ai-spring-boot-autoconfigure</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- Starry二方API依赖 -->
+			<dependency>
+				<groupId>com.walter.starry</groupId>
+				<artifactId>starry-mcp-server-remote</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!--AI相关-->
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<modules>
+		<module>mybatis-generator</module>
+		<module>starry-common-lib</module>
+		<module>starry-mcp-server-remote</module>
+		
+		<module>starry-authorization-server-spring-boot-autoconfigure</module>
+		<module>starry-security-spring-boot-autoconfigure</module>
+		<module>starry-mdc-spring-boot-autoconfigure</module>
+		<module>starry-ai-spring-boot-autoconfigure</module>
+	
 		<module>starry-business-app</module>
 		<module>starry-authorization-server-app</module>
-		<module>authorization-server-spring-boot-autoconfigure</module>
-		<module>security-spring-boot-autoconfigure</module>
-		<module>mybatis-generator</module>
+		<module>starry-mcp-server-app</module>
 	</modules>
 </project>

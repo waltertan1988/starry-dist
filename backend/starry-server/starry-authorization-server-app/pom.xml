@@ -17,10 +17,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.walter.starry</groupId>
-			<artifactId>authorization-server-spring-boot-autoconfigure</artifactId>
+			<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -1,9 +1,9 @@
 package com.walter.starry.security.service;
 
 import com.walter.starry.authorization.server.app.AuthorizationServerApplication;
+import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.security.base.bo.AuthorityItemBo;
 import com.walter.starry.security.base.service.AuthorityItemService;
-import com.walter.starry.security.base.util.JsonUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
