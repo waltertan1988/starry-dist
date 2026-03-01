@@ -1,5 +1,5 @@
 # Starry后端服务系统
-一套基于Spring Security, Spring Authorization Server、MySQL、Redis、MQ的后端应用平台基座。
+一套基于Spring-Security, Spring-Authorization-Server、MySQL、Redis、MQ、Spring-AI的后端应用平台基座。
 
 ## 1. 开始使用
 ### 1.1 依赖中间件
@@ -35,13 +35,25 @@
    集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
 
-6. starry-mdc-spring-boot-autoconfigure
+6. starry-ai-spring-boot-autoconfigure  
+   集成Spring AI的基础能力，被其他模块所依赖。
+
+
+7. starry-mcp-server-app
+   一个MCP服务提供者应用
+
+
+8. starry-mcp-server-remote
+   定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
+
+
+9. starry-mdc-spring-boot-autoconfigure
    提供日志调用链路的跟踪能力。已支持的组件有：
    * Web过滤器
    * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
    * MQ消费者（包括Redis、Pulsar、RocketMQ）
    * Reactor内置线程池，包括WebFlux任务
-   * SpringAI的MCP服务（SSE方式）
+   * SpringAI的MCP服务（streamable-http方式）
 
 ### 1.3 mysql初始化数据
 #### DDL
@@ -230,8 +242,20 @@ CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
    `content` text NOT NULL COMMENT '消息内容',
    `type` varchar(255) NOT NULL COMMENT '消息类型',
    `timestamp` timestamp(3) NOT NULL COMMENT '消息的系统时间戳',
-   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='LLM聊天记忆表';
+   PRIMARY KEY (`id`),
+   KEY `idx_conversationId` (`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LLM聊天记忆表';
+
+CREATE TABLE `user_ai_conversation` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
+   `username` varchar(128) NOT NULL COMMENT '用户账号',
+   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+   PRIMARY KEY (`id`),
+   KEY `uk_username_conversationId` (`username`,`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户对话AI的关联表'
+
 ```
 
 #### DML
@@ -747,6 +771,9 @@ java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-business-app.jar
 
 # 启动单点登录服务进程（授权服务器），如果业务应用需要单点登录时必须启动此进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-app.jar
+
+# 启动MCP服务提供者进程
+java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-mcp-server-app.jar
 ```
 > 注：在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 

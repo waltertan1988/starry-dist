@@ -104,6 +104,9 @@
           </span>
         </template>
     </el-dialog>
+
+    <!-- 智能问答弹框组件 -->
+    <AiPopWindow :popupWidth="600" :popupHeight="550" :iconWidth="60"/>
 </template>
 
 <script setup>
@@ -117,6 +120,7 @@
     import SessionStorage from "../util/sessionStorage";
     import {Expand, Fold, Setting} from "@element-plus/icons-vue";
     import {useStore} from "vuex";
+    import AiPopWindow from "./AiPopWindow.vue";
 
     const store = useStore()
 
@@ -143,6 +147,8 @@
     const menuGroupDefaultOpeneds = ref([])
 
     const elMenuKeyRef = ref(Date.now())
+
+
 
     // 加载菜单
     loadMenuTreeListUsingSessionStorage();
@@ -417,4 +423,6 @@
         height: var(--starry-footer-height);
         text-align: center;
     }
+
+
 </style>

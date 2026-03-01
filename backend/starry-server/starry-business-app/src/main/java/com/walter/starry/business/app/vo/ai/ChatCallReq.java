@@ -1,0 +1,16 @@
+package com.walter.starry.business.app.vo.ai;
+
+import lombok.Data;
+
+/**
+ * @author walter.tan
+ */
+@Data
+public class ChatCallReq {
+    /** 对话ID */
+    private String conversationId;
+    /** 提问内容 */
+    private String content;
+    /** MCP工具的ID */
+    private String mcpToolId;
+}
