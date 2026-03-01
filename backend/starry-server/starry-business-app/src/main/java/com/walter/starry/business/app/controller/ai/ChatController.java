@@ -18,6 +18,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
@@ -36,7 +37,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/ai/chat")
-public class ChatController {
+public class ChatController implements InitializingBean {
     @Autowired
     private OpenAiChatModel openAiChatModel;
     @Autowired
@@ -45,6 +46,18 @@ public class ChatController {
     private UserAiConversationMapper userAiConversationMapper;
     @Autowired
     private List<McpSyncClient> mcpSyncClients;
+
+    private Advisor promptChatMemoryAdvisor;
+
+    @Override
+    public void afterPropertiesSet() {
+        // 聊天记忆的advisor
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(jdbcChatMemoryRepository)
+                .maxMessages(20)
+                .build();
+        this.promptChatMemoryAdvisor = PromptChatMemoryAdvisor.builder(chatMemory).build();
+    }
 
     /**
      * 用户获取一个新的对话ID
@@ -72,14 +85,10 @@ public class ChatController {
     @PostMapping(value = "/call", produces = "text/plain;charset=UTF-8")
     public Flux<String> call(@RequestBody ChatCallReq req) {
         String requestId = UUID.randomUUID().toString();
-        // 聊天记忆的advisor
-        ChatMemory chatMemory = MessageWindowChatMemory.builder().chatMemoryRepository(jdbcChatMemoryRepository).maxMessages(20).build();
-        Advisor promptChatMemoryAdvisor = PromptChatMemoryAdvisor.builder(chatMemory).build();
-
         log.info("chat call start. requestId: {}, req: {}", requestId, JsonUtil.toJson(req));
 
         if(StringUtils.isBlank(req.getConversationId())){
-            throw new IllegalArgumentException("请对话ID不能为空");
+            throw new IllegalArgumentException("对话ID不能为空");
         }
 
         Flux<String> resultFlux;
