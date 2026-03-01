@@ -242,8 +242,20 @@ CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
    `content` text NOT NULL COMMENT '消息内容',
    `type` varchar(255) NOT NULL COMMENT '消息类型',
    `timestamp` timestamp(3) NOT NULL COMMENT '消息的系统时间戳',
-   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='LLM聊天记忆表';
+   PRIMARY KEY (`id`),
+   KEY `idx_conversationId` (`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LLM聊天记忆表';
+
+CREATE TABLE `user_ai_conversation` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
+   `username` varchar(128) NOT NULL COMMENT '用户账号',
+   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+   PRIMARY KEY (`id`),
+   KEY `uk_username_conversationId` (`username`,`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户对话AI的关联表'
+
 ```
 
 #### DML

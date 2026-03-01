@@ -62,7 +62,7 @@ app:
             user-name-attribute: id
 
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath*:mapper/*.xml
 
 # RocketMQ配置
 rocketmq:

@@ -6,7 +6,7 @@
          @mousedown="startDrag"
          @touchstart="startDrag">
         <div class="popup-header">
-            <span>智能问答</span>
+            <span>智能问答（{{conversationIdRef}}）</span>
             <el-icon class="close-icon" @click.stop="closePopup"><Minus/></el-icon>
         </div>
         <div class="popup-content">
@@ -56,7 +56,8 @@
     import { ref } from 'vue'
     import { ElMessage } from 'element-plus';
     import {Minus, ChatDotRound} from "@element-plus/icons-vue";
-    import {defineProps} from '@vue/runtime-core';
+    import {defineProps, onMounted} from '@vue/runtime-core';
+    import HttpApi from "../util/api";
 
     // 定义组件用于接收外部调用方的参数列表
     const props = defineProps(['popupWidth','popupHeight','iconWidth'])
@@ -84,6 +85,28 @@
 
     // MCP工具ID
     const mcpToolIdRef = ref('no'); // 是否启用MCP工具，默认不使用
+
+     // 对话ID
+    const conversationIdRef = ref('');
+
+    onMounted(() => {
+        // 初始化时获取新的对话ID
+        getNewConversationId();
+    })
+
+    function getNewConversationId() {
+        HttpApi.get(`/api/auth/ai/chat/newConversationId`,
+            response => {
+                conversationIdRef.value = response.data
+            },
+            response => {
+                ElMessage.error(response.errMsg)
+            },
+            err => {
+                ElMessage.error(err)
+            }
+        )
+    }
 
     // 开始拖拽
     function startDrag(event) {
@@ -236,7 +259,11 @@
                         'Accept': 'text/plain;charset=UTF-8',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({"content": inputString, "mcpToolId": mcpToolIdRef.value})
+                    body: JSON.stringify({
+                        "conversationId": conversationIdRef.value, 
+                        "content": inputString, 
+                        "mcpToolId": mcpToolIdRef.value
+                    })
                 })
 
                 if (!response.ok) {

@@ -7,6 +7,8 @@ import lombok.Data;
  */
 @Data
 public class ChatCallReq {
+    /** 对话ID */
+    private String conversationId;
     /** 提问内容 */
     private String content;
     /** MCP工具的ID */
