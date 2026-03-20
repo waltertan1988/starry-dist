@@ -766,14 +766,14 @@ singleServerConfig:
 
 #### 2.3.2 启动springboot应用时，添加以下vm参数
 ```shell
+# 启动MCP服务提供者进程
+java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-mcp-server-app.jar
+
 # 启动业务应用进程（资源服务器）
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-business-app.jar
 
 # 启动单点登录服务进程（授权服务器），如果业务应用需要单点登录时必须启动此进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-app.jar
-
-# 启动MCP服务提供者进程
-java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-mcp-server-app.jar
 ```
 > 注：在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 
