@@ -557,6 +557,8 @@ sudo chmod 777 -R ./data/rocketmq
 sudo mkdir -p ./data/minio
 # Milvus相关目录
 sudo mkdir -p ./data/etcd ./data/milvus
+# Grafana相关目录
+sudo mkdir -p ./data/apm/grafana
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```

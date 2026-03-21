@@ -1,0 +1,21 @@
+services:
+  grafana:
+    image: grafana/grafana:12.4.1
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    # if you are running as root then set it to 0
+    # else find the right id with the id -u command
+    user: '0'
+    ports:
+      - '3000:3000'
+    # adding the mount volume point which we create earlier
+    volumes:
+      - './data/apm/grafana:/var/lib/grafana'
+    networks:
+      starry:
+        ipv4_address: 172.18.6.1
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
