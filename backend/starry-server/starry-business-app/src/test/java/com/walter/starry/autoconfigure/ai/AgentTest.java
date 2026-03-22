@@ -9,7 +9,12 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * 智能体测试
@@ -21,6 +26,334 @@ public class AgentTest {
     @Autowired
     private OpenAiChatModel openAiChatModel;
 
+    /**
+     * Chain Workflow模式
+     */
+    @Nested
+    class PracticalChainWorkflowTest{
+
+        static class PracticalChainWorkflow{
+            // Spring AI的聊天客户端，用于与AI模型交互
+            private final ChatClient chatClient;
+
+            /**
+             * 需求分析提示词模板（中文）
+             * 指导AI进行业务需求分析
+             */
+            private static final String REQUIREMENT_ANALYSIS_PROMPT = """
+                你是一个资深的需求分析师，请分析以下业务需求：
+        
+                需求描述: {input}
+        
+                请从以下角度进行分析：
+                1. 核心业务目标
+                2. 主要功能模块
+                3. 技术难点识别
+                4. 风险评估
+        
+                如果需求无法实现直接回复"FAIL"。
+                """;
+
+            /**
+             * 架构设计提示词模板（中文）
+             * 指导AI进行系统架构设计
+             */
+            private static final String ARCHITECTURE_DESIGN_PROMPT = """
+                你是一个系统架构师，基于以下需求分析，设计系统架构：
+        
+                需求分析: {input}
+        
+                请设计：
+                1. 系统整体架构
+                2. 技术栈选择
+                3. 数据库设计要点
+                4. 接口设计规范
+                5. 部署架构建议
+        
+                请提供完整的架构设计方案。
+                """;
+
+            /**
+             * 实施计划提示词模板（中文）
+             * 指导AI制定项目实施计划
+             */
+            private static final String IMPLEMENTATION_PLAN_PROMPT = """
+                你是一个项目经理，基于以下架构设计，制定实施计划：
+        
+                架构设计: {input}
+        
+                请制定：
+                1. 开发阶段划分
+                2. 人员配置建议
+                3. 时间节点规划
+                4. 质量保证措施
+                5. 风险应对策略
+        
+                请提供详细的项目实施计划。
+                """;
+
+            /**
+             * 交付清单提示词模板（中文）
+             * 指导AI制定项目交付清单
+             */
+            private static final String DELIVERY_CHECKLIST_PROMPT = """
+                你是一个交付经理，基于以下实施计划，制定交付清单：
+        
+                实施计划: {input}
+        
+                请制定：
+                1. 开发完成标准
+                2. 测试验收标准
+                3. 部署上线清单
+                4. 运维监控要求
+                5. 用户培训计划
+        
+                请以清晰的表格形式输出交付清单。
+                """;
+
+            /**
+             * 构造函数
+             * @param chatClient Spring AI的聊天客户端
+             */
+            public PracticalChainWorkflow(ChatClient chatClient) {
+                this.chatClient = chatClient;
+            }
+
+            /**
+             * 处理项目全流程的主方法
+             * 执行顺序：需求分析 → 架构设计 → 实施计划 → 交付清单
+             * @param businessRequirement 业务需求描述
+             */
+            public void process(String businessRequirement) {
+                // 存储各步骤输出（当前未使用）
+                List<String> processSteps = new ArrayList<>();
+                // 当前步骤的输出，初始为业务需求
+                String currentOutput = businessRequirement;
+
+                System.out.println("=== 开始项目全流程处理 ===");
+
+                // 步骤1: 需求分析
+                System.out.println("步骤1: 业务需求分析");
+                String currentOutput1 = chatClient.prompt()
+                        .user(u -> u.text(REQUIREMENT_ANALYSIS_PROMPT).param("input", currentOutput))
+                        .call()
+                        .content();
+
+                // ==== 关卡逻辑 ====
+                // 检查需求是否可实现
+                if (currentOutput1.contains("FAIL")) {
+                    System.out.println("【流程终止】：需求无法实现，流程提前退出。");
+                    return; // 提前终止流程
+                }
+                System.out.println("需求分析完成:"+currentOutput1);
+
+                // 步骤2: 架构设计
+                System.out.println("步骤2: 系统架构设计");
+                String currentOutput2 = chatClient.prompt()
+                        .user(u -> u.text(ARCHITECTURE_DESIGN_PROMPT).param("input", currentOutput1))
+                        .call()
+                        .content();
+                System.out.println("架构设计完成:"+currentOutput2);
+
+                // 步骤3: 实施计划
+                System.out.println("步骤3: 项目实施规划");
+                String currentOutput3 = chatClient.prompt()
+                        .user(u -> u.text(IMPLEMENTATION_PLAN_PROMPT).param("input", currentOutput2))
+                        .call()
+                        .content();
+                System.out.println("实施计划完成:"+currentOutput3);
+
+                // 步骤4: 交付清单
+                System.out.println("步骤4: 交付清单制定");
+                String currentOutput4 = chatClient.prompt()
+                        .user(u -> u.text(DELIVERY_CHECKLIST_PROMPT).param("input", currentOutput3))
+                        .call()
+                        .content();
+                System.out.println("交付清单完成:"+currentOutput4);
+
+                System.out.println("=== 项目全流程处理完成 ===");
+            }
+
+            /**
+             * 项目交付物记录类
+             * @param finalDeliverable 最终交付物
+             * @param processSteps 处理步骤记录
+             */
+            public record ProjectDeliverable(String finalDeliverable, List<String> processSteps) {}
+        }
+
+        @Test
+        void test(){
+            ChatClient chatClient = ChatClient.builder(openAiChatModel).build();
+
+            String requirements = """  
+                           电商平台需要升级订单处理系统，要求：
+                             1. 处理能力提升到每秒1000单
+                             2. 支持多种支付方式和优惠券
+                             3. 实时库存管理和预警
+                             4. 订单状态实时跟踪
+                             5. 数据分析和报表功能
+                             现有系统：Spring Boot + MySQL，日订单量10万
+                           """;
+
+            // 创建并执行工作流处理器
+            new PracticalChainWorkflow(chatClient).process(requirements);
+        }
+    }
+
+    /**
+     * Parallelization-Workflow-Aggregator模式
+     */
+    @Nested
+    class ParallelizationWorkflowWithAggregatorTest{
+
+        static class ParallelizationWorkflowWithAggregator{
+
+            private final ChatClient chatClient;
+            // 风险评估提示词模板
+            private static final String RISK_ASSESSMENT_PROMPT = """
+            你是一个风险评估专家，请分析以下部门在数字化转型过程中面临的主要风险：
+
+            请从以下角度分析：
+            1. 技术风险
+            2. 人员风险
+            3. 业务连续性风险
+            4. 预算风险
+            5. 应对建议
+            """;
+
+            /**
+             * 构造函数
+             * @param chatClient Spring AI的ChatClient实例
+             */
+            public ParallelizationWorkflowWithAggregator(ChatClient chatClient) {
+                this.chatClient = chatClient;
+            }
+
+            /**
+             * 并行处理输入并聚合结果的主方法
+             * @param inputs 输入列表（如不同部门/地区的名称）
+             * @return 包含并行结果和聚合结果的AggregatedResult对象
+             */
+            public AggregatedResult parallelWithAggregation(List<String> inputs) {
+                // 步骤1: 并行处理所有输入
+                List<String> parallelResults = this.parallel(inputs);
+
+                // 步骤2: 聚合所有并行结果
+                String aggregatedOutput = this.aggregateResults(parallelResults);
+
+                return new AggregatedResult(parallelResults, aggregatedOutput);
+            }
+
+            /**
+             * 并行执行LLM调用的核心方法
+             * @param inputs 输入列表
+             * @return 并行处理的结果列表
+             */
+            private List<String> parallel(List<String> inputs) {
+                // 创建与输入数量匹配的线程池
+                try(ExecutorService executor = Executors.newFixedThreadPool(inputs.size())) {
+                    // 为每个输入创建CompletableFuture任务
+                    List<CompletableFuture<String>> futures = inputs.stream()
+                            .map(input -> CompletableFuture.supplyAsync(() -> {
+                                // 每个任务使用相同的提示词模板但不同的输入内容
+                                return chatClient.prompt(RISK_ASSESSMENT_PROMPT + "\n输入内容: " + input)
+                                        .call()
+                                        .content();
+                            }, executor))
+                            .toList();
+
+                    // 等待所有任务完成
+                    CompletableFuture<Void> allFutures = CompletableFuture.allOf(
+                            futures.toArray(CompletableFuture[]::new));
+                    allFutures.join();
+
+                    // 收集所有任务结果
+                    return futures.stream()
+                            .map(CompletableFuture::join)
+                            .collect(Collectors.toList());
+
+                }
+            }
+
+            /**
+             * 聚合器：将多个并行结果合并为统一输出
+             * @param results 并行处理的结果列表
+             * @return 聚合后的综合报告
+             */
+            private String aggregateResults(List<String> results) {
+                // 聚合提示词模板
+                String aggregatorPrompt = """
+                    你是一个数据聚合专家，请将以下多个分析结果合并为一份综合报告：
+        
+                    原始分析任务: {originalPrompt}
+        
+                    各部门/地区分析结果:
+                    {results}
+        
+                    请提供：
+                    1. 综合分析摘要
+                    2. 共同趋势和模式
+                    3. 关键差异对比
+                    4. 整体结论和建议
+        
+                    请生成一份统一的综合报告。
+                    """;
+
+                // 合并所有结果，用分隔符分隔
+                String combinedResults = String.join("\n\n---\n\n", results);
+
+                // 调用LLM进行结果聚合
+                return chatClient.prompt()
+                        .user(u -> u.text(aggregatorPrompt)
+                                .param("originalPrompt", RISK_ASSESSMENT_PROMPT)
+                                .param("results", combinedResults))
+                        .call()
+                        .content();
+            }
+
+            /**
+             * 结果记录类，包含并行处理结果和聚合结果
+             * @param individualResults 每个输入的独立处理结果
+             * @param aggregatedOutput 聚合后的综合输出
+             */
+            public record AggregatedResult(List<String> individualResults, String aggregatedOutput) {}
+
+        }
+
+        @Test
+        void test(){
+            ChatClient chatClient = ChatClient.builder(openAiChatModel).build();
+
+            List<String> departments = List.of(
+                    "IT部门：负责系统架构升级，团队技术水平参差不齐，预算紧张",
+                    "销售部门：需要学习新的CRM系统，担心影响客户关系，抗拒变化",
+                    "财务部门：要求数据安全性极高，对云端存储有顾虑，流程复杂",
+                    "人力资源部门：需要数字化招聘流程，缺乏相关技术人员，时间紧迫"
+            );
+
+            System.out.println("=== 并行分析 + 聚合处理 ===");
+            // 执行并行分析流程并获取聚合结果
+            ParallelizationWorkflowWithAggregator.AggregatedResult result = new ParallelizationWorkflowWithAggregator(chatClient)
+                    .parallelWithAggregation(departments);
+
+            // 输出各部门独立分析结果
+            System.out.println("\n=== 各部门独立分析结果 ===");
+            for (int i = 0; i < result.individualResults().size(); i++) {
+                System.out.println("部门" + (i + 1) + ":");
+                System.out.println(result.individualResults().get(i));
+                System.out.println("\n" + "-".repeat(50) + "\n");
+            }
+
+            // 输出聚合器综合报告
+            System.out.println("\n=== 聚合器综合报告 ===");
+            System.out.println(result.aggregatedOutput());
+        }
+    }
+
+    /**
+     * Evaluator-Optimizer模式
+     */
     @Nested
     class EvaluatorOptimizerTest{
 
@@ -180,6 +513,9 @@ public class AgentTest {
         }
     }
 
+    /**
+     * Orchestrator-Workers模式
+     */
     @Nested
     class SimpleOrchestratorWorkersTest{
 
