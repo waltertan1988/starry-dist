@@ -67,7 +67,7 @@ public class UserController extends AbstractBaseController {
             criteria.andUsernameEqualTo(req.getUsername());
         }
         if(StringUtils.isNotBlank(req.getNickname())){
-            criteria.andNicknameLike(req.getNickname());
+            criteria.andNicknameLike("%" + req.getNickname() + "%");
         }
         if(Objects.nonNull(req.getEnabled())){
             criteria.andEnabledEqualTo(req.getEnabled());

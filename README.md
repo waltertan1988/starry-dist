@@ -7,4 +7,5 @@
 > 前后端启动成功后，点击[http://localhost:7080/login](http://localhost:7080/login)进入登录界面：
 > ![Pandao editor.md](https://raw.githubusercontent.com/waltertan1988/starry-dist/refs/heads/main/doc/pic/introduction-login.png "introducion-login.png")
 > 登录后可使用各种相关功能：
+> ![Pandao editor.md](https://raw.githubusercontent.com/waltertan1988/starry-dist/refs/heads/main/doc/pic/introduction-dashboard.png "introduction-dashboard.png")
 > ![Pandao editor.md](https://raw.githubusercontent.com/waltertan1988/starry-dist/refs/heads/main/doc/pic/introduction-menu.png "introducion-menu.png")
