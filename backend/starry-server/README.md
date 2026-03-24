@@ -13,41 +13,44 @@
 * Elasticsearch-8.12.1 + IK分词器插件
 
 ### 1.2 模块说明
-1. starry-security-spring-boot-autoconfigure  
+1. starry-authorization-server-app  
+   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
+
+
+2. starry-mcp-server-app  
+   一个MCP服务提供者应用示例，可直接启动。
+
+
+3. starry-business-app  
+  一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
+  注意：
+   * 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
+   * 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
+
+
+4. starry-security-spring-boot-autoconfigure  
    Spring Security认证与授权相关的基础配置模块，核心功能包括：
    * 身份认证，包括：本地登录、OAuth2的单点登录、登出
    * 提供了用户、角色、菜单、权限等管理功能端点
 
 
-2. starry-business-app  
-   一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用。
-
-
-3. starry-authorization-server-spring-boot-autoconfigure  
+5. starry-authorization-server-spring-boot-autoconfigure  
    在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
 
-4. starry-authorization-server-app  
-   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用。
-
-
-5. starry-common-lib  
+6. starry-common-lib  
    集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
 
-6. starry-ai-spring-boot-autoconfigure  
+7. starry-ai-spring-boot-autoconfigure  
    集成Spring AI的基础能力，被其他模块所依赖。
 
 
-7. starry-mcp-server-app
-   一个MCP服务提供者应用
-
-
-8. starry-mcp-server-remote
+8. starry-mcp-server-remote  
    定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
 
 
-9. starry-mdc-spring-boot-autoconfigure
+9. starry-mdc-spring-boot-autoconfigure  
    提供日志调用链路的跟踪能力。已支持的组件有：
    * Web过滤器
    * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
