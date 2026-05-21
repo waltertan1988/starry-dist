@@ -1,5 +1,5 @@
 services:
-  redis-stack:
+  ollama:
     image: ollama/ollama:0.24.0
     container_name: ollama
     hostname: ollama
