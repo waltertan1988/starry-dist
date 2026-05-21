@@ -12,45 +12,38 @@
 * ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
 * Ollama(v0.24.0)
 
-## 2 模块说明
-1. starry-authorization-server-app  
+
+## 2. 模块说明
+### 2.1. starry-authorization-server-app  
    一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
 
-
-2. starry-mcp-server-app  
+### 2.2. starry-mcp-server-app  
    一个MCP服务提供者应用示例，可直接启动。
 
-
-3. starry-business-app  
+### 2.3. starry-business-app  
   一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
   注意：
    * 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
    * 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
 
-
-4. starry-security-spring-boot-autoconfigure  
+### 2.4. starry-security-spring-boot-autoconfigure  
    Spring Security认证与授权相关的基础配置模块，核心功能包括：
    * 身份认证，包括：本地登录、OAuth2的单点登录、登出
    * 提供了用户、角色、菜单、权限等管理功能端点
 
-
-5. starry-authorization-server-spring-boot-autoconfigure  
+### 2.5. starry-authorization-server-spring-boot-autoconfigure  
    在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
-
-6. starry-common-lib  
+### 2.6. starry-common-lib  
    集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
-
-7. starry-ai-spring-boot-autoconfigure  
+### 2.7. starry-ai-spring-boot-autoconfigure  
    集成Spring AI的基础能力，被其他模块所依赖。
 
-
-8. starry-mcp-server-remote  
+### 2.8. starry-mcp-server-remote  
    定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
 
-
-9. starry-mdc-spring-boot-autoconfigure  
+### 2.9. starry-mdc-spring-boot-autoconfigure  
    提供日志调用链路的跟踪能力。已支持的组件有：
    * Web过滤器
    * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
@@ -278,6 +271,7 @@ curl \
 > Bookie URL：http://192.168.10.131:6650  
 > 租户：${app.pulsar.base-reg.tenant}
 > 命名空间：${app.pulsar.base-reg.namespace}
+
 
 ## 4. 系统数据初始化
 待中间件服务启动成功后，可以初始化系统数据。
@@ -645,7 +639,7 @@ insert into `oauth2_registered_client` (`id`, `client_id`, `client_id_issued_at`
 ```
 > 注：也可以通过执行程序来创建OAuth2 Client配置数据：com.walter.starry.authorizationserver.app.AuthorizationServerApplicationTests.RegisteredClientRepositoryTest.save
 
-### 常用SQL
+#### 常用SQL
 ```mysql
 # 查看指定权限可访问的菜单（或功能）明细
 SELECT ri.*
@@ -757,7 +751,7 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ```
 
 
-## 5 启动Java应用
+## 5. 启动应用进程
 ### 5.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
 * application.yml
 ```yaml
