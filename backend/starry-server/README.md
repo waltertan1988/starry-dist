@@ -10,7 +10,7 @@
 #### 可选中间件
 * Docker Compose（建议本地开发时使用）
 * Pulsar-3.2.1或RocketMQ-5.3.4
-* Elasticsearch-8.12.1 + IK分词器插件
+* ElasticSearch(v8.19.15) + Kibana(8.19.15) + IK分词器插件
 
 ### 1.2 模块说明
 1. starry-authorization-server-app  
@@ -556,6 +556,9 @@ sudo mkdir -p ./data/rocketmq/namesrv/logs
 sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
 sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
 sudo chmod 777 -R ./data/rocketmq
+# Elastic的相关目录（ElasticSearch、Kibana）
+sudo mkdir -p ./data/elastic/elasticsearch/es01/config ./data/elastic/elasticsearch/es01/data ./data/elastic/elasticsearch/es01/logs ./data/elastic/elasticsearch/es01/plugins
+sudo mkdir -p ./data/elastic/kibana/data
 # Minio相关目录
 sudo mkdir -p ./data/minio
 # Milvus相关目录

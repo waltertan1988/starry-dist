@@ -21,3 +21,7 @@ include:
   - compose-milvus.yml
     ## APM子网网段：172.18.6.0/24
   - compose-apm.yml
+  ## elastic子网网段：172.18.7.0/24
+  - compose-elastic.yml
+  ## ollama子网网段：172.18.8.0/24
+  - compose-ollama.yml
