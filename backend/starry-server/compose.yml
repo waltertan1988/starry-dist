@@ -16,12 +16,12 @@ include:
   - compose-rocketmq.yml
 #  - compose-pulsar.yml
     ## minio子网网段：172.18.4.0/24
-  - compose-minio.yml
+#  - compose-minio.yml
     ## milvus子网网段：172.18.5.0/24
-  - compose-milvus.yml
+#  - compose-milvus.yml
     ## APM子网网段：172.18.6.0/24
   - compose-apm.yml
   ## elastic子网网段：172.18.7.0/24
   - compose-elastic.yml
   ## ollama子网网段：172.18.8.0/24
-  - compose-ollama.yml
+#  - compose-ollama.yml
