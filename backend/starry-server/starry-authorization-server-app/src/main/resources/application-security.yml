@@ -80,7 +80,7 @@ spring:
 
   # ES
   elasticsearch:
-    uris: http://127.0.0.1:9203, http://127.0.0.1:9204, http://127.0.0.1:9205
+    uris: http://${app.middleware-host}:9200
 
   # springboot启用虚拟线程
   threads:

@@ -70,7 +70,7 @@ sudo mkdir -p ./data/rocketmq/namesrv/logs
 sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
 sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
 sudo chmod 777 -R ./data/rocketmq
-# Elastic的相关目录（ElasticSearch、Kibana）
+# Elastic相关目录（ElasticSearch、Kibana）
 sudo mkdir -p ./data/elastic/elasticsearch/es01/config ./data/elastic/elasticsearch/es01/data ./data/elastic/elasticsearch/es01/logs ./data/elastic/elasticsearch/es01/plugins
 sudo mkdir -p ./data/elastic/kibana/data
 # Minio相关目录
@@ -79,6 +79,8 @@ sudo mkdir -p ./data/minio
 sudo mkdir -p ./data/etcd ./data/milvus
 # Grafana相关目录
 sudo mkdir -p ./data/apm/grafana
+# Ollama相关目录
+sudo mkdir -p ./data/ollama
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R data
 ```
