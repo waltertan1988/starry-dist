@@ -425,7 +425,7 @@ public class AiTest {
             @Test
             void addText(){
                 // 读取文本文档
-                final String fileName = "C:/Users/think/Downloads/神雕侠侣.txt";
+                final String fileName = "C:/Users/think/Downloads/天龙八部.txt";
                 TextReader reader = new TextReader(new PathResource(fileName));
                 reader.getCustomMetadata().put("tag", TAG_JIN_YONG);
                 List<Document> documentList = new ChineseTokenTextSplitter().apply(reader.read());

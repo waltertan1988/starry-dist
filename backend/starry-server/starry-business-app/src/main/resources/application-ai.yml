@@ -39,16 +39,17 @@ spring:
               url: http://127.0.0.1:8090
         # 启动应用时，不要执行mcp客户端的初始化，防止mcp服务不可用时导致本应用无法启动
         initialized: false
-    vectorstore:
-      milvus:
-        auto-id: true
-        client:
-          host: ${app.middleware-host}
-          port: 19530
-        collection-name: "dev"
-        database-name: "starry"
-#        initialize-schema: true
-        embedding-dimension: 1024
+#    vectorstore:
+#      milvus:
+#        auto-id: true
+#        client:
+#          host: ${app.middleware-host}
+#          port: 19530
+#        collection-name: "dev"
+#        database-name: "starry"
+##        initialize-schema: true
+#        embedding-dimension: 1024
+
 #  datasource:
 #    # 此数据源用于实现jdbc聊天记忆
 #    username: root
@@ -58,3 +59,13 @@ spring:
 #      minimum-idle: 50
 #      maximum-pool-size: 150
 #      connection-test-query: SELECT 1
+
+app:
+  ai:
+    vectorstore:
+      elasticsearch:
+        index-name: starry-rag
+        similarity: cosine
+        dimensions: 1024
+        embedding-field-name: embedding
+        initialize-schema: false
