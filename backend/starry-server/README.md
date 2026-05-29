@@ -123,6 +123,9 @@ sync_binlog=1
 innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
 
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
+
 # 配置半同步复制
 rpl_semi_sync_source_enabled=1
 rpl_semi_sync_replica_enabled=1
@@ -146,6 +149,9 @@ default-time-zone='+08:00'
 sync_binlog=1
 innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
+
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
 
 # 配置半同步复制
 rpl_semi_sync_source_enabled=1
@@ -176,7 +182,10 @@ enforce-gtid-consistency=ON
 从库slave1：
 	mysql < dbdump.db
 	
+	# 非GTID方式
 	CHANGE REPLICATION SOURCE TO SOURCE_HOST='172.18.1.1', SOURCE_PORT=3306, SOURCE_USER='repl', SOURCE_PASSWORD='replpassword', SOURCE_LOG_FILE='binlog.000003', SOURCE_LOG_POS=53320;
+	# GTID方式
+	CHANGE REPLICATION SOURCE TO SOURCE_HOST='172.18.1.1', SOURCE_PORT=3306, SOURCE_USER='repl', SOURCE_PASSWORD='replpassword', SOURCE_AUTO_POSITION=1;
 	
 	START REPLICA
 ```
