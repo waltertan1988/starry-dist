@@ -1,5 +1,7 @@
 app:
   version: @project.version@
+  # 中间件所在主机（仅用于集中管理本配置文件上下文的配置，非必须）
+  middleware-host: 192.168.10.131
 
 logging:
   file:
@@ -34,5 +36,23 @@ spring:
 #        resource-change-notification: true
 #        tool-change-notification: true
 #        prompt-change-notification: true
+
+  # DataSource
+  datasource:
+    username: root
+    password: ''
+    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    hikari:
+      minimum-idle: 50
+      maximum-pool-size: 150
+      connection-test-query: SELECT 1
+
+  # JPA
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
   main:
     banner-mode: off

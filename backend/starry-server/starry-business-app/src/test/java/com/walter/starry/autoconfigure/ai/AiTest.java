@@ -1,6 +1,7 @@
 package com.walter.starry.autoconfigure.ai;
 
 import com.google.common.collect.Lists;
+import com.walter.starry.ai.mcp.server.remote.AclAuthorityItemRes;
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.ai.core.rag.ChineseTokenTextSplitter;
 import com.walter.starry.autoconfigure.ai.core.tool.ExtSyncMcpToolCallbackProvider;
@@ -221,6 +222,23 @@ public class AiTest {
                     .doOnNext(System.out::print)
                     .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
                     .blockLast();
+        }
+
+        @Test
+        void pageQueryAclAuthorityItem(){
+            final String mcpTraceId = "12345678";
+            final String searchName = "管理员";
+
+            List<AclAuthorityItemRes> list = ChatClient.create(openAiChatModel)
+                    .prompt("请查询名字中包含“%s”这%s个字的权限项配置记录".formatted(searchName, searchName.length()))
+                    .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
+                    .toolContext(Map.of(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
+                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("pageQueryAclAuthorityItem")))
+                    .call()
+                    .entity(new ParameterizedTypeReference<List<AclAuthorityItemRes>>() {
+                    });
+
+            System.out.println(JsonUtil.toJson(list));
         }
     }
 
