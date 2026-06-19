@@ -87,7 +87,7 @@ sudo chown 10000 -R data
 
 ### 3.2 配置中间件
 #### 3.2.1 配置MYSQL
-MYSQL主服务配置文件：
+MYSQL主库配置文件：
 cat ./data/mysql/master/conf.d/config-file.cnf
 ```
 [mysqld]
@@ -95,13 +95,20 @@ server_id=1
 port=3306
 default-time-zone='+08:00'
 
+#read_only = 1  		# MHA必选：从库只读
+#super_read_only = 1  	# MHA必选：禁止super权限写从库
+
 sync_binlog=1
-innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
 
 # 配置半同步复制
-#rpl_semi_sync_source_enabled=1
-#rpl_semi_sync_replica_enabled=1
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
 
@@ -109,9 +116,12 @@ replication_optimize_for_static_plugin_config=1
 gtid_mode=ON
 enforce-gtid-consistency=ON
 #skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  #事务提交刷盘，保证数据安全
 ```
 
-MYSQL从服务1配置文件：
+MYSQL从库1（MHA备主库）配置文件：
 cat ./data/mysql/slave1/conf.d/config-file.cnf
 ```
 [mysqld]
@@ -119,16 +129,20 @@ server_id=2
 port=3306
 default-time-zone='+08:00'
 
+read_only = 1  			# MHA必选：从库只读
+super_read_only = 1  	# MHA必选：禁止super权限写从库
+
 sync_binlog=1
-innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
+binlog_expire_logs_seconds = 604800  # binlog7天自动清理
+relay_log_recovery = 1  # MHA必选：重启后自动恢复中继日志，避免复制中断
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
 
 # 配置半同步复制
-rpl_semi_sync_source_enabled=1
-rpl_semi_sync_replica_enabled=1
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
 
@@ -136,9 +150,12 @@ replication_optimize_for_static_plugin_config=1
 gtid_mode=ON
 enforce-gtid-consistency=ON
 #skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 ```
 
-MYSQL从服务2配置文件：
+MYSQL从库2（MHA普通从库）配置文件：
 cat ./data/mysql/slave2/conf.d/config-file.cnf
 ```
 [mysqld]
@@ -146,16 +163,20 @@ server_id=3
 port=3306
 default-time-zone='+08:00'
 
+read_only = 1  			# MHA必选：从库只读
+super_read_only = 1  	# MHA必选：禁止super权限写从库
+
 sync_binlog=1
-innodb_flush_log_at_trx_commit=1
 binlog_format=ROW
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
 
 # 配置半同步复制
-rpl_semi_sync_source_enabled=1
-rpl_semi_sync_replica_enabled=1
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
 replication_sender_observe_commit_only=1
 replication_optimize_for_static_plugin_config=1
 
@@ -163,12 +184,15 @@ replication_optimize_for_static_plugin_config=1
 gtid_mode=ON
 enforce-gtid-consistency=ON
 #skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 ```
 
 配置MySQL主从异步复制的步骤：
 ```text
 主库master：
-	CREATE USER 'repl'@'%' IDENTIFIED BY 'replpassword';
+	CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'replpassword';
 	GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
 	FLUSH PRIVILEGES;
 	
