@@ -192,8 +192,14 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 配置MySQL主从异步复制的步骤：
 ```text
 主库master：
+	ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+
+	CREATE USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '';
+	GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+	
 	CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'replpassword';
 	GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+	
 	FLUSH PRIVILEGES;
 	
 	SHOW MASTER STATUS;
