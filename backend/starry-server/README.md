@@ -223,11 +223,12 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 	START REPLICA
 ```
 > 注：关于搭建MYSQL主从环境：   
->（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
->（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
->（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html  
->（5）设置数据源为只读并备份数据：https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html
+>（1）[项目初始阶段如何搭建主从复制环境](https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html)（本应用使用的复制账/密为：repl/replpassword）  
+>（2）[如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库](https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html)  
+>（3）[如何配置半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)  
+>（4）[允许停机的情况下，如何配置GTID复制](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html)  
+>（5）[设置数据源为只读并备份数据](https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html)  
+>（6）[如何搭建MHA高可用集群](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/MySQL8-MHA.md)  
 
 #### 3.2.2 消息队列配置
 ##### 3.2.2.1 如果消息队列采用Redis，还需要修改以下部署配置
