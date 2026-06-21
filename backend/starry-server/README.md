@@ -102,6 +102,7 @@ sync_binlog=1
 binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -134,8 +135,9 @@ super_read_only = 1  	# MHA必选：禁止super权限写从库
 
 sync_binlog=1
 binlog_format=ROW
-binlog_expire_logs_seconds = 604800  # binlog7天自动清理
-relay_log_recovery = 1  # MHA必选：重启后自动恢复中继日志，避免复制中断
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -170,6 +172,7 @@ sync_binlog=1
 binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
