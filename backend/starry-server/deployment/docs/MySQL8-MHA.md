@@ -572,13 +572,7 @@ walter@slave1:~$
 
 
 # 七. 附录
-## 1. 参考资料：
- - [（官网）mha4mysql-manager](https://github.com/yoshinorim/mha4mysql-manager)
- - [（官网）mha4mysql-node](https://github.com/yoshinorim/mha4mysql-node)
- - [MySQL高可用集群-MHA](https://www.modb.pro/db/74003)
- - [MySQL 8.0+ MHA 高可用集群搭建（生产环境级・超详细）](https://blog.csdn.net/L162476/article/details/157397267)
-
-## 2. masterha_check_repl报错的处理方法
+## 1. masterha_check_repl报错的处理方法
 (1) Redundant argument in sprintf at /usr/share/perl5/MHA/NodeUtil.pm line 195.
 ```shell
 cat /usr/share/perl5/MHA/NodeUtil.pm
@@ -621,3 +615,8 @@ sub parse_mysql_major_version($) {
 }
 ```
 
+## 2. 参考资料
+- [（官网）mha4mysql-manager](https://github.com/yoshinorim/mha4mysql-manager)
+- [（官网）mha4mysql-node](https://github.com/yoshinorim/mha4mysql-node)
+- [MySQL高可用集群-MHA](https://www.modb.pro/db/74003)
+- [MySQL 8.0+ MHA 高可用集群搭建（生产环境级・超详细）](https://blog.csdn.net/L162476/article/details/157397267)
