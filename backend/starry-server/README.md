@@ -1,56 +1,49 @@
 # Starry后端服务系统
 一套基于Spring-Security, Spring-Authorization-Server、MySQL、Redis、MQ、Spring-AI的后端应用平台基座。
 
-## 1. 开始使用
-### 1.1 依赖中间件
-#### 必须中间件
+## 1. 中间件说明
+### 1.1 必须中间件
 * JDK-21
 * MySql-8.0.45
 * Redis-7.4.0-v8
-#### 可选中间件
+### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
-* Pulsar-3.2.1或RocketMQ-5.3.4
-* Elasticsearch-8.12.1 + IK分词器插件
+* MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
+* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
+* Ollama(v0.24.0)
 
-### 1.2 模块说明
-1. starry-authorization-server-app  
+
+## 2. 模块说明
+### 2.1. starry-authorization-server-app  
    一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
 
-
-2. starry-mcp-server-app  
+### 2.2. starry-mcp-server-app  
    一个MCP服务提供者应用示例，可直接启动。
 
-
-3. starry-business-app  
+### 2.3. starry-business-app  
   一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
   注意：
    * 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
    * 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
 
-
-4. starry-security-spring-boot-autoconfigure  
+### 2.4. starry-security-spring-boot-autoconfigure  
    Spring Security认证与授权相关的基础配置模块，核心功能包括：
    * 身份认证，包括：本地登录、OAuth2的单点登录、登出
    * 提供了用户、角色、菜单、权限等管理功能端点
 
-
-5. starry-authorization-server-spring-boot-autoconfigure  
+### 2.5. starry-authorization-server-spring-boot-autoconfigure  
    在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
-
-6. starry-common-lib  
+### 2.6. starry-common-lib  
    集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
-
-7. starry-ai-spring-boot-autoconfigure  
+### 2.7. starry-ai-spring-boot-autoconfigure  
    集成Spring AI的基础能力，被其他模块所依赖。
 
-
-8. starry-mcp-server-remote  
+### 2.8. starry-mcp-server-remote  
    定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
 
-
-9. starry-mdc-spring-boot-autoconfigure  
+### 2.9. starry-mdc-spring-boot-autoconfigure  
    提供日志调用链路的跟踪能力。已支持的组件有：
    * Web过滤器
    * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
@@ -58,9 +51,277 @@
    * Reactor内置线程池，包括WebFlux任务
    * SpringAI的MCP服务（streamable-http方式）
 
-### 1.3 mysql初始化数据
-#### DDL
-##### Spring Security认证与授权相关
+
+## 3. 部署中间件
+假设中间件的宿主机IP是192.168.10.131，且采用docker compose部署各种中间件，入口文件为compose.yml
+
+### 3.1 宿主机上准备各中间件的待挂载目录
+```shell
+# Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
+sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
+# Reids相关目录
+sudo mkdir -p ./data/redis
+# MySQL相关目录
+sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
+sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
+sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
+# RocketMQ相关目录
+sudo mkdir -p ./data/rocketmq/namesrv/logs
+sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
+sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
+sudo chmod 777 -R ./data/rocketmq
+# Elastic相关目录（ElasticSearch、Kibana）
+sudo mkdir -p ./data/elastic/elasticsearch/es01/config ./data/elastic/elasticsearch/es01/data ./data/elastic/elasticsearch/es01/logs ./data/elastic/elasticsearch/es01/plugins
+sudo mkdir -p ./data/elastic/kibana/data
+# Minio相关目录
+sudo mkdir -p ./data/minio
+# Milvus相关目录
+sudo mkdir -p ./data/etcd ./data/milvus
+# Grafana相关目录
+sudo mkdir -p ./data/apm/grafana
+# Ollama相关目录
+sudo mkdir -p ./data/ollama
+# this step might not be necessary on other than Linux platforms
+sudo chown 10000 -R data
+```
+
+### 3.2 配置中间件
+#### 3.2.1 配置MYSQL
+MYSQL主库配置文件：
+cat ./data/mysql/master/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=1
+port=3306
+default-time-zone='+08:00'
+
+#read_only = 1  		# MHA必选：从库只读
+#super_read_only = 1  	# MHA必选：禁止super权限写从库
+
+sync_binlog=1
+binlog_format=ROW
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
+
+# 配置半同步复制
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  #事务提交刷盘，保证数据安全
+```
+
+MYSQL从库1（MHA备主库）配置文件：
+cat ./data/mysql/slave1/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=2
+port=3306
+default-time-zone='+08:00'
+
+read_only = 1  			# MHA必选：从库只读
+super_read_only = 1  	# MHA必选：禁止super权限写从库
+
+sync_binlog=1
+binlog_format=ROW
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
+
+# 配置半同步复制
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
+```
+
+MYSQL从库2（MHA普通从库）配置文件：
+cat ./data/mysql/slave2/conf.d/config-file.cnf
+```
+[mysqld]
+server_id=3
+port=3306
+default-time-zone='+08:00'
+
+read_only = 1  			# MHA必选：从库只读
+super_read_only = 1  	# MHA必选：禁止super权限写从库
+
+sync_binlog=1
+binlog_format=ROW
+binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
+relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
+#relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 参与选主的节点建议开启（默认开启）
+#log_replica_updates=1
+
+# 配置半同步复制
+rpl_semi_sync_source_enabled=1		#即rpl_semi_sync_master_enabled，安装完半同步复制插件后再打开
+rpl_semi_sync_replica_enabled=1		#即rpl_semi_sync_slave_enabled，安装完半同步复制插件后再打开
+replication_sender_observe_commit_only=1
+replication_optimize_for_static_plugin_config=1
+
+# 配置GTID
+gtid_mode=ON
+enforce-gtid-consistency=ON
+#skip_replica_start=ON
+
+# InnoDB核心优化
+innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
+```
+
+配置MySQL主从异步复制的步骤：
+```text
+主库master：
+	ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+
+	CREATE USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '';
+	GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+	
+	CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'replpassword';
+	GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+	
+	FLUSH PRIVILEGES;
+	
+	SHOW MASTER STATUS;
+		File           Position  Binlog_Do_DB  Binlog_Ignore_DB  Executed_Gtid_Set  
+		-------------  --------  ------------  ----------------  -------------------
+		binlog.000003     53320                                                     
+		
+	mysqldump --all-databases --master-data > dbdump.db
+	
+从库slave1：
+	mysql < dbdump.db
+	
+	# 非GTID方式
+	CHANGE REPLICATION SOURCE TO SOURCE_HOST='172.18.1.1', SOURCE_PORT=3306, SOURCE_USER='repl', SOURCE_PASSWORD='replpassword', SOURCE_LOG_FILE='binlog.000003', SOURCE_LOG_POS=53320;
+	# GTID方式
+	CHANGE REPLICATION SOURCE TO SOURCE_HOST='172.18.1.1', SOURCE_PORT=3306, SOURCE_USER='repl', SOURCE_PASSWORD='replpassword', SOURCE_AUTO_POSITION=1;
+	
+	START REPLICA
+```
+> 注：关于搭建MYSQL主从环境：   
+>（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
+>（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
+>（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
+>（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html  
+>（5）设置数据源为只读并备份数据：https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html
+
+#### 3.2.2 消息队列配置
+##### 3.2.2.1 如果消息队列采用Redis，还需要修改以下部署配置
+* application.yml:
+```yaml
+app:
+  message:
+    redis:
+      # 启用redis消息
+      enabled: true
+      namespace: ${spring.application.name}
+```
+
+##### 3.2.2.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
+cat ./data/rocketmq/broker/conf/broker.conf
+```properties
+brokerClusterName = DefaultCluster
+brokerName = broker-a
+brokerId = 0
+deleteWhen = 04
+fileReservedTime = 48
+brokerRole = ASYNC_MASTER
+flushDiskType = ASYNC_FLUSH
+
+# 需按宿主机IP修改此配置
+brokerIP1 = 192.168.10.131
+# 是否自动创建主题，生产环境建议禁用
+autoCreateTopicEnable = true
+```
+
+* application.yml:
+```yaml
+rocketmq:
+  name-server: ${app.middleware-host}:9876
+```
+
+#### 3.2.2.3 如果消息队列采用Pulsar，还需要修改以下部署配置
+* compose-pulsar.yml
+```yaml
+services: 
+  broker: 
+    environment: 
+      - advertisedListeners=external:pulsar://192.168.10.131:6650
+```
+> 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
+
+### 3.3 启动中间件服务
+参考：
+* https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
+* https://redis.io/docs/install/install-stack/docker/
+```shell
+# 启动
+sudo docker compose up -d
+# 停止
+#sudo docker compose down
+# 查看各个容器的运行状态
+#sudo docker compose stats
+# 查看容器日志
+#sudo docker logs <容器id或名称>
+```
+
+#### 3.3.1 如果消息队列采用Pulsar，还需要配置PulsarManager
+（1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
+```shell
+# 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
+
+docker exec -it <PulsarManager容器ID> /bin/bash
+
+CSRF_TOKEN=$(curl http://pulsar-manager:7750/pulsar-manager/csrf-token)
+
+curl \
+-H "X-XSRF-TOKEN: $CSRF_TOKEN" \
+-H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
+-H 'Content-Type: application/json' \
+-X PUT http://pulsar-manager:7750/pulsar-manager/users/superuser \
+-d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
+```
+
+（2） 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
+
+（3）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
+* 创建环境
+> Environment Name：dev  
+> Service URL：http://192.168.10.131:8080  
+> Bookie URL：http://192.168.10.131:6650  
+> 租户：${app.pulsar.base-reg.tenant}
+> 命名空间：${app.pulsar.base-reg.namespace}
+
+
+## 4. 系统数据初始化
+待中间件服务启动成功后，可以初始化系统数据。
+
+### 4.1 Mysql建表
+#### Spring Security认证与授权相关
 ```mysql
 CREATE TABLE `users` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '物理主键',
@@ -153,7 +414,7 @@ CREATE TABLE `authority_resource` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='权限资源项关联表';
 ```
 
-##### OAuth2授权服务器相关
+#### OAuth2授权服务器相关
 ```mysql
 CREATE TABLE `oauth2_registered_client` (
     `id` varchar(255) NOT NULL,
@@ -217,7 +478,7 @@ CREATE TABLE `oauth2_authorization_consent` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-##### OAuth2客户端相关
+#### OAuth2客户端相关
 ```mysql
 # 客户端用户获得授权后的令牌记录表（非必须）
 CREATE TABLE oauth2_authorized_client (
@@ -237,7 +498,7 @@ CREATE TABLE oauth2_authorized_client (
 > OAuth2的相关表字段和DAO相关定义，可参考：  
 > https://docs.spring.io/spring-authorization-server/docs/current/reference/html/guides/how-to-jpa.html#registered-client-repository
 
-##### Spring AI相关
+#### Spring AI相关
 ```mysql
 CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
@@ -261,8 +522,8 @@ CREATE TABLE `user_ai_conversation` (
 
 ```
 
-#### DML
-##### 初始化用户数据
+### 4.2 MySQL添加初始数据
+#### 初始化用户数据
 ```mysql
 # 初始化用户的账号密码：
 # admin：admin
@@ -289,7 +550,7 @@ INSERT INTO users_oidc(`id`, `username`, `oidc_registration_id`, `open_id`, `ena
 ```
 > 注：也可以通过执行此方法创建用户：com.walter.starry.authorizationserver.app.AuthorizationServerApplicationTests.UserDetailsServiceTest.createUser
 
-##### 初始化角色和权限
+#### 初始化角色和权限
 ```mysql
 ## 以下为系统固定角色
 insert into `authority_item` (`id`, `code`, `name`, `parent_code`, `priority`, `system_authority`, `create_time`, `update_time`) values('1','ROLE_ANONYMOUS','匿名用户',NULL,'1000',b'1','2020-09-19 16:13:05.363','2020-10-06 12:00:48.695');
@@ -310,7 +571,7 @@ insert into `authority_item` (`id`, `code`, `name`, `parent_code`, `priority`, `
 insert into `authority_item` (`id`, `code`, `name`, `parent_code`, `priority`, `system_authority`, `create_time`, `update_time`) values('36','ROLE_BIZ_STAFF','职员','ROLE_BIZ_MANAGER','1000','','2020-10-17 06:22:59.000','2020-10-17 08:44:38.000');
 insert into `authority_item` (`id`, `code`, `name`, `parent_code`, `priority`, `system_authority`, `create_time`, `update_time`) values('37','ROLE_BIZ_EC','外包','ROLE_BIZ_STAFF','1000','','2020-10-17 06:23:14.000','2020-10-17 08:44:38.000');
 ```
-##### 层次角色说明
+#### 层次角色说明
 | 一级角色    | 二级角色     | 三级角色   | 四级角色  | 五级角色  |
 |---------|----------|--------|-------|-------|
 | 匿名用户  |         |        |       |       |
@@ -332,7 +593,7 @@ insert into `authority_item` (`id`, `code`, `name`, `parent_code`, `priority`, `
 |         |          |        |       | 初级会员 |
 > 层次角色：上级角色自动包含下级角色的全部权限。上面表格中的“匿名用户”“系统管理员”“已登录用户”为系统固定角色，其他为业务角色。业务角色可按需自行定义。
 
-##### 初始化用户拥有的角色或权限
+#### 初始化用户拥有的角色或权限
 ```mysql
 insert into `authorities` (`id`, `username`, `authority`, `create_time`, `update_time`) values('1','admin','ROLE_ADMIN','2020-09-13 13:19:46.812','2020-09-19 16:15:38.605');
 insert into `authorities` (`id`, `username`, `authority`, `create_time`, `update_time`) values('2','user','ROLE_USER','2020-09-13 13:19:27.877','2020-09-19 16:15:41.826');
@@ -357,7 +618,7 @@ insert into `authorities` (`id`, `username`, `authority`, `create_time`, `update
 insert into `authorities` (`id`, `username`, `authority`, `create_time`, `update_time`) values('82','005f1963cea242d7bfff02ac015d99c2','ROLE_USER','2020-10-13 15:03:31.000','2020-10-13 15:03:31.000');
 ```
 
-##### 初始化资源分组（包括菜单组和功能组）
+#### 初始化资源分组（包括菜单组和功能组）
 ```mysql
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('1','root_menu_group','根菜单组','1','1000','root_menu_group',NULL,'2020-09-19 11:45:09.333','2020-09-19 15:33:58.979');
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('2','system_admin_menu_group','系统管理','1','1000','root_menu_group','{\"defaultOpen\":true,\"icon\":\"Setting\"}','2020-09-19 14:56:26.000','2020-11-03 13:06:05.000');
@@ -373,7 +634,7 @@ insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group
 insert into `resource_group` (`id`, `code`, `name`, `type`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('24','actuator_endpoint_group','Actuator端点','2','900','root_function_group','{\"icon\":\"Histogram\"}','2020-12-23 15:13:18.762','2020-12-23 15:35:49.685');
 ```
 
-##### 初始化资源项（包括菜单项和功能项）
+#### 初始化资源项（包括菜单项和功能项）
 ```mysql
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('1','AdminPage','GET','/admin','管理台首页','1000','root_menu_group','{\"icon\":\"House\"}','2020-09-19 00:04:45.000','2020-11-03 13:11:28.000');
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('2','AdminUserPage','GET','/admin/user','用户管理','1000','system_admin_menu_group','{\"icon\":\"User\"}','2020-09-19 00:04:58.692','2020-09-23 10:58:30.569');
@@ -393,7 +654,7 @@ insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`
 insert into `resource_item` (`id`, `code`, `http_method_list`, `pattern`, `name`, `seq`, `parent_group_code`, `config`, `create_time`, `update_time`) values('34','actuator_endpoint_health','GET','/actuator/health','健康检查端点','1000','actuator_endpoint_group','{\"icon\":null}','2020-12-23 15:19:22.819','2020-12-23 16:01:29.556');
 ```
 
-##### 初始化资源项所需的角色或权限
+#### 初始化资源项所需的角色或权限
 ```mysql
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('1','AdminPage','ROLE_USER','2020-09-19 16:07:08.284','2020-09-23 16:42:09.900');
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('2','AdminUserPage','ROLE_USER','2020-09-19 16:07:32.744','2020-10-07 11:37:12.213');
@@ -416,7 +677,7 @@ insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_co
 insert into `authority_resource` (`id`, `resource_item_code`, `authority_item_code`, `create_time`, `update_time`) values('32','actuator_endpoint_health','ROLE_USER','2020-12-23 16:02:01.398','2020-12-23 16:02:01.398');
 ```
 
-##### 初始化OAuth2的Client配置数据
+#### 初始化OAuth2的Client配置数据
 ```mysql
 insert into `oauth2_registered_client` (`id`, `client_id`, `client_id_issued_at`, `client_secret`, `client_secret_expires_at`, `client_name`, `client_authentication_methods`, `authorization_grant_types`, `redirect_uris`, `post_logout_redirect_uris`, `scopes`, `client_settings`, `token_settings`) values('2f3f7e1f-8ee0-46ce-8d12-d427e3bdac08','oidc-client','2020-08-25 15:14:52','{bcrypt}$2a$10$v84Cecwigq73D7oLZTg2R.7y.UoTFMpXyYfTWoreuKAT6cOco9LMC',NULL,'oidc-client-name','client_secret_basic','refresh_token,client_credentials,authorization_code','http://127.0.0.1:8080/login/oauth2/code/oidc-client','http://127.0.0.1:8080/','openid,profile,email','{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":true}','{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":true,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",3600.000000000],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.device-code-time-to-live\":[\"java.time.Duration\",300.000000000]}');
 ```
@@ -442,9 +703,8 @@ AND rg.`type` = 1 # 1-菜单，2-功能
 ORDER BY ar.id;
 ```
 
-### 1.4 Elasticsearch（可选）
-#### 创建索引
-##### 用户信息索引
+### 4.3 Elasticsearch索引（可选）
+#### 创建用户信息索引
 ```text
 PUT /authorization_server.user.v1
 {
@@ -525,7 +785,7 @@ PUT /authorization_server.user.v1
 }
 ```
 
-##### 索引用户信息
+#### 索引用户信息
 ```text
 // 为用户文档添加索引
 com.walter.starry.security.ElasticsearchTest.DocumentTest.bulkIndex
@@ -534,227 +794,9 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.bulkIndex
 com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 ```
 
-## 2. 启动服务
-### 2.1 启动Mysql和Elasticsearch
-在本示例中，Elasticsearch分别独立部署
 
-### 2.2 Docker Compose启动其他中间件（如：MySQL、Redis-Stack、Pulsar、RocketMQ等）
-docker compose的主文件为compose.yml
-
-#### 2.2.1 宿主机上准备待挂载的目录
-```shell
-# Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
-sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Reids相关目录
-sudo mkdir -p ./data/redis
-# MySQL相关目录
-sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
-sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
-sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
-# RocketMQ相关目录
-sudo mkdir -p ./data/rocketmq/namesrv/logs
-sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
-sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
-sudo chmod 777 -R ./data/rocketmq
-# Minio相关目录
-sudo mkdir -p ./data/minio
-# Milvus相关目录
-sudo mkdir -p ./data/etcd ./data/milvus
-# this step might not be necessary on other than Linux platforms
-sudo chown 10000 -R data
-```
-
-#### 2.2.2 配置MYSQL
-MYSQL主服务配置文件：
-cat ./data/mysql/master/conf.d/config-file.cnf
-```
-[mysqld]
-server_id=1
-port=3306
-default-time-zone='+08:00'
-
-sync_binlog=1
-innodb_flush_log_at_trx_commit=1
-binlog_format=ROW
-
-# 配置半同步复制
-#rpl_semi_sync_source_enabled=1
-#rpl_semi_sync_replica_enabled=1
-replication_sender_observe_commit_only=1
-replication_optimize_for_static_plugin_config=1
-
-# 配置GTID
-gtid_mode=ON
-enforce-gtid-consistency=ON
-#skip_replica_start=ON
-```
-
-MYSQL从服务1配置文件：
-cat ./data/mysql/slave1/conf.d/config-file.cnf
-```
-[mysqld]
-server_id=2
-port=3306
-default-time-zone='+08:00'
-
-sync_binlog=1
-innodb_flush_log_at_trx_commit=1
-binlog_format=ROW
-
-# 配置半同步复制
-rpl_semi_sync_source_enabled=1
-rpl_semi_sync_replica_enabled=1
-replication_sender_observe_commit_only=1
-replication_optimize_for_static_plugin_config=1
-
-# 配置GTID
-gtid_mode=ON
-enforce-gtid-consistency=ON
-#skip_replica_start=ON
-```
-
-MYSQL从服务2配置文件：
-cat ./data/mysql/slave2/conf.d/config-file.cnf
-```
-[mysqld]
-server_id=3
-port=3306
-default-time-zone='+08:00'
-
-sync_binlog=1
-innodb_flush_log_at_trx_commit=1
-binlog_format=ROW
-
-# 配置半同步复制
-rpl_semi_sync_source_enabled=1
-rpl_semi_sync_replica_enabled=1
-replication_sender_observe_commit_only=1
-replication_optimize_for_static_plugin_config=1
-
-# 配置GTID
-gtid_mode=ON
-enforce-gtid-consistency=ON
-#skip_replica_start=ON
-```
-#### 2.2.3 配置MySQL主从异步复制的步骤：
-```text
-主库master：
-	CREATE USER 'repl'@'%' IDENTIFIED BY 'replpassword';
-	GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
-	FLUSH PRIVILEGES;
-	
-	SHOW MASTER STATUS;
-		File           Position  Binlog_Do_DB  Binlog_Ignore_DB  Executed_Gtid_Set  
-		-------------  --------  ------------  ----------------  -------------------
-		binlog.000003     53320                                                     
-		
-	mysqldump --all-databases --master-data > dbdump.db
-	
-从库slave1：
-	mysql < dbdump.db
-	
-	CHANGE REPLICATION SOURCE TO SOURCE_HOST='172.18.1.1', SOURCE_PORT=3306, SOURCE_USER='repl', SOURCE_PASSWORD='replpassword', SOURCE_LOG_FILE='binlog.000003', SOURCE_LOG_POS=53320;
-	
-	START REPLICA
-```
-> 注：关于搭建MYSQL主从环境：   
->（1）项目初始阶段如何搭建主从复制环境（本应用使用的复制账/密为：repl/replpassword）：https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html  
->（2）如何在既有的主从复制环境中，在不对主库停机的情况下加入新的从库：https://dev.mysql.com/doc/refman/8.0/en/replication-howto-additionalslaves.html  
->（3）如何配置半同步复制：https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html  
->（4）允许停机的情况下，如何配置GTID复制：https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html  
->（5）设置数据源为只读并备份数据：https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html  
-
-#### 2.2.4 消息队列配置
-假设中间件的宿主机IP是192.168.10.131
-
-#### 2.2.4.1 如果消息队列采用Redis，还需要修改以下部署配置
-* application.yml:
-```yaml
-app:
-  message:
-    redis:
-      # 启用redis消息
-      enabled: true
-      namespace: ${spring.application.name}
-```
-
-#### 2.2.4.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
-cat ./data/rocketmq/broker/conf/broker.conf
-```properties
-brokerClusterName = DefaultCluster
-brokerName = broker-a
-brokerId = 0
-deleteWhen = 04
-fileReservedTime = 48
-brokerRole = ASYNC_MASTER
-flushDiskType = ASYNC_FLUSH
-
-# 需按宿主机IP修改此配置
-brokerIP1 = 192.168.10.131
-# 是否自动创建主题，生产环境建议禁用
-autoCreateTopicEnable = true
-```
-
-* application.yml:
-```yaml
-rocketmq:
-  name-server: ${app.middleware-host}:9876
-```
-
-#### 2.2.4.3 如果消息队列采用Pulsar，还需要修改以下部署配置
-* compose-pulsar.yml
-```yaml
-services: 
-  broker: 
-    environment: 
-      - advertisedListeners=external:pulsar://192.168.10.131:6650
-```
-> 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
-
-#### 2.2.5 启动中间件服务
-参考：
-* https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster
-* https://redis.io/docs/install/install-stack/docker/
-```shell
-# 启动
-sudo docker compose up -d
-# 停止
-#sudo docker compose down
-# 查看各个容器的运行状态
-#sudo docker compose stats
-# 查看容器日志
-#sudo docker logs <容器id或名称>
-```
-
-#### 2.2.6 如果消息队列采用Pulsar，还需要配置PulsarManager
-（1）Pulsar启动完毕后，执行以下操作生成Pulsar Manager控制台的登录账密：
-```shell
-# 登录账密设置的说明参看：https://github.com/apache/pulsar-manager
-
-docker exec -it <PulsarManager容器ID> /bin/bash
-
-CSRF_TOKEN=$(curl http://pulsar-manager:7750/pulsar-manager/csrf-token)
-
-curl \
--H "X-XSRF-TOKEN: $CSRF_TOKEN" \
--H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
--H 'Content-Type: application/json' \
--X PUT http://pulsar-manager:7750/pulsar-manager/users/superuser \
--d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
-```
-
-（2） 访问PulsarManager控制台：http://<宿主机>:9527/#/management/tenants
-
-（3）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
-* 创建环境
-> Environment Name：dev  
-> Service URL：http://192.168.10.131:8080  
-> Bookie URL：http://192.168.10.131:6650  
-> 租户：${app.pulsar.base-reg.tenant}
-> 命名空间：${app.pulsar.base-reg.namespace}
-
-### 2.3 启动Java应用
-#### 2.3.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
+## 5. 启动应用进程
+### 5.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
 * application.yml
 ```yaml
 app:
@@ -767,7 +809,7 @@ singleServerConfig:
   address: "redis://192.168.10.131:6379"
 ```
 
-#### 2.3.2 启动springboot应用时，添加以下vm参数
+### 5.2 启动springboot应用时，添加以下vm参数
 ```shell
 # 启动MCP服务提供者进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-mcp-server-app.jar
@@ -778,9 +820,10 @@ java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-business-app.jar
 # 启动单点登录服务进程（授权服务器），如果业务应用需要单点登录时必须启动此进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-app.jar
 ```
-> 注：在使用Pulsar3.x的情况下，启动Java进程时需要添加VM启动参数--add-opens java.base/sun.net=ALL-UNNAMED
 
-### 2.4 关于OAuth2的授权登录流程
+
+## 6. 其他
+### 6.1 关于OAuth2的授权登录流程
 * Step1: 用户未登录，客户端请求获取授权码
 > 浏览器地址栏输入：  
 > http://127.0.0.1:8080/oauth2/authorize?client_id=oidc-client&response_type=code&scope=openid+profile+email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/oidc-client

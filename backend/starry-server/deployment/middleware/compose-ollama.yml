@@ -1,0 +1,17 @@
+services:
+  ollama:
+    image: ollama/ollama:0.24.0
+    container_name: ollama
+    hostname: ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    networks:
+      starry:
+        ipv4_address: 172.18.8.1
+    deploy:
+      resources:
+        limits:
+          memory: 6G
