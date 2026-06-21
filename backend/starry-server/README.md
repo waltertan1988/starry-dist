@@ -318,6 +318,23 @@ curl \
 > 命名空间：${app.pulsar.base-reg.namespace}
 
 
+#### 3.3.2 ElasticSearch添加IK分词器
+```shell
+# 进入容器内
+docker exec -it [ES的容器名称或id] /bin/bash
+./bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/8.19.15
+```
+
+#### 3.3.3 Ollama添加大模型
+```shell
+# 进入容器内
+docker exec -it [Ollama的容器名称或id] /bin/bash
+
+# 在容器内拉取大模型qwen3.5:4b和qwen3-embedding:4b
+ollama pull qwen3.5:4b
+ollama pull qwen3-embedding:4b
+```
+
 ## 4. 系统数据初始化
 待中间件服务启动成功后，可以初始化系统数据。
 
