@@ -89,7 +89,7 @@ sudo chown 10000 -R data
 #### 3.2.1 配置MYSQL
 MYSQL主库配置文件：
 cat ./data/mysql/master/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=1
 port=3306
@@ -103,6 +103,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -124,7 +129,7 @@ innodb_flush_log_at_trx_commit = 1  #事务提交刷盘，保证数据安全
 
 MYSQL从库1（MHA备主库）配置文件：
 cat ./data/mysql/slave1/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=2
 port=3306
@@ -138,6 +143,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -159,7 +169,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 
 MYSQL从库2（MHA普通从库）配置文件：
 cat ./data/mysql/slave2/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=3
 port=3306
@@ -173,6 +183,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -287,7 +302,7 @@ curl -o ./data/redis/single/conf/redis.conf https://raw.githubusercontent.com/re
 # 放行所有IP可访问
 # bind 127.0.0.1 -::1
 
-# 放行无password用户可从非本机的IP访问
+# 放行无password用户可从非本机的IP访问，可通过requirepass设置密码
 protected-mode no
 ```
 
