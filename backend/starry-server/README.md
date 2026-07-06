@@ -5,7 +5,7 @@
 ### 1.1 必须中间件
 * JDK-21
 * MySql-8.0.45
-* Redis-7.4.0-v8
+* Redis-8.2.7
 ### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
@@ -59,8 +59,8 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Reids相关目录
-sudo mkdir -p ./data/redis
+# Reids(单点部署)相关目录
+sudo mkdir -p ./data/redis/single/conf ./data/redis/single/data
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
@@ -265,7 +265,7 @@ rocketmq:
   name-server: ${app.middleware-host}:9876
 ```
 
-#### 3.2.2.3 如果消息队列采用Pulsar，还需要修改以下部署配置
+##### 3.2.2.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
 ```yaml
 services: 
@@ -274,6 +274,22 @@ services:
       - advertisedListeners=external:pulsar://192.168.10.131:6650
 ```
 > 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
+
+#### 3.2.3 配置Redis
+##### 3.2.3.1 下载默认的配置文件：
+```shell
+curl -o ./data/redis/single/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
+```
+> 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
+
+##### 3.2.3.2 找到以下配置值并修改为如下：
+```shell
+# 放行所有IP可访问
+# bind 127.0.0.1 -::1
+
+# 放行无password用户可从非本机的IP访问
+protected-mode no
+```
 
 ### 3.3 启动中间件服务
 参考：
