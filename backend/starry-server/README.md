@@ -304,6 +304,9 @@ curl -o ./data/redis/single/conf/redis.conf https://raw.githubusercontent.com/re
 
 # 放行无password用户可从非本机的IP访问，可通过requirepass设置密码
 protected-mode no
+
+# 禁用keys命令
+rename-command KEYS ""
 ```
 
 ### 3.3 启动中间件服务
