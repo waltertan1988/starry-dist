@@ -225,7 +225,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 		-------------  --------  ------------  ----------------  -------------------
 		binlog.000003     53320                                                     
 		
-	mysqldump --all-databases --master-data > dbdump.db
+	mysqldump --all-databases --master-data=2 --single-transaction > dbdump.db
 	
 从库slave1：
 	mysql < dbdump.db
@@ -302,11 +302,31 @@ curl -o ./data/redis/single/conf/redis.conf https://raw.githubusercontent.com/re
 # 放行所有IP可访问
 # bind 127.0.0.1 -::1
 
-# 放行无password用户可从非本机的IP访问，可通过requirepass设置密码
-protected-mode no
+# no可以放行无password用户可从非本机的IP访问，保护模式设置为yes时也可通过同时用requirepass设置密码让所有IP可以访问
+protected-mode yes
 
-# 禁用keys命令
+# 设置密码
+requirepass 123456
+
+# RDB/AOF文件的保存位置
+dir ./
+
+# RDB文件名称
+dbfilename dump.rdb
+
+# RDB自动备份策略（默认开启）
+save 3600 1 300 100 60
+
+# 开启AOF（注：务必先通过config set在线开启，待生成aof文件后，再修改配置文件，否则会丢失已有数据）
+appendonly yes
+
+# AOF文件的落盘策略
+appendfsync everysec
+
+# 禁用不安全的命令
 rename-command KEYS ""
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
 ```
 
 ### 3.3 启动中间件服务
