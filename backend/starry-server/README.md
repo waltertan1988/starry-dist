@@ -59,8 +59,9 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Reids(单点部署)相关目录
+# Redis(单点部署)、RedisInsight相关目录
 sudo mkdir -p ./data/redis/single/conf ./data/redis/single/data
+sudo mkdir -p ./data/redis/redisinsight
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
@@ -315,7 +316,7 @@ dir ./
 dbfilename dump.rdb
 
 # RDB自动备份策略（默认开启）
-save 3600 1 300 100 60
+save 3600 1 300 100 60 10000
 
 # 开启AOF（注：务必先通过config set在线开启，待生成aof文件后，再修改配置文件，否则会丢失已有数据）
 appendonly yes

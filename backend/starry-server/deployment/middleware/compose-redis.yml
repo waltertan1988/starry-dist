@@ -1,4 +1,26 @@
 services:
+#  redisinsight:
+#    image: redis/redisinsight:3.6.0
+#    container_name: redisinsight
+#    hostname: redisinsight
+#    ports:
+#      - "5540:5540"
+#    volumes:
+#      - ./data/redis/redisinsight:/data
+#    networks:
+#      starry:
+#        ipv4_address: 172.18.2.0
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://localhost:5540/api/health || exit 1" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 120s
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.20'
+
   redis-single:
     image: redis:8.2.7
     container_name: redis-single
@@ -13,7 +35,7 @@ services:
       starry:
         ipv4_address: 172.18.2.1
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG || exit 1"]
+      test: ["CMD-SHELL", "redis-cli -a 123456 ping | grep PONG || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 3
