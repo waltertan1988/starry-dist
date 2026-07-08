@@ -324,6 +324,10 @@ appendonly yes
 # AOF文件的落盘策略
 appendfsync everysec
 
+# AOF文件的重写策略
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
 # 禁用不安全的命令
 rename-command KEYS ""
 rename-command FLUSHDB ""
