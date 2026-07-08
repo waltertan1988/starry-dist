@@ -328,6 +328,12 @@ appendfsync everysec
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 64mb
 
+# 主从复制时，从节点配置主节点的ip和端口
+# replicaof <masterip> <masterport>
+
+# 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）
+masterauth 123456
+
 # 禁用不安全的命令
 rename-command KEYS ""
 rename-command FLUSHDB ""
