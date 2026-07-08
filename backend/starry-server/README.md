@@ -59,8 +59,9 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Redis(单点部署)、RedisInsight相关目录
-sudo mkdir -p ./data/redis/single/conf ./data/redis/single/data
+# Redis(主从复制)、RedisInsight相关目录
+sudo mkdir -p ./data/redis/replication/master/conf ./data/redis/replication/master/data
+sudo mkdir -p ./data/redis/replication/salve1/conf ./data/redis/replication/salve1/data
 sudo mkdir -p ./data/redis/redisinsight
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
@@ -328,10 +329,10 @@ appendfsync everysec
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 64mb
 
-# 主从复制时，从节点配置主节点的ip和端口
+# 主从复制时，从节点配置主节点的ip和端口。仅从节点需要配置。从节点可执行命令`replicaof no one`解除主从关系。
 # replicaof <masterip> <masterport>
 
-# 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）
+# 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
 masterauth 123456
 
 # 禁用不安全的命令
