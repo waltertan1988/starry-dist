@@ -335,6 +335,15 @@ auto-aof-rewrite-min-size 64mb
 # 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
 masterauth 123456
 
+# 从节点跟主节点临时断开时，主节点临时存放增量数据（用于从节点重新连接后进行部分复制）的临时缓存区大小
+# repl-backlog-size 1mb
+
+# 主节点在该时间内没有任何从节点连接上，则清空临时缓存区
+# repl-backlog-ttl 3600
+
+# 使用Sentinel进行主从故障转移时，从节点被提升为主节点的优先级，越小越优先，0表示永不提升为主节点
+replica-priority 100
+
 # 禁用不安全的命令
 rename-command KEYS ""
 rename-command FLUSHDB ""
