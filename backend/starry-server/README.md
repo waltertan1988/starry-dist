@@ -59,11 +59,15 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Redis(sentinel主从复制)、RedisInsight相关目录
+# RedisInsight相关目录
+sudo mkdir -p ./data/redis/redisinsight
+# Redis(主从复制)相关目录
+sudo mkdir -p ./data/redis/replication/master/conf ./data/redis/replication/master/data
+sudo mkdir -p ./data/redis/replication/salve1/conf ./data/redis/replication/salve1/data
+# Redis(sentinel哨兵模式)相关目录
 sudo mkdir -p ./data/redis/sentinel/master/conf ./data/redis/sentinel/master/data
 sudo mkdir -p ./data/redis/sentinel/salve1/conf ./data/redis/sentinel/salve1/data
 sudo mkdir -p ./data/redis/sentinel/salve2/conf ./data/redis/sentinel/salve2/data
-sudo mkdir -p ./data/redis/redisinsight
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
@@ -335,6 +339,9 @@ auto-aof-rewrite-min-size 64mb
 
 # 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
 masterauth 123456
+
+# 从节点是否只读
+replica-read-only yes
 
 # 从节点跟主节点临时断开时，主节点临时存放增量数据（用于从节点重新连接后进行部分复制）的临时缓存区大小
 # repl-backlog-size 1mb
