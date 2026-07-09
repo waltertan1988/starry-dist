@@ -298,13 +298,15 @@ services:
 > 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
 #### 3.2.3 配置Redis
-##### 3.2.3.1 下载默认的配置文件：
+##### 3.2.3.1 配置Redis-Server
+###### 3.2.3.1.1 下载默认的配置文件：
 ```shell
-curl -o ./data/redis/single/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
+curl -o ./data/redis/replication/master/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
+curl -o ./data/redis/replication/slave1/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
 ```
 > 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
 
-##### 3.2.3.2 找到以下配置值并修改为如下：
+###### 3.2.3.1.2 找到以下配置值并修改为如下：
 ```shell
 # 放行所有IP可访问
 # bind 127.0.0.1 -::1
@@ -314,6 +316,12 @@ protected-mode yes
 
 # 设置密码
 requirepass 123456
+
+# pid文件保存位置
+pidfile /var/run/redis_6379.pid
+
+# 日志文件位置
+logfile ""
 
 # RDB/AOF文件的保存位置
 dir ./
@@ -356,6 +364,14 @@ replica-priority 100
 rename-command KEYS ""
 rename-command FLUSHDB ""
 rename-command FLUSHALL ""
+```
+
+##### 3.2.3.2 配置Redis-Sentinel
+###### 3.2.3.2.1 下载默认的sentinel配置文件：
+```shell
+curl -o ./data/redis/sentinel/sentinel1/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/sentinel2/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/sentinel3/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 ```
 
 ### 3.3 启动中间件服务
