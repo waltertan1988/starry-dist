@@ -59,9 +59,10 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Redis(主从复制)、RedisInsight相关目录
-sudo mkdir -p ./data/redis/replication/master/conf ./data/redis/replication/master/data
-sudo mkdir -p ./data/redis/replication/salve1/conf ./data/redis/replication/salve1/data
+# Redis(sentinel主从复制)、RedisInsight相关目录
+sudo mkdir -p ./data/redis/sentinel/master/conf ./data/redis/sentinel/master/data
+sudo mkdir -p ./data/redis/sentinel/salve1/conf ./data/redis/sentinel/salve1/data
+sudo mkdir -p ./data/redis/sentinel/salve2/conf ./data/redis/sentinel/salve2/data
 sudo mkdir -p ./data/redis/redisinsight
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
