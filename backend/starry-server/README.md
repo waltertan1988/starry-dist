@@ -5,12 +5,14 @@
 ### 1.1 必须中间件
 * JDK-21
 * MySql-8.0.45
-* Redis-7.4.0-v8
+* Redis-8.2.7 (含redis-server、redis-sentinel)
 ### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
+* MySQL MHA(v0.58-2)
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
 * ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
 * Ollama(v0.24.0)
+* RedisInsight(v3.6.0)
 
 
 ## 2. 模块说明
@@ -59,8 +61,16 @@
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
 sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
-# Reids相关目录
-sudo mkdir -p ./data/redis
+# RedisInsight相关目录
+sudo mkdir -p ./data/redis/redisinsight
+# Redis(主从复制)相关目录
+sudo mkdir -p ./data/redis/replication/master/conf ./data/redis/replication/master/data
+sudo mkdir -p ./data/redis/replication/salve1/conf ./data/redis/replication/salve1/data
+# Redis(sentinel哨兵模式)相关目录
+sudo mkdir -p ./data/redis/sentinel/master/conf ./data/redis/sentinel/master/data
+sudo mkdir -p ./data/redis/sentinel/salve1/conf ./data/redis/sentinel/salve1/data
+sudo mkdir -p ./data/redis/sentinel/salve2/conf ./data/redis/sentinel/salve2/data
+sudo mkdir -p ./data/redis/sentinel/stl1 ./data/redis/sentinel/stl2 ./data/redis/sentinel/stl3
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
@@ -82,14 +92,14 @@ sudo mkdir -p ./data/apm/grafana
 # Ollama相关目录
 sudo mkdir -p ./data/ollama
 # this step might not be necessary on other than Linux platforms
-sudo chown 10000 -R data
+sudo chown 10000 -R ./data
 ```
 
 ### 3.2 配置中间件
 #### 3.2.1 配置MYSQL
 MYSQL主库配置文件：
 cat ./data/mysql/master/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=1
 port=3306
@@ -103,6 +113,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -124,7 +139,7 @@ innodb_flush_log_at_trx_commit = 1  #事务提交刷盘，保证数据安全
 
 MYSQL从库1（MHA备主库）配置文件：
 cat ./data/mysql/slave1/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=2
 port=3306
@@ -138,6 +153,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -159,7 +179,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 
 MYSQL从库2（MHA普通从库）配置文件：
 cat ./data/mysql/slave2/conf.d/config-file.cnf
-```
+```shell
 [mysqld]
 server_id=3
 port=3306
@@ -173,6 +193,11 @@ binlog_format=ROW
 binlog_expire_logs_seconds = 604800  	# binlog7天自动清理
 relay_log_recovery = 1  				# MHA必选：重启后自动恢复中继日志，避免复制中断
 #relay_log_purge = 0					# MHA下，relay_log_purge建议设置为0，保留从库的中继日志‌，以便在主库故障切换时，利用这些日志将其他滞后从库的数据补齐，确保集群数据一致性
+
+# 开启慢日志，日志名称由slow_query_log_file指定，由long_query_time指定超过多少秒为慢SQL
+slow_query_log=1
+# 慢管理语句也记录到慢日志里
+log_slow_admin_statements=1
 
 # 参与选主的节点建议开启（默认开启）
 #log_replica_updates=1
@@ -210,7 +235,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 		-------------  --------  ------------  ----------------  -------------------
 		binlog.000003     53320                                                     
 		
-	mysqldump --all-databases --master-data > dbdump.db
+	mysqldump --all-databases --master-data=2 --single-transaction > dbdump.db
 	
 从库slave1：
 	mysql < dbdump.db
@@ -265,7 +290,7 @@ rocketmq:
   name-server: ${app.middleware-host}:9876
 ```
 
-#### 3.2.2.3 如果消息队列采用Pulsar，还需要修改以下部署配置
+##### 3.2.2.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
 ```yaml
 services: 
@@ -274,6 +299,138 @@ services:
       - advertisedListeners=external:pulsar://192.168.10.131:6650
 ```
 > 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
+
+#### 3.2.3 配置Redis
+##### 3.2.3.1 配置Redis-Server
+###### 3.2.3.1.1 下载默认的配置文件：
+```shell
+curl -o ./data/redis/replication/master/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
+curl -o ./data/redis/replication/slave1/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
+```
+> 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
+
+###### 3.2.3.1.2 找到以下配置值并修改为如下：
+```shell
+# 放行所有IP可访问
+# bind 127.0.0.1 -::1
+
+# no可以放行无password用户可从非本机的IP访问，保护模式设置为yes时也可通过同时用requirepass设置密码让所有IP可以访问
+protected-mode yes
+
+# 设置密码
+requirepass 123456
+
+# pid文件保存位置
+pidfile /var/run/redis_6379.pid
+
+# 日志文件位置
+logfile ""
+
+# RDB/AOF文件的保存位置
+dir ./
+
+# RDB文件名称
+dbfilename dump.rdb
+
+# RDB自动备份策略（默认开启）
+save 3600 1 300 100 60 10000
+
+# 开启AOF（注：务必先通过config set在线开启，待生成aof文件后，再修改配置文件，否则会丢失已有数据）
+appendonly yes
+
+# AOF文件的落盘策略
+appendfsync everysec
+
+# AOF文件的重写策略
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
+# 主从复制时，从节点配置主节点的ip和端口。仅从节点需要配置。从节点可执行命令`replicaof no one`解除主从关系。
+# replicaof <masterip> <masterport>
+
+# 至少有1个从节点在线（最多延迟10秒）时，主节点才可以写入数据
+min-replicas-to-write 1
+min-replicas-max-lag 10
+
+# 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
+masterauth 123456
+
+# 从节点是否只读
+replica-read-only yes
+
+# 从节点跟主节点临时断开时，主节点临时存放增量数据（用于从节点重新连接后进行部分复制）的临时缓存区大小
+# repl-backlog-size 1mb
+
+# 主节点在该时间内没有任何从节点连接上，则清空临时缓存区
+# repl-backlog-ttl 3600
+
+# 使用Sentinel进行主从故障转移时，从节点被提升为主节点的优先级，越小越优先，0表示永不提升为主节点
+replica-priority 100
+
+# 禁用不安全的命令
+rename-command KEYS ""
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+```
+
+##### 3.2.3.2 配置Redis-Sentinel
+###### 3.2.3.2.1 下载默认的sentinel配置文件：
+```shell
+curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+```
+
+###### 3.2.3.2.2 找到以下配置值并修改为如下：
+```shell
+# pid文件位置
+pidfile /var/run/redis-sentinel.pid
+
+# sentinel的日志文件位置
+# logfile ""
+logfile "/usr/local/etc/redis/sentinel.log"
+
+# sentinel监控的redis主节点
+# sentinel monitor mymaster 127.0.0.1 6379 2
+sentinel monitor mymaster 172.18.2.1 6379 2
+
+# sentinel配置redis主节点的密码
+# sentinel auth-pass <master-name> <password>
+sentinel auth-pass mymaster 123456
+
+# redis主节点下线超过指定时间后被sentinel判定为S_DOWN
+# sentinel down-after-milliseconds mymaster 30000
+sentinel down-after-milliseconds mymaster 5000
+```
+
+###### 3.2.3.3 查看sentinel的运行信息
+查看启动日志：
+```shell
+root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log 
+1:X 10 Jul 2026 07:47:48.628 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1:X 10 Jul 2026 07:47:48.628 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:X 10 Jul 2026 07:47:48.628 * Redis version=8.2.7, bits=64, commit=00000000, modified=1, pid=1, just started
+1:X 10 Jul 2026 07:47:48.628 * Configuration loaded
+1:X 10 Jul 2026 07:47:48.629 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+1:X 10 Jul 2026 07:47:48.629 * monotonic clock: POSIX clock_gettime
+1:X 10 Jul 2026 07:47:48.638 * Running mode=sentinel, port=26379.
+1:X 10 Jul 2026 07:47:48.641 * Sentinel ID is 853a3e558885aee07661ffd62d57bf8246e9a936
+1:X 10 Jul 2026 07:47:48.641 # +monitor master mymaster 172.18.2.1 6379 quorum 2
+```
+
+查看sentinel信息
+```shell
+root@redis-sentinel-1:/data# redis-cli -p 26379 info | tail
+# Sentinel
+sentinel_masters:1
+sentinel_tilt:0
+sentinel_tilt_since_seconds:-1
+sentinel_total_tilt:0
+sentinel_running_scripts:0
+sentinel_scripts_queue_length:0
+sentinel_simulate_failure_flags:0
+master0:name=mymaster,status=ok,address=172.18.2.1:6379,slaves=2,sentinels=3
+```
 
 ### 3.3 启动中间件服务
 参考：
