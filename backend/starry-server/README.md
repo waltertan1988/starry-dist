@@ -302,14 +302,14 @@ services:
 
 #### 3.2.3 配置Redis
 ##### 3.2.3.1 配置Redis-Server
-###### 3.2.3.1.1 下载默认的配置文件：
+###### 3.2.3.1.1 下载默认的配置文件
 ```shell
 curl -o ./data/redis/replication/master/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
 curl -o ./data/redis/replication/slave1/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
 ```
 > 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
 
-###### 3.2.3.1.2 找到以下配置值并修改为如下：
+###### 3.2.3.1.2 找到以下配置值并修改为如下
 ```shell
 # 放行所有IP可访问
 # bind 127.0.0.1 -::1
@@ -373,15 +373,15 @@ rename-command FLUSHDB ""
 rename-command FLUSHALL ""
 ```
 
-##### 3.2.3.2 配置Redis-Sentinel
-###### 3.2.3.2.1 下载默认的sentinel配置文件：
+##### 3.2.3.2 Redis-Sentinel使用
+###### 3.2.3.2.1 下载默认的sentinel配置文件
 ```shell
 curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 ```
 
-###### 3.2.3.2.2 找到以下配置值并修改为如下：
+###### 3.2.3.2.2 找到以下配置值并修改为如下
 ```shell
 # pid文件位置
 pidfile /var/run/redis-sentinel.pid
@@ -416,6 +416,13 @@ root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log
 1:X 10 Jul 2026 07:47:48.638 * Running mode=sentinel, port=26379.
 1:X 10 Jul 2026 07:47:48.641 * Sentinel ID is 853a3e558885aee07661ffd62d57bf8246e9a936
 1:X 10 Jul 2026 07:47:48.641 # +monitor master mymaster 172.18.2.1 6379 quorum 2
+```
+
+###### 3.2.3.4 通过sentinel在线切换主节点
+进入sentinel节点的redis客户端里，执行`sentinel failover <master-name>`命令：
+```shell
+root@redis-sentinel-1:~#  redis-cli -p 26379
+127.0.0.1:26379> sentinel failover mymaster
 ```
 
 查看sentinel信息
