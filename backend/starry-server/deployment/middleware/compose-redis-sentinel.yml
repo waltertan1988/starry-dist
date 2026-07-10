@@ -74,3 +74,84 @@ services:
       resources:
         limits:
           cpus: '0.20'
+
+  redis-sentinel-1:
+    image: redis:8.2.7
+    container_name: redis-sentinel-1
+    hostname: redis-sentinel-1
+    ports:
+      - "26379:26379"
+    volumes:
+      - ./data/redis/sentinel/stl1:/usr/local/etc/redis
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf"
+    networks:
+      starry:
+        ipv4_address: 172.18.2.4
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 26379 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-sentinel-2:
+    image: redis:8.2.7
+    container_name: redis-sentinel-2
+    hostname: redis-sentinel-2
+    ports:
+      - "26380:26379"
+    volumes:
+      - ./data/redis/sentinel/stl2:/usr/local/etc/redis
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf"
+    networks:
+      starry:
+        ipv4_address: 172.18.2.5
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 26379 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-sentinel-3:
+    image: redis:8.2.7
+    container_name: redis-sentinel-3
+    hostname: redis-sentinel-3
+    ports:
+      - "26381:26379"
+    volumes:
+      - ./data/redis/sentinel/stl3:/usr/local/etc/redis
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf"
+    networks:
+      starry:
+        ipv4_address: 172.18.2.6
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 26379 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'

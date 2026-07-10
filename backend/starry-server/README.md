@@ -5,12 +5,14 @@
 ### 1.1 必须中间件
 * JDK-21
 * MySql-8.0.45
-* Redis-8.2.7
+* Redis-8.2.7 (含redis-server、redis-sentinel)
 ### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
+* MySQL MHA(v0.58-2)
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
 * ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
 * Ollama(v0.24.0)
+* RedisInsight(v3.6.0)
 
 
 ## 2. 模块说明
@@ -68,6 +70,7 @@ sudo mkdir -p ./data/redis/replication/salve1/conf ./data/redis/replication/salv
 sudo mkdir -p ./data/redis/sentinel/master/conf ./data/redis/sentinel/master/data
 sudo mkdir -p ./data/redis/sentinel/salve1/conf ./data/redis/sentinel/salve1/data
 sudo mkdir -p ./data/redis/sentinel/salve2/conf ./data/redis/sentinel/salve2/data
+sudo mkdir -p ./data/redis/sentinel/stl1 ./data/redis/sentinel/stl2 ./data/redis/sentinel/stl3
 # MySQL相关目录
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
@@ -89,7 +92,7 @@ sudo mkdir -p ./data/apm/grafana
 # Ollama相关目录
 sudo mkdir -p ./data/ollama
 # this step might not be necessary on other than Linux platforms
-sudo chown 10000 -R data
+sudo chown 10000 -R ./data
 ```
 
 ### 3.2 配置中间件
@@ -345,6 +348,10 @@ auto-aof-rewrite-min-size 64mb
 # 主从复制时，从节点配置主节点的ip和端口。仅从节点需要配置。从节点可执行命令`replicaof no one`解除主从关系。
 # replicaof <masterip> <masterport>
 
+# 至少有1个从节点在线（最多延迟10秒）时，主节点才可以写入数据
+min-replicas-to-write 1
+min-replicas-max-lag 10
+
 # 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
 masterauth 123456
 
@@ -369,9 +376,60 @@ rename-command FLUSHALL ""
 ##### 3.2.3.2 配置Redis-Sentinel
 ###### 3.2.3.2.1 下载默认的sentinel配置文件：
 ```shell
-curl -o ./data/redis/sentinel/sentinel1/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
-curl -o ./data/redis/sentinel/sentinel2/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
-curl -o ./data/redis/sentinel/sentinel3/conf/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
+```
+
+###### 3.2.3.2.2 找到以下配置值并修改为如下：
+```shell
+# pid文件位置
+pidfile /var/run/redis-sentinel.pid
+
+# sentinel的日志文件位置
+# logfile ""
+logfile "/usr/local/etc/redis/sentinel.log"
+
+# sentinel监控的redis主节点
+# sentinel monitor mymaster 127.0.0.1 6379 2
+sentinel monitor mymaster 172.18.2.1 6379 2
+
+# sentinel配置redis主节点的密码
+# sentinel auth-pass <master-name> <password>
+sentinel auth-pass mymaster 123456
+
+# redis主节点下线超过指定时间后被sentinel判定为S_DOWN
+# sentinel down-after-milliseconds mymaster 30000
+sentinel down-after-milliseconds mymaster 5000
+```
+
+###### 3.2.3.3 查看sentinel的运行信息
+查看启动日志：
+```shell
+root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log 
+1:X 10 Jul 2026 07:47:48.628 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1:X 10 Jul 2026 07:47:48.628 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:X 10 Jul 2026 07:47:48.628 * Redis version=8.2.7, bits=64, commit=00000000, modified=1, pid=1, just started
+1:X 10 Jul 2026 07:47:48.628 * Configuration loaded
+1:X 10 Jul 2026 07:47:48.629 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+1:X 10 Jul 2026 07:47:48.629 * monotonic clock: POSIX clock_gettime
+1:X 10 Jul 2026 07:47:48.638 * Running mode=sentinel, port=26379.
+1:X 10 Jul 2026 07:47:48.641 * Sentinel ID is 853a3e558885aee07661ffd62d57bf8246e9a936
+1:X 10 Jul 2026 07:47:48.641 # +monitor master mymaster 172.18.2.1 6379 quorum 2
+```
+
+查看sentinel信息
+```shell
+root@redis-sentinel-1:/data# redis-cli -p 26379 info | tail
+# Sentinel
+sentinel_masters:1
+sentinel_tilt:0
+sentinel_tilt_since_seconds:-1
+sentinel_total_tilt:0
+sentinel_running_scripts:0
+sentinel_scripts_queue_length:0
+sentinel_simulate_failure_flags:0
+master0:name=mymaster,status=ok,address=172.18.2.1:6379,slaves=2,sentinels=3
 ```
 
 ### 3.3 启动中间件服务
