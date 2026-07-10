@@ -17,6 +17,12 @@ services:
         ipv4_address: 172.18.1.1
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -u root | grep -q 'mysqld is alive' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     deploy:
       resources:
         limits:
@@ -39,7 +45,14 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
     depends_on:
-      - mysql-master
+      mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -u root | grep -q 'mysqld is alive' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     deploy:
       resources:
         limits:
@@ -62,7 +75,14 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
     depends_on:
-      - mysql-master
+      mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -u root | grep -q 'mysqld is alive' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     deploy:
       resources:
         limits:

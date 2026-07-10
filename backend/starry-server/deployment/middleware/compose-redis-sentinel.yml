@@ -43,7 +43,8 @@ services:
       retries: 3
       start_period: 5s
     depends_on:
-      - redis-master
+      redis-master:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -69,7 +70,8 @@ services:
       retries: 3
       start_period: 5s
     depends_on:
-      - redis-master
+      redis-master:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -94,9 +96,12 @@ services:
       retries: 3
       start_period: 5s
     depends_on:
-      - redis-master
-      - redis-slave1
-      - redis-slave2
+      redis-master:
+        condition: service_healthy
+      redis-slave1:
+        condition: service_healthy
+      redis-slave2:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -121,9 +126,12 @@ services:
       retries: 3
       start_period: 5s
     depends_on:
-      - redis-master
-      - redis-slave1
-      - redis-slave2
+      redis-master:
+        condition: service_healthy
+      redis-slave1:
+        condition: service_healthy
+      redis-slave2:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -148,9 +156,12 @@ services:
       retries: 3
       start_period: 5s
     depends_on:
-      - redis-master
-      - redis-slave1
-      - redis-slave2
+      redis-master:
+        condition: service_healthy
+      redis-slave1:
+        condition: service_healthy
+      redis-slave2:
+        condition: service_healthy
     deploy:
       resources:
         limits:
