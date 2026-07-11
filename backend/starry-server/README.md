@@ -10,48 +10,48 @@
 * Docker Compose（建议本地开发时使用）
 * MySQL MHA(v0.58-2)
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
-* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
+* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana)
 * Ollama(v0.24.0)
 * RedisInsight(v3.6.0)
 
 
 ## 2. 模块说明
-### 2.1. starry-authorization-server-app  
-   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
+### 2.1. starry-authorization-server-app
+一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
 
-### 2.2. starry-mcp-server-app  
-   一个MCP服务提供者应用示例，可直接启动。
+### 2.2. starry-mcp-server-app
+一个MCP服务提供者应用示例，可直接启动。
 
-### 2.3. starry-business-app  
-  一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
-  注意：
-   * 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
-   * 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
+### 2.3. starry-business-app
+一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
+注意：
+* 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
+* 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
 
-### 2.4. starry-security-spring-boot-autoconfigure  
-   Spring Security认证与授权相关的基础配置模块，核心功能包括：
-   * 身份认证，包括：本地登录、OAuth2的单点登录、登出
-   * 提供了用户、角色、菜单、权限等管理功能端点
+### 2.4. starry-security-spring-boot-autoconfigure
+Spring Security认证与授权相关的基础配置模块，核心功能包括：
+* 身份认证，包括：本地登录、OAuth2的单点登录、登出
+* 提供了用户、角色、菜单、权限等管理功能端点
 
-### 2.5. starry-authorization-server-spring-boot-autoconfigure  
-   在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
+### 2.5. starry-authorization-server-spring-boot-autoconfigure
+在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
-### 2.6. starry-common-lib  
-   集成全局的公共基础类的内嵌模块，被其他模块所依赖。
+### 2.6. starry-common-lib
+集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
-### 2.7. starry-ai-spring-boot-autoconfigure  
-   集成Spring AI的基础能力，被其他模块所依赖。
+### 2.7. starry-ai-spring-boot-autoconfigure
+集成Spring AI的基础能力，被其他模块所依赖。
 
-### 2.8. starry-mcp-server-remote  
-   定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
+### 2.8. starry-mcp-server-remote
+定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
 
-### 2.9. starry-mdc-spring-boot-autoconfigure  
-   提供日志调用链路的跟踪能力。已支持的组件有：
-   * Web过滤器
-   * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
-   * MQ消费者（包括Redis、Pulsar、RocketMQ）
-   * Reactor内置线程池，包括WebFlux任务
-   * SpringAI的MCP服务（streamable-http方式）
+### 2.9. starry-mdc-spring-boot-autoconfigure
+提供日志调用链路的跟踪能力。已支持的组件有：
+* Web过滤器
+* 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
+* MQ消费者（包括Redis、Pulsar、RocketMQ）
+* Reactor内置线程池，包括WebFlux任务
+* SpringAI的MCP服务（streamable-http方式）
 
 
 ## 3. 部署中间件
@@ -253,7 +253,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 >（3）[如何配置半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)  
 >（4）[允许停机的情况下，如何配置GTID复制](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html)  
 >（5）[设置数据源为只读并备份数据](https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html)  
->（6）[如何搭建MHA高可用集群](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/MySQL8-MHA.md)  
+>（6）[如何搭建MHA高可用集群](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/MySQL8-MHA.md)
 
 #### 3.2.2 消息队列配置
 ##### 3.2.2.1 如果消息队列采用Redis，还需要修改以下部署配置
@@ -307,7 +307,7 @@ services:
 curl -o ./data/redis/replication/master/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
 curl -o ./data/redis/replication/slave1/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
 ```
-> 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
+> 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)
 
 ###### 3.2.3.1.2 找到以下配置值并修改为如下
 ```shell
@@ -373,7 +373,84 @@ rename-command FLUSHDB ""
 rename-command FLUSHALL ""
 ```
 
+###### 3.2.3.1.3 查看主从复制信息
+查看主节点信息：
+```shell
+root@redis-slave1:/data# redis-cli -p 6379 -a 123456
+127.0.0.1:6379> info replication
+# Replication
+role:master
+connected_slaves:2
+min_slaves_good_slaves:2
+slave0:ip=192.168.100.42,port=6381,state=online,offset=34643,lag=0
+slave1:ip=192.168.100.42,port=6380,state=online,offset=34643,lag=0
+master_failover_state:no-failover
+master_replid:4bafdd8d908ee15beb5b5f2f1bb401630e03dc56
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:34786
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:34786
+127.0.0.1:6379>
+127.0.0.1:6379> role
+1) "master"
+2) (integer) 60383
+3) 1) 1) "192.168.100.42"
+      2) "6381"
+      3) "60383"
+   2) 1) "192.168.100.42"
+      2) "6380"
+      3) "60240"
+````
+
+查看从节点信息：
+```shell
+root@redis-slave1:/data# redis-cli -p 6380 -a 123456
+127.0.0.1:6380> info replication
+# Replication
+role:slave
+master_host:192.168.100.42
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:0
+master_sync_in_progress:0
+slave_read_repl_offset:71251
+slave_repl_offset:71251
+replica_full_sync_buffer_size:0
+replica_full_sync_buffer_peak:0
+master_current_sync_attempts:1
+master_total_sync_attempts:1
+master_link_up_since_seconds:334
+total_disconnect_time_sec:0
+slave_priority:90
+slave_read_only:1
+replica_announced:1
+connected_slaves:0
+min_slaves_good_slaves:0
+master_failover_state:no-failover
+master_replid:4bafdd8d908ee15beb5b5f2f1bb401630e03dc56
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:71251
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:15
+repl_backlog_histlen:71237
+127.0.0.1:6380> 
+127.0.0.1:6380> role
+1) "slave"
+2) "192.168.100.42"
+3) (integer) 6379
+4) "connected"
+5) (integer) 72681
+
+```
+
 ##### 3.2.3.2 Redis-Sentinel使用
+注意：使用docker部署redis哨兵模式时，网络模式需要改用host模式，原因参考[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/#sentinel-docker-nat-and-possible-issues)
+
 ###### 3.2.3.2.1 下载默认的sentinel配置文件
 ```shell
 curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
@@ -391,8 +468,7 @@ pidfile /var/run/redis-sentinel.pid
 logfile "/usr/local/etc/redis/sentinel.log"
 
 # sentinel监控的redis主节点
-# sentinel monitor mymaster 127.0.0.1 6379 2
-sentinel monitor mymaster 172.18.2.1 6379 2
+sentinel monitor mymaster 127.0.0.1 6379 2
 
 # sentinel配置redis主节点的密码
 # sentinel auth-pass <master-name> <password>
@@ -418,25 +494,26 @@ root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log
 1:X 10 Jul 2026 07:47:48.641 # +monitor master mymaster 172.18.2.1 6379 quorum 2
 ```
 
+查看sentinel信息：
+```shell
+root@redis-slave1:/data# redis-cli -p 26380
+127.0.0.1:26380> info sentinel
+# Sentinel
+sentinel_masters:1
+sentinel_tilt:0
+sentinel_tilt_since_seconds:-1
+sentinel_total_tilt:1
+sentinel_running_scripts:0
+sentinel_scripts_queue_length:0
+sentinel_simulate_failure_flags:0
+master0:name=mymaster,status=ok,address=192.168.100.42:6379,slaves=2,sentinels=3
+```
+
 ###### 3.2.3.4 通过sentinel在线切换主节点
 进入sentinel节点的redis客户端里，执行`sentinel failover <master-name>`命令：
 ```shell
 root@redis-sentinel-1:~#  redis-cli -p 26379
 127.0.0.1:26379> sentinel failover mymaster
-```
-
-查看sentinel信息
-```shell
-root@redis-sentinel-1:/data# redis-cli -p 26379 info | tail
-# Sentinel
-sentinel_masters:1
-sentinel_tilt:0
-sentinel_tilt_since_seconds:-1
-sentinel_total_tilt:0
-sentinel_running_scripts:0
-sentinel_scripts_queue_length:0
-sentinel_simulate_failure_flags:0
-master0:name=mymaster,status=ok,address=172.18.2.1:6379,slaves=2,sentinels=3
 ```
 
 ### 3.3 启动中间件服务
@@ -1026,7 +1103,7 @@ http://127.0.0.1:8080/login/oauth2/code/oidc-client?code=KchrQNG1pmQaMdFKh1sT7QS
             redirect_uri=[预设的重定向地址]
 ```
 
-* Step5: 刷新令牌  
+* Step5: 刷新令牌
 ```text
 [Post]      http://127.0.0.1:8080/oauth2/token
 [Header]    Authorization=Basic [[[clientId]:[clientSecret]]的Base64编码值]
