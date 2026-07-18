@@ -96,10 +96,10 @@ sudo chown 10000 -R ./data
 ```
 
 ### 3.2 配置中间件
-#### 3.2.1 配置MYSQL
+#### 3.2.1 MySQL的配置和管理
 关于MySQL的多种HA部署方式，请参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/mysql/README.md)
 
-#### 3.2.2 配置并使用Redis
+#### 3.2.2 Redis的配置和管理
 关于Redis的多种HA部署方式，请参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/redis/README.md)
 
 #### 3.2.3 消息队列配置

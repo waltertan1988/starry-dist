@@ -220,3 +220,6 @@ master0:name=mymaster,status=ok,address=192.168.100.42:6379,slaves=2,sentinels=3
 root@redis-sentinel-1:~#  redis-cli -p 26379
 127.0.0.1:26379> sentinel failover mymaster
 ```
+
+## 三、配置并使用Redis-Cluster模式
+待补充
