@@ -59,10 +59,18 @@ spring:
   data:
     # Redis
     redis:
-      host: ${app.middleware-host}
-      port: 6379
       database: 0
       password: '123456'
+      # 单机配置
+#      host: ${app.middleware-host}
+#      port: 6379
+      # sentinel配置
+      sentinel:
+        master: mymaster
+        nodes:
+          - ${app.middleware-host}:26379
+          - ${app.middleware-host}:26380
+          - ${app.middleware-host}:26381
       lettuce:
         pool:
           max-active: 300

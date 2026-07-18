@@ -10,52 +10,52 @@
 * Docker Compose（建议本地开发时使用）
 * MySQL MHA(v0.58-2)
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
-* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana) 
+* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana)
 * Ollama(v0.24.0)
 * RedisInsight(v3.6.0)
 
 
 ## 2. 模块说明
-### 2.1. starry-authorization-server-app  
-   一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
+### 2.1. starry-authorization-server-app
+一个直接依赖starry-authorization-server-spring-boot-autoconfigure能力的后台应用示例，可直接启动。
 
-### 2.2. starry-mcp-server-app  
-   一个MCP服务提供者应用示例，可直接启动。
+### 2.2. starry-mcp-server-app
+一个MCP服务提供者应用示例，可直接启动。
 
-### 2.3. starry-business-app  
-  一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
-  注意：
-   * 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
-   * 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
+### 2.3. starry-business-app
+一个直接依赖starry-security-spring-boot-autoconfigure能力的后台应用示例，可直接启动。  
+注意：
+* 如需接入OAuth2 SSO单点登录服务，请确保先把starry-authorization-server-app服务启动起来。
+* 如需调用大模型的MCP服务示例，请确保先把starry-mcp-server-app服务启动起来。
 
-### 2.4. starry-security-spring-boot-autoconfigure  
-   Spring Security认证与授权相关的基础配置模块，核心功能包括：
-   * 身份认证，包括：本地登录、OAuth2的单点登录、登出
-   * 提供了用户、角色、菜单、权限等管理功能端点
+### 2.4. starry-security-spring-boot-autoconfigure
+Spring Security认证与授权相关的基础配置模块，核心功能包括：
+* 身份认证，包括：本地登录、OAuth2的单点登录、登出
+* 提供了用户、角色、菜单、权限等管理功能端点
 
-### 2.5. starry-authorization-server-spring-boot-autoconfigure  
-   在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
+### 2.5. starry-authorization-server-spring-boot-autoconfigure
+在starry-security-spring-boot-autoconfigure的基础上，补充提供了OAuth2授权服务器特性的基础配置模块，也可以为其他业务系统提供统一单点登录的认证服务。
 
-### 2.6. starry-common-lib  
-   集成全局的公共基础类的内嵌模块，被其他模块所依赖。
+### 2.6. starry-common-lib
+集成全局的公共基础类的内嵌模块，被其他模块所依赖。
 
-### 2.7. starry-ai-spring-boot-autoconfigure  
-   集成Spring AI的基础能力，被其他模块所依赖。
+### 2.7. starry-ai-spring-boot-autoconfigure
+集成Spring AI的基础能力，被其他模块所依赖。
 
-### 2.8. starry-mcp-server-remote  
-   定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
+### 2.8. starry-mcp-server-remote
+定义MCP服务的接口返回格式，通常被mcp服务提供者或大模型客户端所依赖。
 
-### 2.9. starry-mdc-spring-boot-autoconfigure  
-   提供日志调用链路的跟踪能力。已支持的组件有：
-   * Web过滤器
-   * 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
-   * MQ消费者（包括Redis、Pulsar、RocketMQ）
-   * Reactor内置线程池，包括WebFlux任务
-   * SpringAI的MCP服务（streamable-http方式）
+### 2.9. starry-mdc-spring-boot-autoconfigure
+提供日志调用链路的跟踪能力。已支持的组件有：
+* Web过滤器
+* 可扩展的虚拟线程池：ExtendedVirtualThreadExecutorService
+* MQ消费者（包括Redis、Pulsar、RocketMQ）
+* Reactor内置线程池，包括WebFlux任务
+* SpringAI的MCP服务（streamable-http方式）
 
 
 ## 3. 部署中间件
-假设中间件的宿主机IP是192.168.10.131，且采用docker compose部署各种中间件，入口文件为compose.yml
+假设下文提到的中间件的宿主机IP都是192.168.100.42，且采用docker compose部署各种中间件，入口文件为compose.yml
 
 ### 3.1 宿主机上准备各中间件的待挂载目录
 ```shell
@@ -253,7 +253,7 @@ innodb_flush_log_at_trx_commit = 1  # 事务提交刷盘，保证数据安全
 >（3）[如何配置半同步复制](https://dev.mysql.com/doc/refman/8.0/en/replication-semisync.html)  
 >（4）[允许停机的情况下，如何配置GTID复制](https://dev.mysql.com/doc/refman/8.0/en/replication-gtids-howto.html)  
 >（5）[设置数据源为只读并备份数据](https://dev.mysql.com/doc/refman/8.0/en/replication-solutions-backups-read-only.html)  
->（6）[如何搭建MHA高可用集群](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/MySQL8-MHA.md)  
+>（6）[如何搭建MHA高可用集群](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/MySQL8-MHA.md)
 
 #### 3.2.2 消息队列配置
 ##### 3.2.2.1 如果消息队列采用Redis，还需要修改以下部署配置
@@ -279,7 +279,7 @@ brokerRole = ASYNC_MASTER
 flushDiskType = ASYNC_FLUSH
 
 # 需按宿主机IP修改此配置
-brokerIP1 = 192.168.10.131
+brokerIP1 = 192.168.100.42
 # 是否自动创建主题，生产环境建议禁用
 autoCreateTopicEnable = true
 ```
@@ -296,141 +296,12 @@ rocketmq:
 services: 
   broker: 
     environment: 
-      - advertisedListeners=external:pulsar://192.168.10.131:6650
+      - advertisedListeners=external:pulsar://192.168.100.42:6650
 ```
 > 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
-#### 3.2.3 配置Redis
-##### 3.2.3.1 配置Redis-Server
-###### 3.2.3.1.1 下载默认的配置文件：
-```shell
-curl -o ./data/redis/replication/master/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
-curl -o ./data/redis/replication/slave1/conf/redis.conf https://raw.githubusercontent.com/redis/redis/8.2/redis.conf
-```
-> 参考：[官方配置说明](https://redis.io/docs/latest/operate/oss_and_stack/management/config/)  
-
-###### 3.2.3.1.2 找到以下配置值并修改为如下：
-```shell
-# 放行所有IP可访问
-# bind 127.0.0.1 -::1
-
-# no可以放行无password用户可从非本机的IP访问，保护模式设置为yes时也可通过同时用requirepass设置密码让所有IP可以访问
-protected-mode yes
-
-# 设置密码
-requirepass 123456
-
-# pid文件保存位置
-pidfile /var/run/redis_6379.pid
-
-# 日志文件位置
-logfile ""
-
-# RDB/AOF文件的保存位置
-dir ./
-
-# RDB文件名称
-dbfilename dump.rdb
-
-# RDB自动备份策略（默认开启）
-save 3600 1 300 100 60 10000
-
-# 开启AOF（注：务必先通过config set在线开启，待生成aof文件后，再修改配置文件，否则会丢失已有数据）
-appendonly yes
-
-# AOF文件的落盘策略
-appendfsync everysec
-
-# AOF文件的重写策略
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 64mb
-
-# 主从复制时，从节点配置主节点的ip和端口。仅从节点需要配置。从节点可执行命令`replicaof no one`解除主从关系。
-# replicaof <masterip> <masterport>
-
-# 至少有1个从节点在线（最多延迟10秒）时，主节点才可以写入数据
-min-replicas-to-write 1
-min-replicas-max-lag 10
-
-# 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
-masterauth 123456
-
-# 从节点是否只读
-replica-read-only yes
-
-# 从节点跟主节点临时断开时，主节点临时存放增量数据（用于从节点重新连接后进行部分复制）的临时缓存区大小
-# repl-backlog-size 1mb
-
-# 主节点在该时间内没有任何从节点连接上，则清空临时缓存区
-# repl-backlog-ttl 3600
-
-# 使用Sentinel进行主从故障转移时，从节点被提升为主节点的优先级，越小越优先，0表示永不提升为主节点
-replica-priority 100
-
-# 禁用不安全的命令
-rename-command KEYS ""
-rename-command FLUSHDB ""
-rename-command FLUSHALL ""
-```
-
-##### 3.2.3.2 配置Redis-Sentinel
-###### 3.2.3.2.1 下载默认的sentinel配置文件：
-```shell
-curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
-curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
-curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
-```
-
-###### 3.2.3.2.2 找到以下配置值并修改为如下：
-```shell
-# pid文件位置
-pidfile /var/run/redis-sentinel.pid
-
-# sentinel的日志文件位置
-# logfile ""
-logfile "/usr/local/etc/redis/sentinel.log"
-
-# sentinel监控的redis主节点
-# sentinel monitor mymaster 127.0.0.1 6379 2
-sentinel monitor mymaster 172.18.2.1 6379 2
-
-# sentinel配置redis主节点的密码
-# sentinel auth-pass <master-name> <password>
-sentinel auth-pass mymaster 123456
-
-# redis主节点下线超过指定时间后被sentinel判定为S_DOWN
-# sentinel down-after-milliseconds mymaster 30000
-sentinel down-after-milliseconds mymaster 5000
-```
-
-###### 3.2.3.3 查看sentinel的运行信息
-查看启动日志：
-```shell
-root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log 
-1:X 10 Jul 2026 07:47:48.628 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
-1:X 10 Jul 2026 07:47:48.628 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-1:X 10 Jul 2026 07:47:48.628 * Redis version=8.2.7, bits=64, commit=00000000, modified=1, pid=1, just started
-1:X 10 Jul 2026 07:47:48.628 * Configuration loaded
-1:X 10 Jul 2026 07:47:48.629 * Increased maximum number of open files to 10032 (it was originally set to 1024).
-1:X 10 Jul 2026 07:47:48.629 * monotonic clock: POSIX clock_gettime
-1:X 10 Jul 2026 07:47:48.638 * Running mode=sentinel, port=26379.
-1:X 10 Jul 2026 07:47:48.641 * Sentinel ID is 853a3e558885aee07661ffd62d57bf8246e9a936
-1:X 10 Jul 2026 07:47:48.641 # +monitor master mymaster 172.18.2.1 6379 quorum 2
-```
-
-查看sentinel信息
-```shell
-root@redis-sentinel-1:/data# redis-cli -p 26379 info | tail
-# Sentinel
-sentinel_masters:1
-sentinel_tilt:0
-sentinel_tilt_since_seconds:-1
-sentinel_total_tilt:0
-sentinel_running_scripts:0
-sentinel_scripts_queue_length:0
-sentinel_simulate_failure_flags:0
-master0:name=mymaster,status=ok,address=172.18.2.1:6379,slaves=2,sentinels=3
-```
+#### 3.2.3 配置并使用Redis
+关于Redis的多种部署方式，请参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/redis/README.md)
 
 ### 3.3 启动中间件服务
 参考：
@@ -469,8 +340,8 @@ curl \
 （3）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
 * 创建环境
 > Environment Name：dev  
-> Service URL：http://192.168.10.131:8080  
-> Bookie URL：http://192.168.10.131:6650  
+> Service URL：http://192.168.100.42:8080  
+> Bookie URL：http://192.168.100.42:6650  
 > 租户：${app.pulsar.base-reg.tenant}
 > 命名空间：${app.pulsar.base-reg.namespace}
 
@@ -971,17 +842,18 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 
 
 ## 5. 启动应用进程
-### 5.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
+### 5.1 按需修改以下springboot应用配置
 * application.yml
 ```yaml
 app:
-  middleware-host: 192.168.10.131
+  # 指定中间件的宿主机IP，便于测试
+  middleware-host: 192.168.100.42
 ```
 
 * redisson.yml
 ```yaml
 singleServerConfig:
-  address: "redis://192.168.10.131:6379"
+  address: "redis://192.168.100.42:6379"
 ```
 
 ### 5.2 启动springboot应用时，添加以下vm参数
@@ -1019,7 +891,7 @@ http://127.0.0.1:8080/login/oauth2/code/oidc-client?code=KchrQNG1pmQaMdFKh1sT7QS
             redirect_uri=[预设的重定向地址]
 ```
 
-* Step5: 刷新令牌  
+* Step5: 刷新令牌
 ```text
 [Post]      http://127.0.0.1:8080/oauth2/token
 [Header]    Authorization=Basic [[[clientId]:[clientSecret]]的Base64编码值]

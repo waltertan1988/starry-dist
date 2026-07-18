@@ -97,7 +97,7 @@ public class RedisConfig {
 
         public RedissonConfiguration() throws IOException {
             URL resource = RedissonConfiguration.class.getClassLoader().getResource(CONFIG_FILE);
-            log.info("Reading redisson config file:{}", resource);
+            log.info("Reading redisson config file: {}", resource);
             Config config = Config.fromYAML(resource);
             redissonClient = Redisson.create(config);
         }
