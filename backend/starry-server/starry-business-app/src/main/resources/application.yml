@@ -1,6 +1,6 @@
 app:
   # 中间件所在主机（仅用于集中管理本配置文件上下文的配置，非必须）
-  middleware-host: 192.168.10.131
+  middleware-host: 192.168.100.42
 
 server:
   port: 8080

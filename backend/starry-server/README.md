@@ -55,7 +55,7 @@ Spring Security认证与授权相关的基础配置模块，核心功能包括�
 
 
 ## 3. 部署中间件
-假设中间件的宿主机IP是192.168.10.131，且采用docker compose部署各种中间件，入口文件为compose.yml
+假设下文提到的中间件的宿主机IP都是192.168.100.42，且采用docker compose部署各种中间件，入口文件为compose.yml
 
 ### 3.1 宿主机上准备各中间件的待挂载目录
 ```shell
@@ -279,7 +279,7 @@ brokerRole = ASYNC_MASTER
 flushDiskType = ASYNC_FLUSH
 
 # 需按宿主机IP修改此配置
-brokerIP1 = 192.168.10.131
+brokerIP1 = 192.168.100.42
 # 是否自动创建主题，生产环境建议禁用
 autoCreateTopicEnable = true
 ```
@@ -296,7 +296,7 @@ rocketmq:
 services: 
   broker: 
     environment: 
-      - advertisedListeners=external:pulsar://192.168.10.131:6650
+      - advertisedListeners=external:pulsar://192.168.100.42:6650
 ```
 > 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
 
@@ -553,8 +553,8 @@ curl \
 （3）在Pulsar Manager控制台添加本SpringBoot应用所必须的Pulsar信息：
 * 创建环境
 > Environment Name：dev  
-> Service URL：http://192.168.10.131:8080  
-> Bookie URL：http://192.168.10.131:6650  
+> Service URL：http://192.168.100.42:8080  
+> Bookie URL：http://192.168.100.42:6650  
 > 租户：${app.pulsar.base-reg.tenant}
 > 命名空间：${app.pulsar.base-reg.namespace}
 
@@ -1055,17 +1055,18 @@ com.walter.starry.security.ElasticsearchTest.DocumentTest.searchEsUser
 
 
 ## 5. 启动应用进程
-### 5.1 按需修改以下springboot应用配置（假设中间件的宿主机IP是192.168.10.131）
+### 5.1 按需修改以下springboot应用配置
 * application.yml
 ```yaml
 app:
-  middleware-host: 192.168.10.131
+  # 指定中间件的宿主机IP，便于测试
+  middleware-host: 192.168.100.42
 ```
 
 * redisson.yml
 ```yaml
 singleServerConfig:
-  address: "redis://192.168.10.131:6379"
+  address: "redis://192.168.100.42:6379"
 ```
 
 ### 5.2 启动springboot应用时，添加以下vm参数
