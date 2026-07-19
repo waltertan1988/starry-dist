@@ -388,7 +388,7 @@ root@redis-node-1:/data#
 ```
 
 #### 3.5.2 查看redis cluster集群中各个节点的主从配对关系
-在任意一个redis cluster节点中，通过以下2种方法查看：
+在任意一个redis cluster节点中，通过以下3种方法查看：
 
 * 方法1 - 使用`redis-cli cluster nodes`命令：
 ```shell
@@ -403,7 +403,42 @@ c2b93cd7503a40cdf9066f61dc1d6489bc6a03dd 192.168.100.42:6380@16380 master - 0 17
 root@redis-node-1:/data#
 ```
 
-* 方法2 - 查看由配置项`cluster-config-file`指定的文件内容：
+* 方法2 - 使用`redis-cli --cluster check`命令：
+```shell
+root@redis-node-1:/data# redis-cli -a 123456 --cluster check 192.168.100.42:6380
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+192.168.100.42:6380 (c2b93cd7...) -> 0 keys | 5462 slots | 1 slaves.
+192.168.100.42:6379 (e16857fa...) -> 0 keys | 5461 slots | 1 slaves.
+192.168.100.42:6381 (81bdf7ef...) -> 0 keys | 5461 slots | 1 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 192.168.100.42:6380)
+M: c2b93cd7503a40cdf9066f61dc1d6489bc6a03dd 192.168.100.42:6380
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+M: e16857fa2b900a5ca0060d62a2d0914ea054648d 192.168.100.42:6379
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+S: 9dbaab53954ee3a408d284c6e43869b1470d7017 192.168.100.42:6384
+   slots: (0 slots) slave
+   replicates c2b93cd7503a40cdf9066f61dc1d6489bc6a03dd
+S: 9ef9f6fdc42a98de1dcf1921f494f8ecb3b280d9 192.168.100.42:6382
+   slots: (0 slots) slave
+   replicates 81bdf7ef1e54b20898c4f5762216f3b2998d8001
+S: 1bea1e5f22b6ffcc12619c5d25541edbd71e2860 192.168.100.42:6383
+   slots: (0 slots) slave
+   replicates e16857fa2b900a5ca0060d62a2d0914ea054648d
+M: 81bdf7ef1e54b20898c4f5762216f3b2998d8001 192.168.100.42:6381
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+root@redis-node-1:/data#
+```
+
+* 方法3 - 查看由配置项`cluster-config-file`指定的文件内容：
 ```shell
 root@redis-node-1:/data# cat nodes-6379.conf 
 81bdf7ef1e54b20898c4f5762216f3b2998d8001 192.168.100.42:6381@16381,,tls-port=0,shard-id=650ae2437d727dff0139a6ee2b8fd1415c2fb28b master - 0 1784474134000 3 connected 10923-16383
@@ -436,3 +471,15 @@ repl_backlog_first_byte_offset:1
 repl_backlog_histlen:616
 127.0.0.1:6379>
 ```
+
+### 3.6 访问redis cluster中的数据
+在redis cluster的任意节点，使用`redis-cli -c`命令访问：
+```shell
+root@redis-node-1:/data# redis-cli -a 123456 -p 6380 -c
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+127.0.0.1:6380> ttl mykey
+-> Redirected to slot [14687] located at 192.168.100.42:6381
+(integer) -2
+192.168.100.42:6381>
+```
+> 注：redis cluster模式下的所有从节点都无法读或写，仅用于备份数据，读写操作必须MOVE到对应的主节点进行
