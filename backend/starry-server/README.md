@@ -60,7 +60,11 @@ Spring Security认证与授权相关的基础配置模块，核心功能包括�
 ### 3.1 宿主机上准备各中间件的待挂载目录
 ```shell
 # Pulsar相关目录（参考：https://pulsar.apache.org/docs/3.2.x/getting-started-docker-compose/#step-2-create-a-pulsar-cluster）
-sudo mkdir -p ./data/zookeeper ./data/bookkeeper 
+sudo mkdir -p ./data/zookeeper ./data/bookkeeper
+# MySQL相关目录
+sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
+sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
+sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
 # RedisInsight相关目录
 sudo mkdir -p ./data/redis/redisinsight
 # Redis(主从复制)相关目录
@@ -71,10 +75,13 @@ sudo mkdir -p ./data/redis/sentinel/master/conf ./data/redis/sentinel/master/dat
 sudo mkdir -p ./data/redis/sentinel/salve1/conf ./data/redis/sentinel/salve1/data
 sudo mkdir -p ./data/redis/sentinel/salve2/conf ./data/redis/sentinel/salve2/data
 sudo mkdir -p ./data/redis/sentinel/stl1 ./data/redis/sentinel/stl2 ./data/redis/sentinel/stl3
-# MySQL相关目录
-sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
-sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
-sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
+# Redis(cluster模式)相关目录
+sudo mkdir -p ./data/redis/cluster/node1/conf ./data/redis/cluster/node1/data
+sudo mkdir -p ./data/redis/cluster/node2/conf ./data/redis/cluster/node2/data
+sudo mkdir -p ./data/redis/cluster/node3/conf ./data/redis/cluster/node3/data
+sudo mkdir -p ./data/redis/cluster/node4/conf ./data/redis/cluster/node4/data
+sudo mkdir -p ./data/redis/cluster/node5/conf ./data/redis/cluster/node5/data
+sudo mkdir -p ./data/redis/cluster/node6/conf ./data/redis/cluster/node6/data
 # RocketMQ相关目录
 sudo mkdir -p ./data/rocketmq/namesrv/logs
 sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf

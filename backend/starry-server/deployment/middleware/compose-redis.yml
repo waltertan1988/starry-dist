@@ -22,5 +22,6 @@ services:
           cpus: '0.20'
 
 include:
-  #  - compose-redis-replication.yml
-  - compose-redis-sentinel.yml
+#  - compose-redis-replication.yml
+#  - compose-redis-sentinel.yml
+  - compose-redis-cluster.yml

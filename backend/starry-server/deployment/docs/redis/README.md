@@ -48,14 +48,14 @@ auto-aof-rewrite-min-size 64mb
 # 主从复制时，从节点配置主节点的ip和端口。仅从节点需要配置。从节点可执行命令`replicaof no one`解除主从关系。
 # replicaof <masterip> <masterport>
 
-# 至少有1个从节点在线（最多延迟10秒）时，主节点才可以写入数据
+# 至少有1个从节点在线（最多延迟10秒）时，主节点才可以写入数据（注：该配置在redis-cluster模式不生效）
 min-replicas-to-write 1
 min-replicas-max-lag 10
 
 # 主从复制时，从节点配置主节点的密码（与主节点的requirepass一致）。建议主节点也一同配置
 masterauth 123456
 
-# 从节点是否只读
+# 从节点是否只读（注：该配置在redis-cluster模式不生效，redis-cluster强制从节点只读）
 replica-read-only yes
 
 # 从节点跟主节点临时断开时，主节点临时存放增量数据（用于从节点重新连接后进行部分复制）的临时缓存区大小
@@ -64,7 +64,7 @@ replica-read-only yes
 # 主节点在该时间内没有任何从节点连接上，则清空临时缓存区
 # repl-backlog-ttl 3600
 
-# 使用Sentinel进行主从故障转移时，从节点被提升为主节点的优先级，越小越优先，0表示永不提升为主节点
+# 使用Sentinel进行主从故障转移时，从节点被提升为主节点的优先级，越小越优先，0表示永不提升为主节点（注：该配置在redis-cluster模式不生效）
 replica-priority 100
 
 # 禁用不安全的命令
@@ -151,16 +151,18 @@ repl_backlog_histlen:71237
 ```
 
 ## 二、配置并使用Redis-Sentinel模式
-注意：使用docker部署redis哨兵模式时，网络模式需要改用host模式，原因参考[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/#sentinel-docker-nat-and-possible-issues)
+### 2.1 前提
+* 注意：使用docker部署redis哨兵模式时，网络模式需要改用host模式，原因参考[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/#sentinel-docker-nat-and-possible-issues)
+* 哨兵实例数为2n+1，建议至少3个节点
 
-### 2.1 下载默认的sentinel配置文件
+### 2.2 下载默认的sentinel配置文件
 ```shell
 curl -o ./data/redis/sentinel/stl1/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 ```
 
-### 2.2 找到以下配置值并修改为如下
+### 2.3 找到以下配置值并修改为如下
 ```shell
 # pid文件位置
 pidfile /var/run/redis-sentinel.pid
@@ -181,10 +183,10 @@ sentinel auth-pass mymaster 123456
 sentinel down-after-milliseconds mymaster 5000
 ```
 
-### 2.3 启动服务
+### 2.4 启动服务
 docker compose启动示例参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-redis-sentinel.yml)
 
-### 2.4 查看sentinel的运行信息
+### 2.5 查看sentinel的运行信息
 查看启动日志：
 ```shell
 root@redis-sentinel-1:/usr/local/etc/redis# cat sentinel.log 
@@ -222,4 +224,9 @@ root@redis-sentinel-1:~#  redis-cli -p 26379
 ```
 
 ## 三、配置并使用Redis-Cluster模式
-待补充
+### 3.1 前提
+* 必须有2n+1个主节点，最少3个。生产环境建议至少为每个主节点配置1个从节点，一共需要6个节点。
+* Redis版本>=5，可直接使用`redis-cli --cluster`命令创建集群；Redis版本<=4，需要使用`redis-trib.rb`工具创建集群（不推荐）。
+* 使用docker部署redis cluster模式时，网络模式需要改用host模式，原因参考[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/#redis-cluster-and-docker)
+> 注意：本文使用的Redis版本为8.2。
+
