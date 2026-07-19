@@ -300,10 +300,10 @@ cluster-require-full-coverage no
 ```
 > Redis Cluster配置参数的具体说明可参看：[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/#create-and-use-a-redis-cluster)
 
-### 3.3 启动服务
+### 3.3 启动Redis Cluster的各个节点
 docker compose启动示例参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-redis-cluster.yml)
 
-### 3.4 建立集群
+### 3.4 创建Redis Cluster集群
 在任意一个节点中执行`redis-cli --cluster create`命令，创建集群：
 ```shell
 root@redis-node-1:/data# redis-cli -a 123456 --cluster create 192.168.100.42:6379 192.168.100.42:6380 192.168.100.42:6381 192.168.100.42:6382 192.168.100.42:6383 192.168.100.42:6384 --cluster-replicas 1
@@ -361,7 +361,7 @@ S: 9ef9f6fdc42a98de1dcf1921f494f8ecb3b280d9 192.168.100.42:6382
 root@redis-node-1:/data#
 ```
 
-### 3.5 查看redis cluster集群的信息
+### 3.5 查看Redis Cluster集群的信息
 #### 3.5.1 查看redis cluster集群的总体情况
 在任一节点上使用`redis-cli cluster info`命令：
 ```shell
@@ -472,7 +472,7 @@ repl_backlog_histlen:616
 127.0.0.1:6379>
 ```
 
-### 3.6 访问redis cluster中的数据
+### 3.6 访问Redis Cluster中的数据
 在redis cluster的任意节点，使用`redis-cli -c`命令访问：
 ```shell
 root@redis-node-1:/data# redis-cli -a 123456 -p 6380 -c
@@ -480,6 +480,44 @@ Warning: Using a password with '-a' or '-u' option on the command line interface
 127.0.0.1:6380> ttl mykey
 -> Redirected to slot [14687] located at 192.168.100.42:6381
 (integer) -2
-192.168.100.42:6381>
+192.168.100.42:6381> select 1
+(error) ERR SELECT is not allowed in cluster mode
+192.168.100.42:6381> 
 ```
-> 注：redis cluster模式下的所有从节点都无法读或写，仅用于备份数据，读写操作必须MOVE到对应的主节点进行
+> 注：redis cluster模式下，
+> 1. 所有从节点都无法读或写，仅用于备份数据，读写操作必须MOVE到对应的主节点进行
+> 2. 只能使用db0，无法使用select命令切换数据库
+
+### 3.7 Redis Cluster扩容
+#### 3.7.1 作为主节点加入到集群
+* 第1步：使用`redis-cli --cluster add-node <新节点IP:新节点端口> <集群中任意节点的IP:端口>`命令，把192.168.100.42:6385节点加入到redis cluster中：
+```shell
+root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6385 192.168.100.42:6379
+```
+
+* 第2步：使用`redis-cli --cluster reshard <集群中任意节点的IP:端口>`命令，对集群重新分片：
+```shell
+root@redis-node-1:/data# redis-cli -a 123456 --cluster reshard 192.168.100.42:6379
+```
+重新分配时，会问以下几个问题并需要输入提示：
+```text
+How many slots do you want to move (from 1 to 16384)? 4096                  #新分配多少个槽位=16384/扩容后的master数量
+
+What is the receiving node ID? 2b7b2a56a221d48fb3ff83c03de1afc5611916d3     #新master节点的ID
+
+Please enter all the source node IDs.
+Type 'all' to use all the nodes as source nodes for the hash slots.
+Type 'done' once you entered all the source nodes IDs.
+Source node #1:all                                                          #输入all，自动在所有node选择划分
+
+Do you want to proceed with the proposed reshard plan? [yes/no]: yes        # 确认分配
+```
+
+#### 3.7.2 作为从节点加入到集群
+使用`redis-cli --cluster add-node <新节点IP:新节点端口> <集群中任意节点的IP:端口> --cluster-slave --cluster-master-id <新主节点的ID>`命令，把192.168.100.42:6386节点加入到redis cluster中并作为2b7b2a56a221d48fb3ff83c03de1afc5611916d3的从节点：
+```shell
+root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6386 192.168.100.42:6379 --cluster-slave --cluster-master-id 2b7b2a56a221d48fb3ff83c03de1afc5611916d3
+```
+
+### 3.7 Redis Cluster缩容
+待补充
