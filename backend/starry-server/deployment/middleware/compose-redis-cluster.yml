@@ -74,9 +74,10 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
-    depends_on:
-      redis-master:
-        condition: service_healthy
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-3:
+#        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -97,9 +98,10 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
-    depends_on:
-      redis-master:
-        condition: service_healthy
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-1:
+#        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -120,9 +122,10 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
-    depends_on:
-      redis-master:
-        condition: service_healthy
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-2:
+#        condition: service_healthy
     deploy:
       resources:
         limits:
