@@ -1,0 +1,132 @@
+services:
+  redis-node-1:
+    image: redis:8.2.7
+    container_name: redis-node-1
+    hostname: redis-node-1
+    volumes:
+      - ./data/redis/cluster/node1/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node1/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6379"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6379 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-node-2:
+    image: redis:8.2.7
+    container_name: redis-node-2
+    hostname: redis-node-2
+    volumes:
+      - ./data/redis/cluster/node2/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node2/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6380"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6380 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-node-3:
+    image: redis:8.2.7
+    container_name: redis-node-3
+    hostname: redis-node-3
+    volumes:
+      - ./data/redis/cluster/node3/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node3/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6381"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6381 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-node-4:
+    image: redis:8.2.7
+    container_name: redis-node-4
+    hostname: redis-node-4
+    volumes:
+      - ./data/redis/cluster/node4/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node4/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6382"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6382 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-3:
+#        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-node-5:
+    image: redis:8.2.7
+    container_name: redis-node-5
+    hostname: redis-node-5
+    volumes:
+      - ./data/redis/cluster/node5/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node5/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6383"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6383 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-1:
+#        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+
+  redis-node-6:
+    image: redis:8.2.7
+    container_name: redis-node-6
+    hostname: redis-node-6
+    volumes:
+      - ./data/redis/cluster/node6/conf:/usr/local/etc/redis
+      - ./data/redis/cluster/node6/data:/data
+    command: bash -c "redis-server /usr/local/etc/redis/redis.conf --port 6384"
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6384 -a 123456 ping | grep PONG || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    # 待redis cluster集群分配完毕后再定义depends_on
+#    depends_on:
+#      redis-node-2:
+#        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
