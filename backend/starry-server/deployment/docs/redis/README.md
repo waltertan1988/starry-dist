@@ -528,3 +528,19 @@ root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6
 > 注：
 > （1）只使用`--cluster-copy`参数，则要导入集群中的key不能存在；若集群中已存在同样的key且需要替换，可同时指定`--cluster-copy`和`--cluster-replace`，让集群中的key被外部redis的数据覆盖掉。
 > （2）因为导入时不能指定验证密码，所以导入数据前要临时关闭所有Redis节点（包括外部Redis和Redis Cluster）的密码。
+
+### 3.10 Redis Cluster其他常用的命令
+- 获取指定key在哪个哈希槽位：`redis-cli cluster keyslot <key>`
+- 获取指定哈希槽位中对应key值的个数：`redis-cli cluster countkeysinslot <slot值>`
+- 哈希槽位自动重平衡：`redis-cli --cluster rebalance <集群中任意节点的IP:端口>`
+
+### 3.11 Redis Cluster的缺点
+1. 大多数时客户端性能会“降低”
+2. 命令无法跨节点使用：mget、keys、scan、flush、sinter等
+3. 只能使用db0
+4. 复制只支持1层，不支持树形复制结构和级联复制
+5. key事务和Lua支持有限：操作的key必须在同一个节点上，不能跨节点使用
+
+## 4. 其他常用的Redis命令
+- 查看大key：`redis-cli --bigkeys`
+
