@@ -519,5 +519,6 @@ Do you want to proceed with the proposed reshard plan? [yes/no]: yes        # �
 root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6386 192.168.100.42:6379 --cluster-slave --cluster-master-id 2b7b2a56a221d48fb3ff83c03de1afc5611916d3
 ```
 
-### 3.7 Redis Cluster缩容
-待补充
+### 3.8 Redis Cluster缩容
+* 第1步：把待撤销的节点上的哈希槽归还到其他节点。 依旧使用`redis-cli --cluster reshard <集群中任意节点的IP:端口>`命令。节点在归还所有哈希槽后，会自动成为挂到其他主节点下成为从节点。
+* 第2步：把待缩容的节点从集群中删除。可使用`redis-cli --cluster del-node <集群中任意节点的IP:端口> <待缩容的节点ID>`命令。
