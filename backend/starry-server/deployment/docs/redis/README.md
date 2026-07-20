@@ -522,3 +522,9 @@ root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6
 ### 3.8 Redis Cluster缩容
 * 第1步：把待撤销的节点上的哈希槽归还到其他节点。 依旧使用`redis-cli --cluster reshard <集群中任意节点的IP:端口>`命令。节点在归还所有哈希槽后，会自动成为挂到其他主节点下成为从节点。
 * 第2步：把待缩容的节点从集群中删除。可使用`redis-cli --cluster del-node <集群中任意节点的IP:端口> <待缩容的节点ID>`命令。
+
+### 3.9 把外部Redis的数据迁移到Redis Cluster中
+使用命令`redis-cli --cluster import <集群中任意节点的IP:端口> --cluster-from <外部Redis节点的IP:端口> --cluster-copy --cluster-replace`导入数据即可。
+> 注：
+> （1）只使用`--cluster-copy`参数，则要导入集群中的key不能存在；若集群中已存在同样的key且需要替换，可同时指定`--cluster-copy`和`--cluster-replace`，让集群中的key被外部redis的数据覆盖掉。
+> （2）因为导入时不能指定验证密码，所以导入数据前要临时关闭所有Redis节点（包括外部Redis和Redis Cluster）的密码。
