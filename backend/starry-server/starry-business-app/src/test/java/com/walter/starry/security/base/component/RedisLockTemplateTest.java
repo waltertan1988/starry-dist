@@ -20,17 +20,17 @@ public class RedisLockTemplateTest extends AbstractControllerJupiterTest {
 
     @Test
     void tryLockAndCallback(){
-
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        final int threadNum = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
 
         List<CompletableFuture<?>> futureList = new ArrayList<>();
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < threadNum; i++) {
             CompletableFuture<?> future = CompletableFuture.runAsync(() -> {
                 redisLockTemplate.tryLockAndCallback("testLock", 0L, 1L, TimeUnit.MINUTES, null, () -> {
                     try {
                         log.info(">>>>>> lock start...");
-                        TimeUnit.MINUTES.sleep(1);
+                        TimeUnit.SECONDS.sleep(5);
                         log.info(">>>>>> lock end...");
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
