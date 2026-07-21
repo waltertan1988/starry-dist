@@ -25,13 +25,47 @@
 ###############
 # Sentinel模式 #
 ###############
-sentinelServersConfig:
+#sentinelServersConfig:
+#  idleConnectionTimeout: 10000
+#  connectTimeout: 10000
+#  timeout: 3000
+#  retryAttempts: 3
+#  retryInterval: 1500
+#  password: "123456"
+#  subscriptionsPerConnection: 5
+#  clientName: null
+#  loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
+#  subscriptionConnectionMinimumIdleSize: 1
+#  subscriptionConnectionPoolSize: 50
+#  slaveConnectionMinimumIdleSize: 24
+#  slaveConnectionPoolSize: 64
+#  masterConnectionMinimumIdleSize: 24
+#  masterConnectionPoolSize: 64
+#  # readMode‌：SLAVE-表示读写分离，MASTER-表示只从主节点读取，MASTER_SLAVE-表示主从节点都可读取
+#  readMode: "MASTER"
+#  sentinelAddresses:
+#    - "redis://192.168.100.42:26379"
+#    - "redis://192.168.100.42:26380"
+#    - "redis://192.168.100.42:26381"
+#  masterName: "mymaster"
+#  database: 0
+#threads: 16
+#nettyThreads: 32
+#codec: !<org.redisson.codec.JsonJacksonCodec> {}
+#transportMode: "NIO"
+
+##############
+# Cluster模式 #
+##############
+clusterServersConfig:
   idleConnectionTimeout: 10000
   connectTimeout: 10000
-  timeout: 3000
+  timeout: 10000
   retryAttempts: 3
   retryInterval: 1500
   password: "123456"
+  failedSlaveReconnectionInterval: 3000
+  failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
   subscriptionsPerConnection: 5
   clientName: null
   loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
@@ -41,14 +75,17 @@ sentinelServersConfig:
   slaveConnectionPoolSize: 64
   masterConnectionMinimumIdleSize: 24
   masterConnectionPoolSize: 64
-  # readMode‌：SLAVE-表示读写分离，MASTER-表示只从主节点读取，MASTER_SLAVE-表示主从节点都可读取
   readMode: "MASTER"
-  sentinelAddresses:
-    - "redis://192.168.100.42:26379"
-    - "redis://192.168.100.42:26380"
-    - "redis://192.168.100.42:26381"
-  masterName: "mymaster"
-  database: 0
+  subscriptionMode: "MASTER"
+  nodeAddresses:
+    - "redis://192.168.100.42:6379"
+    - "redis://192.168.100.42:6380"
+    - "redis://192.168.100.42:6381"
+    - "redis://192.168.100.42:6382"
+    - "redis://192.168.100.42:6383"
+    - "redis://192.168.100.42:6384"
+  scanInterval: 1000
+  pingConnectionInterval: 30000
 threads: 16
 nettyThreads: 32
 codec: !<org.redisson.codec.JsonJacksonCodec> {}

@@ -519,5 +519,28 @@ Do you want to proceed with the proposed reshard plan? [yes/no]: yes        # �
 root@redis-node-1:/data# redis-cli -a 123456 --cluster add-node 192.168.100.42:6386 192.168.100.42:6379 --cluster-slave --cluster-master-id 2b7b2a56a221d48fb3ff83c03de1afc5611916d3
 ```
 
-### 3.7 Redis Cluster缩容
-待补充
+### 3.8 Redis Cluster缩容
+* 第1步：把待撤销的节点上的哈希槽归还到其他节点。 依旧使用`redis-cli --cluster reshard <集群中任意节点的IP:端口>`命令。节点在归还所有哈希槽后，会自动成为挂到其他主节点下成为从节点。
+* 第2步：把待缩容的节点从集群中删除。可使用`redis-cli --cluster del-node <集群中任意节点的IP:端口> <待缩容的节点ID>`命令。
+
+### 3.9 把外部Redis的数据迁移到Redis Cluster中
+使用命令`redis-cli --cluster import <集群中任意节点的IP:端口> --cluster-from <外部Redis节点的IP:端口> --cluster-copy --cluster-replace`导入数据即可。
+> 注：
+> （1）只使用`--cluster-copy`参数，则要导入集群中的key不能存在；若集群中已存在同样的key且需要替换，可同时指定`--cluster-copy`和`--cluster-replace`，让集群中的key被外部redis的数据覆盖掉。
+> （2）因为导入时不能指定验证密码，所以导入数据前要临时关闭所有Redis节点（包括外部Redis和Redis Cluster）的密码。
+
+### 3.10 Redis Cluster其他常用的命令
+- 获取指定key在哪个哈希槽位：`redis-cli cluster keyslot <key>`
+- 获取指定哈希槽位中对应key值的个数：`redis-cli cluster countkeysinslot <slot值>`
+- 哈希槽位自动重平衡：`redis-cli --cluster rebalance <集群中任意节点的IP:端口>`
+
+### 3.11 Redis Cluster的缺点
+1. 大多数时客户端性能会“降低”
+2. 命令无法跨节点使用：mget、keys、scan、flush、sinter等
+3. 只能使用db0
+4. 复制只支持1层，不支持树形复制结构和级联复制
+5. key事务和Lua支持有限：操作的key必须在同一个节点上，不能跨节点使用
+
+## 4. 其他常用的Redis命令
+- 查看大key：`redis-cli --bigkeys`
+

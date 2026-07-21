@@ -64,13 +64,19 @@ spring:
       # 单机配置
 #      host: ${app.middleware-host}
 #      port: 6379
+
       # sentinel配置
-      sentinel:
-        master: mymaster
-        nodes:
-          - ${app.middleware-host}:26379
-          - ${app.middleware-host}:26380
-          - ${app.middleware-host}:26381
+#      sentinel:
+#        master: mymaster
+#        nodes:
+#          - ${app.middleware-host}:26379
+#          - ${app.middleware-host}:26380
+#          - ${app.middleware-host}:26381
+
+      # 集群配置
+      cluster:
+        nodes: ${app.middleware-host}:6379,${app.middleware-host}:6380,${app.middleware-host}:6381,${app.middleware-host}:6382,${app.middleware-host}:6383,${app.middleware-host}:6384
+        max-redirects: 3
       lettuce:
         pool:
           max-active: 300
