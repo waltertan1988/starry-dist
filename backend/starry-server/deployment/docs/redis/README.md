@@ -152,6 +152,7 @@ repl_backlog_histlen:71237
 
 ## 二、配置并使用Redis-Sentinel模式
 ### 2.1 前提
+* 以Redis主从复制模式为基础
 * 注意：使用docker部署redis哨兵模式时，网络模式需要改用host模式，原因参考[这里](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/#sentinel-docker-nat-and-possible-issues)
 * 哨兵实例数为2n+1，建议至少3个节点
 
@@ -162,7 +163,7 @@ curl -o ./data/redis/sentinel/stl2/sentinel.conf https://raw.githubusercontent.c
 curl -o ./data/redis/sentinel/stl3/sentinel.conf https://raw.githubusercontent.com/redis/redis/refs/tags/8.2.7/sentinel.conf
 ```
 
-### 2.3 找到以下配置值并修改为如下
+### 2.3 找到`sentinel.conf`以下配置值并修改为如下
 ```shell
 # pid文件位置
 pidfile /var/run/redis-sentinel.pid
