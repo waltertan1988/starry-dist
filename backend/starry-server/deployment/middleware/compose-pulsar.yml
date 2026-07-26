@@ -99,7 +99,7 @@ services:
       - subscriptionExpiryCheckIntervalInMinutes=1
       - advertisedAddress=broker
       # advertisedListeners指向客户端可访问的地址（如宿主机的IP）
-      - advertisedListeners=external:pulsar://192.168.100.42:6650
+      - advertisedListeners=external:pulsar://${DOCKER_HOST}:6650
       - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
     depends_on:
       zookeeper:
