@@ -71,7 +71,9 @@ services:
     hostname: redis-sentinel-1
     volumes:
       - ./data/redis/sentinel/stl1:/usr/local/etc/redis
-    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26379 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+     # 首次部署时，指定mymaster的主节点，后续启动时无需指定了（配置文件已被自动rewrite）
+#    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26379 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26379"
     network_mode: host
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -p 26379 ping | grep PONG || exit 1"]
@@ -97,7 +99,9 @@ services:
     hostname: redis-sentinel-2
     volumes:
       - ./data/redis/sentinel/stl2:/usr/local/etc/redis
-    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26380 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+     # 首次部署时，指定mymaster的主节点，后续启动时无需指定了（配置文件已被自动rewrite）
+#    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26380 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26380"
     network_mode: host
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -p 26380 ping | grep PONG || exit 1"]
@@ -123,7 +127,9 @@ services:
     hostname: redis-sentinel-3
     volumes:
       - ./data/redis/sentinel/stl3:/usr/local/etc/redis
-    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26381 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+     # 首次部署时，指定mymaster的主节点，后续启动时无需指定了（配置文件已被自动rewrite）
+#    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26381 --sentinel monitor mymaster ${DOCKER_HOST} 6379 2"
+    command: bash -c "redis-sentinel /usr/local/etc/redis/sentinel.conf --port 26381"
     network_mode: host
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -p 26381 ping | grep PONG || exit 1"]
