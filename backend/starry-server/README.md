@@ -55,7 +55,9 @@ Spring Security认证与授权相关的基础配置模块，核心功能包括�
 
 
 ## 3. 部署中间件
-假设下文提到的中间件的宿主机IP都是192.168.100.42，且采用docker compose部署各种中间件，入口文件为compose.yml
+前提： 
+- 采用docker compose部署各种中间件，入口文件为`compose.yml`，并通过`.env`文件定义docker compose中用到的全局变量值
+- 下文提到的中间件的宿主机IP都是`192.168.100.42`
 
 ### 3.1 宿主机上准备各中间件的待挂载目录
 ```shell
