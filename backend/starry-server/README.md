@@ -146,8 +146,8 @@ rocketmq:
 
 > * RocketMQ的部署方式说明，参见[官网](https://rocketmq.apache.org/zh/docs/)和[中文社区](https://rocketmq-learning.com/)。  
 > * 配置示例：  
->（1）单机模式，参考[这里](https://github.com/waltertan1988/starry-dist/tree/main/backend/starry-server/deployment/middleware/data/rocketmq/local)  
->（2）NameServer内嵌Controller的高可用模式，参考[这里](https://github.com/waltertan1988/starry-dist/tree/main/backend/starry-server/deployment/middleware/data/rocketmq/controller)  
+>（1）单机模式，参考[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-rocketmq-local.yml)  
+>（2）NameServer内嵌Controller的高可用模式，参考[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-rocketmq-controller.yml)  
 
 ##### 3.2.3.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
