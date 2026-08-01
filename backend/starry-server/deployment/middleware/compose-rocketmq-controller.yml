@@ -1,0 +1,135 @@
+services:
+  rmq-namesrv-1:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqnamesrv1
+    ports:
+      - 9876:9876
+    volumes:
+      - ./data/rocketmq/controller/namesrv1/conf/namesrv.conf:/home/rocketmq/conf/namesrv.conf
+      - ./data/rocketmq/controller/namesrv1/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/namesrv1/DLedgerController:/home/rocketmq/DLedgerController
+    environment:
+      HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
+    networks:
+      starry:
+        ipv4_address: 172.18.3.1
+    command: ["sh","mqnamesrv","-c","/home/rocketmq/conf/namesrv.conf"]
+  rmq-namesrv-2:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqnamesrv2
+    ports:
+      - 9886:9876
+    volumes:
+      - ./data/rocketmq/controller/namesrv2/conf/namesrv.conf:/home/rocketmq/conf/namesrv.conf
+      - ./data/rocketmq/controller/namesrv2/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/namesrv2/DLedgerController:/home/rocketmq/DLedgerController
+    environment:
+      HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
+    networks:
+      starry:
+        ipv4_address: 172.18.3.2
+    command: ["sh","mqnamesrv","-c","/home/rocketmq/conf/namesrv.conf"]
+  rmq-namesrv-3:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqnamesrv3
+    ports:
+      - 9896:9876
+    volumes:
+      - ./data/rocketmq/controller/namesrv3/conf/namesrv.conf:/home/rocketmq/conf/namesrv.conf
+      - ./data/rocketmq/controller/namesrv3/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/namesrv3/DLedgerController:/home/rocketmq/DLedgerController
+    environment:
+      HEAP_OPTS: -Xms128m -Xmx128m -Xmn64m
+    networks:
+      starry:
+        ipv4_address: 172.18.3.3
+    command: ["sh","mqnamesrv","-c","/home/rocketmq/conf/namesrv.conf"]
+
+  rmq-broker-a1:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqbrokera1
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    volumes:
+      - ./data/rocketmq/controller/brokera1/conf/broker.conf:/home/rocketmq/conf/broker.conf
+      - ./data/rocketmq/controller/brokera1/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/brokera1/store:/home/rocketmq/store
+    environment:
+      NAMESRV_ADDR: rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876
+      HEAP_OPTS: -Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m
+    depends_on:
+      - rmq-namesrv-1
+      - rmq-namesrv-2
+      - rmq-namesrv-3
+    networks:
+      starry:
+        ipv4_address: 172.18.3.4
+    command: ["sh","mqbroker","-c","/home/rocketmq/conf/broker.conf"]
+  rmq-broker-a2:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqbrokera2
+    ports:
+      - 11909:11909
+      - 11911:11911
+      - 11912:11912
+    volumes:
+      - ./data/rocketmq/controller/brokera2/conf/broker.conf:/home/rocketmq/conf/broker.conf
+      - ./data/rocketmq/controller/brokera2/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/brokera2/store:/home/rocketmq/store
+    environment:
+      NAMESRV_ADDR: rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876
+      HEAP_OPTS: -Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m
+    depends_on:
+      - rmq-namesrv-1
+      - rmq-namesrv-2
+      - rmq-namesrv-3
+    networks:
+      starry:
+        ipv4_address: 172.18.3.5
+    command: ["sh","mqbroker","-c","/home/rocketmq/conf/broker.conf"]
+  rmq-broker-b1:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqbrokerb1
+    ports:
+      - 12909:12909
+      - 12911:12911
+      - 12912:12912
+    volumes:
+      - ./data/rocketmq/controller/brokerb1/conf/broker.conf:/home/rocketmq/conf/broker.conf
+      - ./data/rocketmq/controller/brokerb1/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/brokerb1/store:/home/rocketmq/store
+    environment:
+      NAMESRV_ADDR: rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876
+      HEAP_OPTS: -Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m
+    depends_on:
+      - rmq-namesrv-1
+      - rmq-namesrv-2
+      - rmq-namesrv-3
+    networks:
+      starry:
+        ipv4_address: 172.18.3.6
+    command: ["sh","mqbroker","-c","/home/rocketmq/conf/broker.conf"]
+  rmq-broker-b2:
+    image: apache/rocketmq:${ROCKET_MQ_VERSION}
+    container_name: rmqbrokerb2
+    ports:
+      - 13909:13909
+      - 13911:13911
+      - 13912:13912
+    volumes:
+      - ./data/rocketmq/controller/brokerb2/conf/broker.conf:/home/rocketmq/conf/broker.conf
+      - ./data/rocketmq/controller/brokerb2/logs:/home/rocketmq/logs
+      - ./data/rocketmq/controller/brokerb2/store:/home/rocketmq/store
+    environment:
+      NAMESRV_ADDR: rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876
+      HEAP_OPTS: -Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m
+    depends_on:
+      - rmq-namesrv-1
+      - rmq-namesrv-2
+      - rmq-namesrv-3
+    networks:
+      starry:
+        ipv4_address: 172.18.3.7
+    command: ["sh","mqbroker","-c","/home/rocketmq/conf/broker.conf"]

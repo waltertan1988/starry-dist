@@ -67,6 +67,7 @@ sudo mkdir -p ./data/zookeeper ./data/bookkeeper
 sudo mkdir -p ./data/mysql/master/conf.d ./data/mysql/master/datadir
 sudo mkdir -p ./data/mysql/slave1/conf.d ./data/mysql/slave1/datadir
 sudo mkdir -p ./data/mysql/slave2/conf.d ./data/mysql/slave2/datadir
+# Redis相关目录
 # RedisInsight相关目录
 sudo mkdir -p ./data/redis/redisinsight
 # Redis(主从复制)相关目录
@@ -85,10 +86,18 @@ sudo mkdir -p ./data/redis/cluster/node4/conf ./data/redis/cluster/node4/data
 sudo mkdir -p ./data/redis/cluster/node5/conf ./data/redis/cluster/node5/data
 sudo mkdir -p ./data/redis/cluster/node6/conf ./data/redis/cluster/node6/data
 # RocketMQ相关目录
-sudo mkdir -p ./data/rocketmq/namesrv/logs
-sudo mkdir -p ./data/rocketmq/broker/logs ./data/rocketmq/broker/store ./data/rocketmq/broker/conf
-sudo mkdir -p ./data/rocketmq/proxy/logs ./data/rocketmq/proxy/.rocketmq_offsets
-sudo chmod 777 -R ./data/rocketmq
+# RocketMQ本地单实例部署模式
+sudo mkdir -p ./data/rocketmq/local/namesrv/logs
+sudo mkdir -p ./data/rocketmq/local/broker/conf ./data/rocketmq/local/broker/logs ./data/rocketmq/local/broker/store
+sudo mkdir -p ./data/rocketmq/local/proxy/logs ./data/rocketmq/local/proxy/.rocketmq_offsets
+# RocketMQ高可用部署 - Controller（NameServer嵌入）模式
+sudo mkdir -p ./data/rocketmq/controller/namesrv1/conf ./data/rocketmq/controller/namesrv1/logs ./data/rocketmq/controller/namesrv1/DLedgerController
+sudo mkdir -p ./data/rocketmq/controller/namesrv2/conf ./data/rocketmq/controller/namesrv2/logs ./data/rocketmq/controller/namesrv2/DLedgerController  #可选，仅影响Controller本身的高可用
+sudo mkdir -p ./data/rocketmq/controller/namesrv3/conf ./data/rocketmq/controller/namesrv3/logs ./data/rocketmq/controller/namesrv3/DLedgerController  #可选，仅影响Controller本身的高可用
+sudo mkdir -p ./data/rocketmq/controller/brokera1/conf ./data/rocketmq/controller/brokera1/logs ./data/rocketmq/controller/brokera1/store
+sudo mkdir -p ./data/rocketmq/controller/brokera2/conf ./data/rocketmq/controller/brokera2/logs ./data/rocketmq/controller/brokera2/store
+sudo mkdir -p ./data/rocketmq/controller/brokerb1/conf ./data/rocketmq/controller/brokerb1/logs ./data/rocketmq/controller/brokerb1/store
+sudo mkdir -p ./data/rocketmq/controller/brokerb2/conf ./data/rocketmq/controller/brokerb2/logs ./data/rocketmq/controller/brokerb2/store
 # Elastic相关目录（ElasticSearch、Kibana）
 sudo mkdir -p ./data/elastic/elasticsearch/es01/config ./data/elastic/elasticsearch/es01/data ./data/elastic/elasticsearch/es01/logs ./data/elastic/elasticsearch/es01/plugins
 sudo mkdir -p ./data/elastic/kibana/data
@@ -100,6 +109,8 @@ sudo mkdir -p ./data/etcd ./data/milvus
 sudo mkdir -p ./data/apm/grafana
 # Ollama相关目录
 sudo mkdir -p ./data/ollama
+# 开放文件和目录的权限
+sudo chmod 777 -R ./data
 # this step might not be necessary on other than Linux platforms
 sudo chown 10000 -R ./data
 ```
@@ -124,7 +135,7 @@ app:
 ```
 
 ##### 3.2.3.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
-cat ./data/rocketmq/broker/conf/broker.conf
+cat ./data/rocketmq/local/broker/conf/broker.conf
 ```properties
 brokerClusterName = DefaultCluster
 brokerName = broker-a
