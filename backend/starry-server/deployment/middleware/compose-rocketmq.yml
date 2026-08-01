@@ -9,9 +9,9 @@ services:
         ipv4_address: 172.18.3.0
     restart: always
     environment:
-      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Xms128m -Xmx128m -Xmn64m"
-#      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876 -Xms128m -Xmx128m -Xmn64m"
+#      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Xms128m -Xmx128m -Xmn64m"
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv1:9876;rmqnamesrv2:9876;rmqnamesrv3:9876 -Xms128m -Xmx128m -Xmn64m"
 
 include:
-  - compose-rocketmq-local.yml
-#  - compose-rocketmq-controller.yml
+#  - compose-rocketmq-local.yml
+  - compose-rocketmq-controller.yml
