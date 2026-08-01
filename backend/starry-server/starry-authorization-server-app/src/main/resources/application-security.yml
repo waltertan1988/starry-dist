@@ -33,7 +33,7 @@ mybatis:
 
 # RocketMQ配置
 rocketmq:
-  name-server: ${app.middleware-host}:9876
+  name-server: ${app.middleware-host}:9876;${app.middleware-host}:9886;${app.middleware-host}:9896
   producer:
     group: ${spring.application.name}
     namespace: ${spring.application.name}
