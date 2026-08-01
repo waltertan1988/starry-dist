@@ -135,27 +135,19 @@ app:
 ```
 
 ##### 3.2.3.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
-cat ./data/rocketmq/local/broker/conf/broker.conf
-```properties
-brokerClusterName = DefaultCluster
-brokerName = broker-a
-brokerId = 0
-deleteWhen = 04
-fileReservedTime = 48
-brokerRole = ASYNC_MASTER
-flushDiskType = ASYNC_FLUSH
-
-# 需按宿主机IP修改此配置
-brokerIP1 = 192.168.100.42
-# 是否自动创建主题，生产环境建议禁用
-autoCreateTopicEnable = true
-```
-
-* application.yml:
+在`application-security.yml`配置:
 ```yaml
 rocketmq:
   name-server: ${app.middleware-host}:9876
+  producer:
+    group: ${spring.application.name}
+    namespace: ${spring.application.name}
 ```
+
+> * RocketMQ的部署方式说明，参见[官网](https://rocketmq.apache.org/zh/docs/)和[中文社区](https://rocketmq-learning.com/)。  
+> * 配置示例：  
+>（1）单机模式，参考[这里](https://github.com/waltertan1988/starry-dist/tree/main/backend/starry-server/deployment/middleware/data/rocketmq/local)  
+>（2）NameServer内嵌Controller的高可用模式，参考[这里](https://github.com/waltertan1988/starry-dist/tree/main/backend/starry-server/deployment/middleware/data/rocketmq/controller)  
 
 ##### 3.2.3.3 如果消息队列采用Pulsar，还需要修改以下部署配置
 * compose-pulsar.yml
