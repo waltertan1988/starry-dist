@@ -9,8 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.log.LogMessage;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -88,7 +89,7 @@ public class CompositeLogoutPageGeneratingFilter extends OncePerRequestFilter {
         }
 
         public NonAjaxLogoutPageGeneratingFilter(String logoutPageUrl, String logoutUrl){
-            this.matcher = new AntPathRequestMatcher(logoutPageUrl, "GET");
+            this.matcher = PathPatternRequestMatcher.pathPattern(HttpMethod.GET, logoutPageUrl);
             this.logoutUrl = logoutUrl;
         }
 
@@ -177,7 +178,7 @@ public class CompositeLogoutPageGeneratingFilter extends OncePerRequestFilter {
         }
 
         public AjaxLogoutPageGeneratingFilter(String logoutPageUrl, String logoutUrl){
-            this.matcher = new AntPathRequestMatcher(logoutPageUrl, "GET");
+            this.matcher = PathPatternRequestMatcher.pathPattern(HttpMethod.GET, logoutPageUrl);
             this.logoutUrl = logoutUrl;
         }
 

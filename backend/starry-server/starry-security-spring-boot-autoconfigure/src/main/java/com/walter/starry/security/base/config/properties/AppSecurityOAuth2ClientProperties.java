@@ -2,8 +2,8 @@ package com.walter.starry.security.base.config.properties;
 
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
