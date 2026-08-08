@@ -12,7 +12,7 @@ import io.modelcontextprotocol.client.McpSyncClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -47,7 +47,7 @@ public class ChatController implements InitializingBean {
     @Autowired
     private List<McpSyncClient> mcpSyncClients;
 
-    private Advisor promptChatMemoryAdvisor;
+    private Advisor messageChatMemoryAdvisor;
 
     @Override
     public void afterPropertiesSet() {
@@ -56,7 +56,7 @@ public class ChatController implements InitializingBean {
                 .chatMemoryRepository(jdbcChatMemoryRepository)
                 .maxMessages(20)
                 .build();
-        this.promptChatMemoryAdvisor = PromptChatMemoryAdvisor.builder(chatMemory).build();
+        this.messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
     }
 
     /**
@@ -98,7 +98,7 @@ public class ChatController implements InitializingBean {
             ChatClient.ChatClientRequestSpec spec = ChatClient
                     .create(openAiChatModel)
                     .prompt(req.getContent())
-                    .advisors(promptChatMemoryAdvisor) // 聊天记忆功能
+                    .advisors(messageChatMemoryAdvisor) // 聊天记忆功能
                     .advisors(a -> a.params(Map.of(
                             ChatMemory.CONVERSATION_ID, req.getConversationId() // 聊天记忆的对话ID
                     )));

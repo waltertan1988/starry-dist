@@ -1,6 +1,7 @@
 package com.walter.starry.autoconfigure.ai;
 
 import com.google.common.collect.Lists;
+import com.openai.models.audio.AudioResponseFormat;
 import com.walter.starry.ai.mcp.server.remote.AclAuthorityItemRes;
 import com.walter.starry.ai.mcp.server.remote.StarryInfoRes;
 import com.walter.starry.autoconfigure.ai.core.rag.ChineseTokenTextSplitter;
@@ -18,7 +19,7 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -27,8 +28,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.openai.*;
-import org.springframework.ai.openai.api.OpenAiAudioApi;
-import org.springframework.ai.openai.metadata.audio.OpenAiAudioSpeechResponseMetadata;
+import org.springframework.ai.openai.metadata.OpenAiAudioSpeechResponseMetadata;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.MimeTypeUtils;
 
@@ -61,20 +60,26 @@ import java.util.stream.Collectors;
 @Slf4j
 @SpringBootTest(classes = BusinessApplication.class)
 public class AiTest {
+    @Autowired
+    private OpenAiChatModel openAiChatModel;
+    @Autowired
+    private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
+    @Autowired
+    private OpenAiAudioSpeechModel openAiAudioSpeechModel;
+    @Autowired
+    private JdbcChatMemoryRepository jdbcChatMemoryRepository;
+    @Autowired
+    private VectorStore vectorStore;
 
     @Nested
     class ModelTest{
         @Nested
         class AudioModelTest {
-            @Autowired
-            private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
-            @Autowired
-            private OpenAiAudioSpeechModel openAiAudioSpeechModel;
 
             @Test
             void asr(){
                 OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                        .responseFormat(OpenAiAudioApi.TranscriptResponseFormat.TEXT)
+                        .responseFormat(AudioResponseFormat.TEXT)
                         .temperature(0f)
                         .build();
                 FileSystemResource audioFile = new FileSystemResource("E:/Download/《海滨仲夏夜》示范朗读.mp3");
@@ -106,8 +111,6 @@ public class AiTest {
         @Nested
         class ChatModelTest {
             private static final String PROMPT_TMPL_2 = "{subject}的{property}是？";
-            @Autowired
-            private OpenAiChatModel openAiChatModel;
 
             @Test
             void call(){
@@ -182,7 +185,7 @@ public class AiTest {
             MdcUtil.setTraceId(MdcUtil.genNewTraceId());
 
             OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-                    .httpHeaders(Collections.emptyMap())
+                    .customHeaders(Collections.emptyMap())
                     .build();
 
             Prompt prompt = Prompt.builder()
@@ -328,7 +331,7 @@ public class AiTest {
             void textReader(){
                 // 读取文本文档
                 final String fileName = "C:/Users/walter.tan/Desktop/1.txt";
-                TextReader reader = new TextReader(new PathResource(fileName));
+                TextReader reader = new TextReader(new FileSystemResource(fileName));
 
                 List<Document> documents = reader.read();
                 System.out.println("documents.size(): " + documents.size());
@@ -361,7 +364,7 @@ public class AiTest {
                         .withAdditionalMetadata("filename", "README.md")
                         .build();
 
-                MarkdownDocumentReader reader = new MarkdownDocumentReader(new PathResource(fileName), config);
+                MarkdownDocumentReader reader = new MarkdownDocumentReader(new FileSystemResource(fileName), config);
                 List<Document> documents = reader.read();
                 System.out.println("documents.size(): " + documents.size());
                 for (Document document : documents) {
@@ -373,7 +376,7 @@ public class AiTest {
             void pagePdfDocumentReader(){
                 // 按页读取PDF文档
                 final String fileName = "C:/公司资料/1.集团HR制度/3.《加班管理制度》-20110101.pdf";
-                PagePdfDocumentReader reader = new PagePdfDocumentReader(new PathResource(fileName),
+                PagePdfDocumentReader reader = new PagePdfDocumentReader(new FileSystemResource(fileName),
                         PdfDocumentReaderConfig.builder()
                                 .withPageTopMargin(0)
                                 .withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
@@ -391,7 +394,7 @@ public class AiTest {
             @Test
             void tikaDocumentReader(){
                 final String fileName = "C:/projects/mine/starry-dist/doc/Starry系统使用说明.docx";
-                TikaDocumentReader reader = new TikaDocumentReader(new PathResource(fileName));
+                TikaDocumentReader reader = new TikaDocumentReader(new FileSystemResource(fileName));
                 List<Document> documents = reader.read();
                 System.out.println("documents.size(): " + documents.size());
                 for (Document document : documents) {
@@ -402,13 +405,6 @@ public class AiTest {
 
         @Nested
         class RagSearchTest{
-            @Autowired
-            private OpenAiChatModel openAiChatModel;
-            @Autowired
-            private JdbcChatMemoryRepository jdbcChatMemoryRepository;
-            @Autowired
-            private VectorStore vectorStore;
-
             private static final String TAG_JIN_YONG = "金庸武侠小说";
             private static final String TAG_STARRY = "Starry系统";
 
@@ -430,7 +426,7 @@ public class AiTest {
                         .withAdditionalMetadata("tag", TAG_STARRY)
                         .build();
 
-                MarkdownDocumentReader reader = new MarkdownDocumentReader(new PathResource(fileName), config);
+                MarkdownDocumentReader reader = new MarkdownDocumentReader(new FileSystemResource(fileName), config);
                 List<Document> documents = new ChineseTokenTextSplitter().apply(reader.read());
                 int remainDoc = documents.size();
                 for (List<Document> documentSubList : Lists.partition(documents, 10)) {
@@ -444,7 +440,7 @@ public class AiTest {
             void addText(){
                 // 读取文本文档
                 final String fileName = "C:/Users/think/Downloads/天龙八部.txt";
-                TextReader reader = new TextReader(new PathResource(fileName));
+                TextReader reader = new TextReader(new FileSystemResource(fileName));
                 reader.getCustomMetadata().put("tag", TAG_JIN_YONG);
                 List<Document> documentList = new ChineseTokenTextSplitter().apply(reader.read());
                 int remainDoc = documentList.size();
@@ -477,7 +473,7 @@ public class AiTest {
             void ragSearchWithJdbcChatMemory(){
                 // 聊天记忆的advisor
                 ChatMemory chatMemory = MessageWindowChatMemory.builder().chatMemoryRepository(jdbcChatMemoryRepository).maxMessages(5).build();
-                Advisor promptChatMemoryAdvisor = PromptChatMemoryAdvisor.builder(chatMemory).build();
+                Advisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
 
                 // RAG的advisor
                 Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
@@ -493,7 +489,7 @@ public class AiTest {
 
                 ChatClient.builder(openAiChatModel).build()
                         .prompt()
-                        .advisors(retrievalAugmentationAdvisor, promptChatMemoryAdvisor)
+                        .advisors(retrievalAugmentationAdvisor, messageChatMemoryAdvisor)
                         .advisors(a -> a.params(Map.of(
                                 VectorStoreDocumentRetriever.FILTER_EXPRESSION, String.format("source == '%s'", "天龙八部.txt"),
                                 ChatMemory.CONVERSATION_ID, 1759996851659L

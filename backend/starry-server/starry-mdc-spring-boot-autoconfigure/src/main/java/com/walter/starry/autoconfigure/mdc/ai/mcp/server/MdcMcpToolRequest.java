@@ -2,7 +2,7 @@ package com.walter.starry.autoconfigure.mdc.ai.mcp.server;
 
 import com.walter.starry.common.util.MdcUtil;
 import lombok.Getter;
-import org.springaicommunity.mcp.annotation.McpToolParam;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 
 import java.io.Serializable;
 

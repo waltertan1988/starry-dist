@@ -1,12 +1,11 @@
 package com.walter.starry.ai.mcp.server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.walter.starry.common.util.MdcUtil;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.ServerParameters;
 import io.modelcontextprotocol.client.transport.StdioClientTransport;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
+import io.modelcontextprotocol.json.McpJsonDefaults;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +49,7 @@ public class McpServerTest {
                         "-jar", jarPath)
                 .build();
 
-        var transport = new StdioClientTransport(stdioParams, new JacksonMcpJsonMapper(new ObjectMapper()));
+        var transport = new StdioClientTransport(stdioParams, McpJsonDefaults.getMapper());
 
         new SampleClient(transport).run();
     }

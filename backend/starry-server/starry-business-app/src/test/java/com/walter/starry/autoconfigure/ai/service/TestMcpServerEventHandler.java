@@ -3,8 +3,8 @@ package com.walter.starry.autoconfigure.ai.service;
 import com.walter.starry.autoconfigure.mdc.ai.mcp.client.McpServerEventMdcHandler;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
-import org.springaicommunity.mcp.annotation.McpLogging;
-import org.springaicommunity.mcp.annotation.McpProgress;
+import org.springframework.ai.mcp.annotation.McpLogging;
+import org.springframework.ai.mcp.annotation.McpProgress;
 import org.springframework.stereotype.Component;
 
 /**
