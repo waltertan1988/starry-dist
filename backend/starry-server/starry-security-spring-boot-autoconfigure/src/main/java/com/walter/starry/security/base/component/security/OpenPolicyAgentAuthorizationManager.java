@@ -8,24 +8,27 @@ import com.walter.starry.security.base.entity.AclResourceItem;
 import com.walter.starry.security.base.repository.AclAuthorityItemRepository;
 import com.walter.starry.security.base.repository.AclAuthorityResourceRepository;
 import com.walter.starry.security.base.repository.AclResourceItemRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.log.LogMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
-import org.springframework.security.authorization.AuthorityAuthorizationManager;
-import org.springframework.security.authorization.AuthorizationDecision;
-import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.*;
 import org.springframework.security.config.annotation.web.AbstractRequestMatcherRegistry;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -59,7 +62,7 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
      * 定义层次角色，参考：https://docs.spring.io/spring-security/reference/servlet/authorization/architecture.html#authz-hierarchical-roles
      */
     @Getter
-    private final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    private final RoleHierarchy roleHierarchy = new DelegatedRoleHierarchy();
     private volatile boolean isRoleHierarchyRefreshed = false;
 
     private final AclAuthorityItemRepository aclAuthorityItemRepository;
@@ -96,7 +99,7 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
             return;
         }
 
-        roleHierarchy.setHierarchy(String.join("\n", pairList));
+        ((DelegatedRoleHierarchy)roleHierarchy).setRoleHierarchy(RoleHierarchyImpl.fromHierarchy(String.join("\n", pairList)));
 
         this.isRoleHierarchyRefreshed = true;
 
@@ -183,7 +186,7 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
     }
 
     @Override
-    public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
+    public AuthorizationResult authorize(Supplier<? extends @Nullable Authentication> authentication, RequestAuthorizationContext context) {
         // 访问资源时，检查是否已授权
 
         if (this.logger.isTraceEnabled()) {
@@ -220,7 +223,7 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
                     if (this.logger.isTraceEnabled()) {
                         this.logger.trace(LogMessage.format("Checking authorization on %s using %s", context.getRequest(), manager));
                     }
-                    return manager.check(authentication,
+                    return manager.authorize(authentication,
                             new RequestAuthorizationContext(context.getRequest(), matchResult.getVariables()));
                 }
             }
@@ -235,7 +238,7 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
                 if (this.logger.isTraceEnabled()) {
                     this.logger.trace(LogMessage.format("Checking authorization on %s using %s", context.getRequest(), manager));
                 }
-                return manager.check(authentication,
+                return manager.authorize(authentication,
                         new RequestAuthorizationContext(context.getRequest(), matchResult.getVariables()));
             }
         }
@@ -271,5 +274,21 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
          * 未指定httpMethod的RequestMatcherEntry
          */
         private final List<RequestMatcherEntry<AuthorizationManager<RequestAuthorizationContext>>> nullHttpMethodMappingList = new ArrayList<>();
+    }
+
+    /**
+     * 层次角色的代理
+     */
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DelegatedRoleHierarchy implements RoleHierarchy {
+
+        private volatile RoleHierarchy roleHierarchy;
+
+        @Override
+        public Collection<? extends GrantedAuthority> getReachableGrantedAuthorities(Collection<? extends GrantedAuthority> authorities) {
+            return roleHierarchy.getReachableGrantedAuthorities(authorities);
+        }
     }
 }
