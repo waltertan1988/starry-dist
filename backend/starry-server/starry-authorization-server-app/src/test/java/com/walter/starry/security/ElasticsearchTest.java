@@ -180,7 +180,7 @@ public class ElasticsearchTest {
                     .index(ElasticsearchIndexAliasEnum.USER.getAlias())
                     .id("1")
                     .script(s -> s.lang(ScriptLanguage.Painless)
-                            .source("ctx._source.nickname = params.nickname")
+                            .source(fn -> fn.scriptString("ctx._source.nickname = params.nickname"))
                             .params("nickname", JsonData.of("孙悟空"))
                     ), EsUser.class);
 
