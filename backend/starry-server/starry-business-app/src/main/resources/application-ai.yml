@@ -10,26 +10,17 @@ spring:
       base-url: "https://api.siliconflow.cn"
       audio:
         transcription:
-          options:
-            model: "TeleAI/TeleSpeechASR"
+          model: "TeleAI/TeleSpeechASR"
         speech:
-          options:
-            model: "fnlp/MOSS-TTSD-v0.5"
-            voice: "fnlp/MOSS-TTSD-v0.5:claire"
-            response-format: mp3
-            speed: 0.75
+          model: "fnlp/MOSS-TTSD-v0.5"
+          voice: "fnlp/MOSS-TTSD-v0.5:claire"
+          response-format: mp3
+          speed: 0.75
       chat:
-        base-url: "https://open.bigmodel.cn/api/paas"
-        completions-path: "/v4/chat/completions"
-        options:
-          # 支持图片识别
-#          model: "glm-4.6v-flash"
-          # 支持工具调用
-          model: "glm-4.7-flash"
+        model: "Qwen/Qwen3.5-4B"
         api-key: "XXX"
       embedding:
-        options:
-          model: "BAAI/bge-m3"
+        model: "BAAI/bge-m3"
     mcp:
       client:
         type: SYNC
