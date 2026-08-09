@@ -3,6 +3,7 @@ package com.walter.starry.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -18,6 +19,10 @@ import java.util.List;
 public class JsonUtil {
 
     public static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     public static <T> T toBean(String json, Class<T> clz){
         if(StringUtils.isBlank(json)){
