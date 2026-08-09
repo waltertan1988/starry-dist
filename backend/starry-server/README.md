@@ -3,14 +3,14 @@
 
 ## 1. 中间件说明
 ### 1.1 必须中间件
-* JDK-21
+* JDK-21, SpringBoot-4.0.7
 * MySql-8.0.45
 * Redis-8.2.7 (含redis-server、redis-sentinel)
 ### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
 * MySQL MHA(v0.58-2)
 * MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
-* ElasticStack(v8.19.15，主要是ElasticSearch（安装IK分词器插件）、Kibana)
+* ElasticStack(v9.2.8，主要是ElasticSearch（安装IK分词器插件）、Kibana)
 * Ollama(v0.24.0)
 * RedisInsight(v3.6.0)
 
