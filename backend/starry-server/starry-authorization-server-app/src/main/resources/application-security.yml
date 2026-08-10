@@ -33,6 +33,9 @@ mybatis:
 
 # RocketMQ配置
 rocketmq:
+  # 单机部署
+  # name-server: ${app.middleware-host}:9876
+  # 集群部署
   name-server: ${app.middleware-host}:9876;${app.middleware-host}:9886;${app.middleware-host}:9896
   producer:
     group: ${spring.application.name}
