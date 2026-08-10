@@ -159,7 +159,7 @@ public class SecurityConfig {
      */
     @Bean("openPolicyAgentAuthorizationManager")
     public OpenPolicyAgentAuthorizationManager openPolicyAgentAuthorizationManager(AclAuthorityItemRepository aclAuthorityItemRepository, AclResourceItemRepository aclResourceItemRepository, AclAuthorityResourceRepository aclAuthorityResourceRepository){
-        return new OpenPolicyAgentAuthorizationManager(aclAuthorityItemRepository, aclResourceItemRepository, aclAuthorityResourceRepository);
+        return new OpenPolicyAgentAuthorizationManager(aclAuthorityItemRepository, aclResourceItemRepository, aclAuthorityResourceRepository, applicationContext);
     }
 
     /**

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.log.LogMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,10 +72,11 @@ public class OpenPolicyAgentAuthorizationManager extends AbstractRequestMatcherR
 
     private final AclAuthorityResourceRepository aclAuthorityResourceRepository;
 
-    public OpenPolicyAgentAuthorizationManager(AclAuthorityItemRepository aclAuthorityItemRepository, AclResourceItemRepository aclResourceItemRepository, AclAuthorityResourceRepository aclAuthorityResourceRepository) {
+    public OpenPolicyAgentAuthorizationManager(AclAuthorityItemRepository aclAuthorityItemRepository, AclResourceItemRepository aclResourceItemRepository, AclAuthorityResourceRepository aclAuthorityResourceRepository, ApplicationContext context) {
         this.aclAuthorityItemRepository = aclAuthorityItemRepository;
         this.aclResourceItemRepository = aclResourceItemRepository;
         this.aclAuthorityResourceRepository = aclAuthorityResourceRepository;
+        super.setApplicationContext(context);
     }
 
     /**
