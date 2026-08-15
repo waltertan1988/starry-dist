@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConditionalOnClass(ElasticsearchVectorStore.class)
-@ConfigurationProperties("app.ai.vectorstore")
+@ConfigurationProperties("app.ai.vector-store")
 public class AppAiVectorStoreProperties {
     /**
      * ElasticSearch向量数据库的配置字段及含义参照：{@link ElasticsearchVectorStoreOptions}

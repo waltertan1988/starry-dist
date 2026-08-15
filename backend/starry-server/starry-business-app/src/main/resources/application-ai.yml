@@ -18,7 +18,6 @@ spring:
           speed: 0.75
       chat:
         model: "Qwen/Qwen3.5-4B"
-        api-key: "XXX"
       embedding:
         model: "BAAI/bge-m3"
     mcp:
@@ -53,7 +52,7 @@ spring:
 
 app:
   ai:
-    vectorstore:
+    vector-store:
       elasticsearch:
         index-name: starry-rag
         similarity: cosine
