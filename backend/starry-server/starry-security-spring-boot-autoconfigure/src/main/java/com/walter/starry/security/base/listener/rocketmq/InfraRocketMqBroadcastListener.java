@@ -13,7 +13,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,9 +28,11 @@ import java.util.List;
     topic = InfraRocketMqBroadcastListener.TOPIC, namespace = "${rocketmq.producer.namespace}",
     consumerGroup = "${spring.application.name}", messageModel = MessageModel.BROADCASTING
 )
-@ConditionalOnBean(InfraMessageRocketMqService.class)
+@ConditionalOnProperty(name = InfraMessageRocketMqService.CONDITIONAL_ON_PROPERTIES_NAME)
 public class InfraRocketMqBroadcastListener extends AbstractRocketMqMessageListener {
+
     public static final String TOPIC = "INFRA_BROADCAST";
+
     @Autowired
     private RoleService roleService;
     @Autowired

@@ -20,8 +20,11 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = {"rocketmq.name-server"})
+@ConditionalOnProperty(name = InfraMessageRocketMqService.CONDITIONAL_ON_PROPERTIES_NAME)
 public class InfraMessageRocketMqService extends AbstractInfraMessageService {
+
+    public static final String CONDITIONAL_ON_PROPERTIES_NAME = "rocketmq.name-server";
+
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 

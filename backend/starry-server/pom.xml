@@ -24,7 +24,7 @@
 		<redisson.version>3.26.0</redisson.version>
 		<mybatis-spring-boot-starter.version>4.0.1</mybatis-spring-boot-starter.version>
 		<pagehelper-spring-boot-starter.version>2.1.0</pagehelper-spring-boot-starter.version>
-		<rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
+		<rocketmq-spring-boot-starter.version>2.3.6</rocketmq-spring-boot-starter.version>
 		<spring-ai.version>2.0.0</spring-ai.version>
 	</properties>
 
