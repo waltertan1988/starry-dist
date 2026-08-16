@@ -7,7 +7,7 @@ spring:
             initialize-schema: never
     openai:
       api-key: "XXX"
-      base-url: "https://api.siliconflow.cn"
+      base-url: "https://api.siliconflow.cn/v1"
       audio:
         transcription:
           model: "TeleAI/TeleSpeechASR"
