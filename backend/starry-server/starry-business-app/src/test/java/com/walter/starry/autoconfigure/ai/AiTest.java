@@ -152,7 +152,10 @@ public class AiTest {
                 AreaResponse areaResponse = ChatClient.builder(openAiChatModel).build()
                         .prompt("中国各个地区分别包含了哪些省份？请输出中文内容。")
                         .call()
-                        .entity(AreaResponse.class);
+                        .entity(AreaResponse.class,
+                                spec -> spec
+                                        .useProviderStructuredOutput() // 要求大模型自校验，不允许返回无效响应
+                                        .validateSchema()); // 大模型返回响应结果后，由SpringAI框架进行JSON的校验和重试
                 System.out.println(JsonUtil.toJson(areaResponse));
             }
 
