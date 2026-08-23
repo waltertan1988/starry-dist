@@ -164,7 +164,7 @@ public class AiTest {
                 ResponseEntity<ChatResponse, AreaResponse> responseEntity = ChatClient.builder(openAiChatModel).build()
                         .prompt("中国各个地区分别包含了哪些省份？请输出中文内容。")
                         .call()
-                        .responseEntity(AreaResponse.class);
+                        .responseEntity(AreaResponse.class, spec -> spec.useProviderStructuredOutput().validateSchema());
                 System.out.println(JsonUtil.toJson(responseEntity));
             }
 
