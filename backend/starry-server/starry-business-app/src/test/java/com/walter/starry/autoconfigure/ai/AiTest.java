@@ -19,11 +19,14 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.ResponseEntity;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
@@ -109,21 +112,57 @@ public class AiTest {
         }
 
         @Nested
-        class ChatModelTest {
+        class ChatTest {
             private static final String PROMPT_TMPL_2 = "{subject}的{property}是？";
 
             @Test
-            void call(){
+            void modelCall(){
                 System.out.println(openAiChatModel.call("中国的首都是哪里？"));
             }
 
             @Test
-            void callAndReturnEntity(){
+            void callContent(){
+                String content = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国的首都是哪里？")
+                        .call()
+                        .content();
+                System.out.println(content);
+            }
+
+            @Test
+            void callChatResponse(){
+                ChatResponse chatResponse = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国的首都是哪里？")
+                        .call()
+                        .chatResponse();
+                System.out.println(JsonUtil.toJson(chatResponse));
+            }
+
+            @Test
+            void callChatClientResponse(){
+                ChatClientResponse chatClientResponse = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国的首都是哪里？")
+                        .call()
+                        .chatClientResponse();
+                System.out.println(JsonUtil.toJson(chatClientResponse));
+            }
+
+            @Test
+            void callEntity(){
                 AreaResponse areaResponse = ChatClient.builder(openAiChatModel).build()
                         .prompt("中国各个地区分别包含了哪些省份？请输出中文内容。")
                         .call()
                         .entity(AreaResponse.class);
                 System.out.println(JsonUtil.toJson(areaResponse));
+            }
+
+            @Test
+            void callResponseEntity(){
+                ResponseEntity<ChatResponse, AreaResponse> responseEntity = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国各个地区分别包含了哪些省份？请输出中文内容。")
+                        .call()
+                        .responseEntity(AreaResponse.class);
+                System.out.println(JsonUtil.toJson(responseEntity));
             }
 
             @Test
@@ -139,7 +178,7 @@ public class AiTest {
             }
 
             @Test
-            void stream(){
+            void streamContent(){
                 String last = ChatClient.builder(openAiChatModel).build()
                         .prompt("为婚礼挑选主持人时需要考察他哪些特质？请按重要性从高到低列出来")
                         .stream()
@@ -148,6 +187,30 @@ public class AiTest {
                         .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
                         .blockLast();
                 System.out.println(">>>>>> last=" + last);
+            }
+
+            @Test
+            void streamChatResponse(){
+                ChatResponse last = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国的中国的首都是哪里？")
+                        .stream()
+                        .chatResponse()
+                        .doOnNext(r -> System.out.println(JsonUtil.toJson(r)))
+                        .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
+                        .blockLast();
+                System.out.println(">>>>>> last=" + JsonUtil.toJson(last));
+            }
+
+            @Test
+            void streamChatClientResponse(){
+                ChatClientResponse last = ChatClient.builder(openAiChatModel).build()
+                        .prompt("中国的中国的首都是哪里？")
+                        .stream()
+                        .chatClientResponse()
+                        .doOnNext(r -> System.out.println(JsonUtil.toJson(r)))
+                        .doOnComplete(() -> System.out.println("\n~~~~~~~~~~~~~~~~~~~"))
+                        .blockLast();
+                System.out.println(">>>>>> last=" + JsonUtil.toJson(last));
             }
 
             @Test
