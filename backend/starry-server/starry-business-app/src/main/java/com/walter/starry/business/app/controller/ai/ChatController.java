@@ -69,7 +69,7 @@ public class ChatController implements InitializingBean {
         Long conversationId = IdUtil.genNextGlobalId();
         UserAiConversation conversation = new UserAiConversation();
         conversation.setUsername(context.getAuthentication().getName());
-        conversation.setConversationId(conversationId);
+        conversation.setConversationId(String.valueOf(conversationId));
         conversation.setCreateTime(now);
         conversation.setUpdateTime(now);
         userAiConversationMapper.insertSelective(conversation);

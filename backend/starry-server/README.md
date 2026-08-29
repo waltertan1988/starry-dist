@@ -404,18 +404,20 @@ CREATE TABLE oauth2_authorized_client (
 ```mysql
 CREATE TABLE `SPRING_AI_CHAT_MEMORY` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
-   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `conversation_id` VARCHAR(36) NOT NULL COMMENT '对话ID',
    `content` text NOT NULL COMMENT '消息内容',
-   `type` varchar(255) NOT NULL COMMENT '消息类型',
+   `type` ENUM('USER', 'ASSISTANT', 'SYSTEM', 'TOOL') NOT NULL COMMENT '消息类型',
    `timestamp` timestamp(3) NOT NULL COMMENT '消息的系统时间戳',
+   `sequence_id` BIGINT NOT NULL COMMENT '消息的顺序',
    PRIMARY KEY (`id`),
-   KEY `idx_conversationId` (`conversation_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='LLM聊天记忆表';
+   INDEX `SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_TIMESTAMP_IDX` (`conversation_id`, `timestamp`),
+   INDEX `SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_SEQUENCE_ID_IDX` (`conversation_id`, `sequence_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SpringAI内置的LLM聊天记忆表';
 
 CREATE TABLE `user_ai_conversation` (
    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '物理主键',
    `username` varchar(128) NOT NULL COMMENT '用户账号',
-   `conversation_id` bigint NOT NULL COMMENT '对话ID',
+   `conversation_id` VARCHAR(36) NOT NULL COMMENT '对话ID',
    `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
    `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
    PRIMARY KEY (`id`),

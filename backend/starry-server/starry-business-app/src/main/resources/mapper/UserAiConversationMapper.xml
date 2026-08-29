@@ -8,7 +8,7 @@
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="username" jdbcType="VARCHAR" property="username" />
-    <result column="conversation_id" jdbcType="BIGINT" property="conversationId" />
+    <result column="conversation_id" jdbcType="VARCHAR" property="conversationId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -138,7 +138,7 @@
     -->
     insert into user_ai_conversation (id, username, conversation_id, 
       create_time, update_time)
-    values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{conversationId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{conversationId,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.walter.starry.business.app.entity.UserAiConversation">
@@ -172,7 +172,7 @@
         #{username,jdbcType=VARCHAR},
       </if>
       <if test="conversationId != null">
-        #{conversationId,jdbcType=BIGINT},
+        #{conversationId,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -206,7 +206,7 @@
         username = #{row.username,jdbcType=VARCHAR},
       </if>
       <if test="row.conversationId != null">
-        conversation_id = #{row.conversationId,jdbcType=BIGINT},
+        conversation_id = #{row.conversationId,jdbcType=VARCHAR},
       </if>
       <if test="row.createTime != null">
         create_time = #{row.createTime,jdbcType=TIMESTAMP},
@@ -227,7 +227,7 @@
     update user_ai_conversation
     set id = #{row.id,jdbcType=BIGINT},
       username = #{row.username,jdbcType=VARCHAR},
-      conversation_id = #{row.conversationId,jdbcType=BIGINT},
+      conversation_id = #{row.conversationId,jdbcType=VARCHAR},
       create_time = #{row.createTime,jdbcType=TIMESTAMP},
       update_time = #{row.updateTime,jdbcType=TIMESTAMP}
     <if test="example != null">
@@ -245,7 +245,7 @@
         username = #{username,jdbcType=VARCHAR},
       </if>
       <if test="conversationId != null">
-        conversation_id = #{conversationId,jdbcType=BIGINT},
+        conversation_id = #{conversationId,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -263,7 +263,7 @@
     -->
     update user_ai_conversation
     set username = #{username,jdbcType=VARCHAR},
-      conversation_id = #{conversationId,jdbcType=BIGINT},
+      conversation_id = #{conversationId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
