@@ -109,10 +109,14 @@ sudo mkdir -p ./data/etcd ./data/milvus
 sudo mkdir -p ./data/apm/grafana
 # Ollama相关目录
 sudo mkdir -p ./data/ollama
+
 # 开放文件和目录的权限
 sudo chmod 777 -R ./data
+# MySql配置文件的权限不能a+w，否则mysql在启动时会忽略该文件
+sudo chmod 644 ./data/mysql/master/conf.d/config-file.cnf ./data/mysql/slave1/conf.d/config-file.cnf ./data/mysql/slave2/conf.d/config-file.cnf
+
 # this step might not be necessary on other than Linux platforms
-sudo chown 10000 -R ./data
+# sudo chown 10000 -R ./data
 ```
 
 ### 3.2 配置中间件
