@@ -266,7 +266,7 @@ public class AiTest {
                             "progressToken", mcpProgressToken // 要使用McpProgress能力，必须传递progressToken
                     ))
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getStarryInfo")))
+                    .tools(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getStarryInfo")))
                     .call()
                     .content();
             System.out.println(content);
@@ -285,7 +285,7 @@ public class AiTest {
                             "progressToken", mcpProgressToken, // 要使用McpProgress能力，必须传递progressToken
                             MdcUtil.ATTR_TRACE_ID, mcpTraceId
                     ))
-                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getUserInfo")))
+                    .tools(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("getUserInfo")))
                     .stream()
                     .content()
                     .doOnNext(System.out::print)
@@ -302,9 +302,9 @@ public class AiTest {
                     .prompt("请查询名字中包含“%s”这%s个字的权限项配置记录".formatted(searchName, searchName.length()))
                     .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
                     .toolContext(Map.of(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
-                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("pageQueryAclAuthorityItem")))
+                    .tools(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("pageQueryAclAuthorityItem")))
                     .call()
-                    .entity(new ParameterizedTypeReference<List<AclAuthorityItemRes>>() {
+                    .entity(new ParameterizedTypeReference<>() {
                     });
 
             System.out.println(JsonUtil.toJson(list));
@@ -331,7 +331,7 @@ public class AiTest {
             StarryInfoRes starryInfoRes = ChatClient.create(openAiChatModel)
                     .prompt("请提供Starry系统的基本信息。要求：不存在的数据用null填充，禁止胡乱编造。")
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(toolCallBacks)
+                    .tools(toolCallBacks)
                     .call()
                     .entity(StarryInfoRes.class);
             log.info("starryInfoRes: {}", JsonUtil.toJson(starryInfoRes));
@@ -340,7 +340,7 @@ public class AiTest {
                     .prompt().user(u -> u.text("请提供ID为{uid}的用户的个人简介。")
                             .param("uid", Optional.ofNullable(starryInfoRes).map(StarryInfoRes::authorUid).orElse("")))
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(toolCallBacks)
+                    .tools(toolCallBacks)
                     .call()
                     .content();
             System.out.println(content);
@@ -357,7 +357,7 @@ public class AiTest {
             String result = ChatClient.create(openAiChatModel)
                     .prompt("我要获取Starry系统的作者的用户信息，请依次调用合适的工具方法给我返回最终答案。要求：调用工具的过程中，不存在的数据用null填充，严禁胡乱编造。")
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()))
+                    .tools(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()))
                     .call()
                     .content();
             log.info("result: {}", result);
@@ -377,7 +377,7 @@ public class AiTest {
             List<String> plannedToolCallbackList = ChatClient.create(openAiChatModel)
                     .prompt("我要获取Starry系统的作者的用户信息，需要依次调用哪些工具？最后请把工具的名称以数组形式按需要调用的顺序返回。")
                     .advisors(new MdcMcpAdvisor())
-                    .toolCallbacks(toolCallbackMap.values().stream().toList())
+                    .tools(toolCallbackMap.values().stream().toList())
                     .call()
                     .entity(new ParameterizedTypeReference<>() {});
 
