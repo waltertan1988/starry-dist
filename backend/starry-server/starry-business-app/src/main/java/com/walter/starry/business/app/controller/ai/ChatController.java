@@ -109,7 +109,7 @@ public class ChatController implements InitializingBean {
                 spec = spec.advisors(new MdcMcpAdvisor()); // 为MCP请求添加MDC信息
                 if ("starry".equals(req.getMcpToolId())){
                     // 使用第一个MCP服务(starry)
-                    spec = spec.toolCallbacks(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()));
+                    spec = spec.tools(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()));
                 }else{
                     throw new IllegalArgumentException("不支持的MCP工具ID");
                 }

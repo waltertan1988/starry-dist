@@ -1,11 +1,11 @@
 package com.walter.starry.autoconfigure.ai.core.tool;
 
 import io.modelcontextprotocol.client.McpSyncClient;
+import org.jspecify.annotations.NonNull;
 import org.springframework.ai.mcp.McpToolFilter;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.lang.NonNull;
 
 import java.util.Collection;
 

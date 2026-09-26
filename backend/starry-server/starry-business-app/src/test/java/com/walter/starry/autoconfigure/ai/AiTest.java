@@ -43,6 +43,8 @@ import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -309,6 +311,45 @@ public class AiTest {
 
             System.out.println(JsonUtil.toJson(list));
         }
+
+        @Test
+        void toolArgAugment(){
+            AugmentedToolCallbackProvider<AgentThinking> provider = AugmentedToolCallbackProvider
+                    .<AgentThinking>builder()
+                    // wrap the original tools
+                    .delegate(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst(), Set.of("pageQueryAclAuthorityItem")))
+                    // augmentation schema type
+                    .argumentType(AgentThinking.class)
+                    // optional consumer of augmented content
+                    .argumentConsumer(event -> {
+                        AgentThinking thinking = event.arguments();
+                        log.info("Tool: {} | Reasoning: {}", event.toolDefinition().name(), thinking.innerThought());
+                    })
+                    .removeExtraArgumentsAfterProcessing(true)
+                    .build();
+
+            final String mcpTraceId = "12345678";
+            final String searchName = "管理员";
+
+            List<AclAuthorityItemRes> list = ChatClient.create(openAiChatModel)
+                    .prompt("请查询名字中包含“%s”这%s个字的权限项配置记录".formatted(searchName, searchName.length()))
+                    .advisors(a -> a.advisors(new MdcMcpAdvisor()).param(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
+                    .toolContext(Map.of(MdcUtil.ATTR_TRACE_ID, mcpTraceId))
+                    .tools(provider)
+                    .call()
+                    .entity(new ParameterizedTypeReference<>() {
+                    });
+
+            System.out.println(JsonUtil.toJson(list));
+        }
+
+        public record AgentThinking(
+                @ToolParam(description = "Your reasoning for calling this tool")
+                String innerThought,
+
+                @ToolParam(description = "Confidence level (low, medium, high)", required = false)
+                String confidence
+        ) {}
     }
 
     @Nested
