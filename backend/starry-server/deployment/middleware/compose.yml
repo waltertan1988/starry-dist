@@ -13,7 +13,8 @@ include:
     ## redis子网网段：172.18.2.0/24
   - compose-redis.yml
     ## MQ子网网段：172.18.3.0/24
-  - compose-rocketmq.yml
+  - compose-kafka.yml
+#  - compose-rocketmq.yml
 #  - compose-pulsar.yml
     ## minio子网网段：172.18.4.0/24
 #  - compose-minio.yml

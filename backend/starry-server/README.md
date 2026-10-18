@@ -10,7 +10,7 @@
 ### 1.2 可选中间件
 * Docker Compose（建议本地开发时使用）
 * MySQL MHA(v0.58-2)
-* MQ（RocketMQ-5.3.4或Pulsar-3.2.1）
+* MQ（Kafka-4.3.1、RocketMQ-5.3.4或Pulsar-3.2.1）
 * Ollama(v0.24.0)
 * RedisInsight(v3.6.0)
 
@@ -85,6 +85,9 @@ sudo mkdir -p ./data/redis/cluster/node3/conf ./data/redis/cluster/node3/data
 sudo mkdir -p ./data/redis/cluster/node4/conf ./data/redis/cluster/node4/data
 sudo mkdir -p ./data/redis/cluster/node5/conf ./data/redis/cluster/node5/data
 sudo mkdir -p ./data/redis/cluster/node6/conf ./data/redis/cluster/node6/data
+# Kafka相关目录
+# Kafka本地单实例部署模式
+sudo mkdir -p ./data/kafka/singlenode/config ./data/kafka/singlenode/kraft-combined-logs
 # RocketMQ相关目录
 # RocketMQ本地单实例部署模式
 sudo mkdir -p ./data/rocketmq/local/namesrv/logs
@@ -147,7 +150,6 @@ rocketmq:
     group: ${spring.application.name}
     namespace: ${spring.application.name}
 ```
-
 > * RocketMQ的部署方式说明，参见[官网](https://rocketmq.apache.org/zh/docs/)和[中文社区](https://rocketmq-learning.com/)。  
 > * 配置示例：  
 >（1）单机模式，参考[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-rocketmq-local.yml)  
