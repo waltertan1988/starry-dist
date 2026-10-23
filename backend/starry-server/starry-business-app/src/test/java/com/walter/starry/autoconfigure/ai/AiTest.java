@@ -59,8 +59,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest(classes = BusinessApplication.class)
@@ -402,28 +400,6 @@ public class AiTest {
                     .call()
                     .content();
             log.info("result: {}", result);
-        }
-
-        /**
-         * 半自动编排
-         */
-        @Test
-        void getStarryAuthorInfoAgent3(){
-            MdcUtil.setTraceId(MdcUtil.genNewTraceId());
-            log.info("getStarryAuthorInfoAgent3 start.");
-
-            Map<String, ToolCallback> toolCallbackMap = Arrays.stream(new ExtSyncMcpToolCallbackProvider(mcpSyncClients.getFirst()).getToolCallbacks())
-                    .collect(Collectors.toMap(tcb -> tcb.getToolDefinition().name(), Function.identity()));
-
-            List<String> plannedToolCallbackList = ChatClient.create(openAiChatModel)
-                    .prompt("我要获取Starry系统的作者的用户信息，需要依次调用哪些工具？最后请把工具的名称以数组形式按需要调用的顺序返回。")
-                    .advisors(new MdcMcpAdvisor())
-                    .tools(toolCallbackMap.values().stream().toList())
-                    .call()
-                    .entity(new ParameterizedTypeReference<>() {});
-
-            Objects.requireNonNull(plannedToolCallbackList).forEach(System.out::println);
-            // TODO tyx 半自动编排
         }
     }
 
