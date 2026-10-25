@@ -1,13 +1,13 @@
 package com.walter.starry.security.base.listener.rocketmq;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.common.message.ResourceChangeMessage;
 import com.walter.starry.security.base.common.message.RoleChangeMessage;
 import com.walter.starry.security.base.service.ResourceGroupService;
 import com.walter.starry.security.base.service.RoleService;
-import com.walter.starry.security.base.service.msg.InfraMessageRocketMqService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.MessageModel;
@@ -28,7 +28,7 @@ import java.util.List;
     topic = InfraRocketMqBroadcastListener.TOPIC, namespace = "${rocketmq.producer.namespace}",
     consumerGroup = "${spring.application.name}", messageModel = MessageModel.BROADCASTING
 )
-@ConditionalOnProperty(name = InfraMessageRocketMqService.CONDITIONAL_ON_PROPERTIES_NAME)
+@ConditionalOnProperty(name = MqConstant.RocketMq.CONDITIONAL_ON_PROP)
 public class InfraRocketMqBroadcastListener extends AbstractRocketMqMessageListener {
 
     public static final String TOPIC = "INFRA_BROADCAST";

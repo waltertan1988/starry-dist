@@ -1,5 +1,6 @@
 package com.walter.starry.security.base.service.msg;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.util.MdcUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
@@ -20,11 +21,8 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = InfraMessageRocketMqService.CONDITIONAL_ON_PROPERTIES_NAME)
+@ConditionalOnProperty(name = MqConstant.RocketMq.CONDITIONAL_ON_PROP)
 public class InfraMessageRocketMqService extends AbstractInfraMessageService {
-
-    public static final String CONDITIONAL_ON_PROPERTIES_NAME = "rocketmq.name-server";
-
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 

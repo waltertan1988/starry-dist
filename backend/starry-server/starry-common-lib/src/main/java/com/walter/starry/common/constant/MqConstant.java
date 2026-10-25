@@ -12,7 +12,7 @@ public interface MqConstant {
     }
 
     interface RocketMq{
-
+        String CONDITIONAL_ON_PROP = "rocketmq.name-server";
     }
 
     interface Kafka{
