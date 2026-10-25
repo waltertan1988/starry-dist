@@ -1,16 +1,16 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.MdcUtil;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 /**
  * @author walter.tan
  */
 @Component
-@ConditionalOnProperty(name = {"rocketmq.name-server"})
+@ConditionalOnProperty(name = MqConstant.RocketMq.CONDITIONAL_ON_PROP)
 public class RocketMdcMqMessageListenerPostProcessor implements MdcMessageListenerPostProcessor {
 
     @Override
