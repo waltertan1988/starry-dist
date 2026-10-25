@@ -7,7 +7,8 @@ public interface MqConstant {
     }
 
     interface Pulsar{
-
+        String CONDITIONAL_ON_PROP_1 = "spring.pulsar.client.service-url";
+        String CONDITIONAL_ON_PROP_2 = "spring.pulsar.admin.service-url";
     }
 
     interface RocketMq{

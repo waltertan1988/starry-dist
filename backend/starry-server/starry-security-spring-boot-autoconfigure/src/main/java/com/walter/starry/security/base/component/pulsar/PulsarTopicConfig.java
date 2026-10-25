@@ -1,5 +1,6 @@
 package com.walter.starry.security.base.component.pulsar;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.security.base.config.properties.AppMsgProps;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = {"spring.pulsar.client.service-url", "spring.pulsar.admin.service-url"})
+@ConditionalOnProperty(name = {MqConstant.Pulsar.CONDITIONAL_ON_PROP_1, MqConstant.Pulsar.CONDITIONAL_ON_PROP_2})
 public class PulsarTopicConfig implements InitializingBean {
     @Autowired
     private AppMsgProps appMsgProps;

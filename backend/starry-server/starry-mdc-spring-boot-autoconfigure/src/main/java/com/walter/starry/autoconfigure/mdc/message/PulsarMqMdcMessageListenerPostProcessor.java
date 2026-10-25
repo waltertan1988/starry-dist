@@ -1,5 +1,6 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.MdcUtil;
 import org.apache.pulsar.client.api.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
  * @author walter.tan
  */
 @Component
-@ConditionalOnProperty(name = {"spring.pulsar.client.service-url", "spring.pulsar.admin.service-url"})
+@ConditionalOnProperty(name = {MqConstant.Pulsar.CONDITIONAL_ON_PROP_1, MqConstant.Pulsar.CONDITIONAL_ON_PROP_2})
 public class PulsarMqMdcMessageListenerPostProcessor implements MdcMessageListenerPostProcessor {
 
     @Override
