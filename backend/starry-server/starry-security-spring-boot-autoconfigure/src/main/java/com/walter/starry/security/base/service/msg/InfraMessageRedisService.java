@@ -1,5 +1,6 @@
 package com.walter.starry.security.base.service.msg;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.common.core.message.RedisMessage;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+@ConditionalOnProperty(name = MqConstant.Redis.CONDITIONAL_ON_PROP, havingValue = "true")
 public class InfraMessageRedisService extends AbstractInfraMessageService {
     @Value("${app.message.redis.namespace}")
     private String namespace;

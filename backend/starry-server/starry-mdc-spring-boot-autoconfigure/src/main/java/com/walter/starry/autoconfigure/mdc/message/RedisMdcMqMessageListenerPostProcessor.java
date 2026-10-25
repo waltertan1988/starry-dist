@@ -1,5 +1,6 @@
 package com.walter.starry.autoconfigure.mdc.message;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.core.message.RedisMessage;
 import com.walter.starry.common.util.MdcUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @author walter.tan
  */
 @Component
-@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+@ConditionalOnProperty(name = MqConstant.Redis.CONDITIONAL_ON_PROP, havingValue = "true")
 public class RedisMdcMqMessageListenerPostProcessor implements MdcMessageListenerPostProcessor {
 
     @Override

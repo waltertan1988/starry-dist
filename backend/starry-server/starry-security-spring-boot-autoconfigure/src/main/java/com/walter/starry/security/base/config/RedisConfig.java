@@ -1,5 +1,6 @@
 package com.walter.starry.security.base.config;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.security.base.listener.redis.RedisSubscribe;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    @ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = MqConstant.Redis.CONDITIONAL_ON_PROP, havingValue = "true")
     RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, @Qualifier("redisSubscribeVirtualThreadTaskExecutor") ExecutorService executor) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);

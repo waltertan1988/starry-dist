@@ -1,5 +1,6 @@
 package com.walter.starry.security.base.listener.redis;
 
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.common.core.message.RedisMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.TEST_BROADCAST)
-@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+@ConditionalOnProperty(name = MqConstant.Redis.CONDITIONAL_ON_PROP, havingValue = "true")
 public class TestBroadcastRedisListener extends AbstractRedisMessageListener {
     @Override
     public void handle(RedisMessage message, byte[] pattern) {

@@ -1,6 +1,7 @@
 package com.walter.starry.security.base.listener.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
 import com.walter.starry.common.core.message.RedisMessage;
@@ -21,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RedisSubscribe(namespace = "${app.message.redis.namespace}", topic = MessageTopicEnum.ROLE_CHANGE_BROADCAST)
-@ConditionalOnProperty(name = "app.message.redis.enabled", havingValue = "true")
+@ConditionalOnProperty(name = MqConstant.Redis.CONDITIONAL_ON_PROP, havingValue = "true")
 public class RoleChangeRedisListener extends AbstractRedisMessageListener {
     @Autowired
     private RoleService roleService;
