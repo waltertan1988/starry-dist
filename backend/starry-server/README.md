@@ -130,8 +130,8 @@ sudo chmod 644 ./data/mysql/master/conf.d/config-file.cnf ./data/mysql/slave1/co
 关于Redis的多种HA部署方式，请参看：[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/docs/redis/README.md)
 
 #### 3.2.3 消息队列配置
-##### 3.2.3.1 如果消息队列采用Redis，还需要修改以下部署配置
-* application.yml:
+##### 3.2.3.1 如果消息队列采用Redis，还需要打开以下配置
+在redis配置文件`application-redis.yml`启用redis消息功能：
 ```yaml
 app:
   message:
@@ -141,29 +141,43 @@ app:
       namespace: ${spring.application.name}
 ```
 
-##### 3.2.3.2 如果消息队列采用RocketMQ，还需要修改以下部署配置
-在`application-security.yml`配置:
+##### 3.2.3.2 如果消息队列采用RocketMQ，还需要修改以下配置
+在`application.yml`里引入`application-rocketmq.yml`:
 ```yaml
-rocketmq:
-  name-server: ${app.middleware-host}:9876
-  producer:
-    group: ${spring.application.name}
-    namespace: ${spring.application.name}
+spring:
+  config:
+    import:
+      - classpath:application-rocketmq.yml
 ```
 > * RocketMQ的部署方式说明，参见[官网](https://rocketmq.apache.org/zh/docs/)和[中文社区](https://rocketmq-learning.com/)。  
 > * 配置示例：  
 >（1）单机模式，参考[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-rocketmq-local.yml)  
 >（2）NameServer内嵌Controller的高可用模式，参考[这里](https://github.com/waltertan1988/starry-dist/blob/main/backend/starry-server/deployment/middleware/compose-rocketmq-controller.yml)  
 
-##### 3.2.3.3 如果消息队列采用Pulsar，还需要修改以下部署配置
-* compose-pulsar.yml
+##### 3.2.3.3 如果消息队列采用Pulsar，还需要修改以下部署配置及应用配置
+在docker compose部署文件`compose-pulsar.yml`中修改以下值：
 ```yaml
 services: 
   broker: 
     environment: 
       - advertisedListeners=external:pulsar://192.168.100.42:6650
 ```
-> 注：如果要使用Pulsar作为本应用的基础MQ中间件，则需在application.yml设置app.message.pulsar.base-reg.tenant和app.message.pulsar.base-reg.namespace
+在应用配置文件`application.yml`里引入`application-pulsar.yml`:
+```yaml
+spring:
+  config:
+    import:
+      - classpath:application-pulsar.yml
+```
+
+##### 3.2.3.4 如果消息队列采用Kafka，还需要修改以下配置
+在`application.yml`里引入`application-kafka.yml`:
+```yaml
+spring:
+  config:
+    import:
+      - classpath:application-kafka.yml
+```
 
 ### 3.3 启动中间件服务
 参考：
