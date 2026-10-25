@@ -13,6 +13,7 @@ spring:
   config:
     import:
       - classpath:application-security.yml
+      - classpath:application-kafka.yml
       - classpath:application-ai.yml
 
   # 优雅停机的宽限期

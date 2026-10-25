@@ -5,7 +5,7 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-  message:
+#  message:
 #    redis:
 #      # 启用redis消息
 #      enabled: true
@@ -15,11 +15,6 @@ app:
 #      base-reg:
 #        tenant: starry
 #        namespace: ${spring.application.name}
-    kafka:
-      infra-cluster-key: infra
-      cluster:
-        infra:
-          bootstrap-servers: "${app.middleware-host}:9092"
 
   security:
     enable-front-back-seperated: true

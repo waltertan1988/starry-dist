@@ -1,6 +1,7 @@
 package com.walter.starry.security.base.service.msg;
 
 import com.walter.starry.common.constant.MqConstant;
+import com.walter.starry.common.util.IdUtil;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.util.MdcUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -30,7 +30,7 @@ public class InfraMessageKafkaService extends AbstractInfraMessageService{
 
     @Override
     public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) {
-        String msgId = UUID.randomUUID().toString().replace("-", "");
+        String msgId = IdUtil.getUUID();
         String topic = MqConstant.Kafka.INFRA_BROADCAST_TOPIC.formatted(appName);
         List<String> message = List.of(messageTopicEnum.getKafka().getTopic(), JsonUtil.toJson(msgObj));
 

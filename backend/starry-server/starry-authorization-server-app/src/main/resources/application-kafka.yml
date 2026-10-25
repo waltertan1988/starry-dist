@@ -1,0 +1,7 @@
+app:
+  message:
+    kafka:
+      infra-cluster-key: infra
+      cluster:
+        infra:
+          bootstrap-servers: "${app.middleware-host}:9092"
