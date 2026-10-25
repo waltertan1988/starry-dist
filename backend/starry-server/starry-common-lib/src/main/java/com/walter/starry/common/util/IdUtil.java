@@ -2,6 +2,7 @@ package com.walter.starry.common.util;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,6 +11,10 @@ import java.util.concurrent.TimeUnit;
  */
 @UtilityClass
 public class IdUtil {
+
+    public static String getUUID(){
+        return UUID.randomUUID().toString().replace("-", "");
+    }
 
     /**
      * 获取下一个全局ID

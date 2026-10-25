@@ -32,8 +32,8 @@ public class InfraKafkaBroadcastListener {
     private ResourceGroupService resourceGroupService;
 
     @KafkaListener(
-            id = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted(${spring.application.name}) + '-' + T(java.util.UUID).randomUUID()}",
-            topics = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted(${spring.application.name})}",
+            id = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted('${spring.application.name}') + '.' + T(com.walter.starry.common.util.IdUtil).getUUID()}",
+            topics = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted('${spring.application.name}')}",
             containerFactory = "infraKafkaListenerContainerFactory", concurrency = "1")
     public void handle(ConsumerRecord<String, String> record) {
         String message = record.value();

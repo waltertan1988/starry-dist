@@ -51,7 +51,7 @@ public class InfraPulsarListener {
      */
     @PulsarListener(
         topics = {"#{T(String).format(T(com.walter.starry.security.base.common.enums.MessageTopicEnum).ROLE_CHANGE_BROADCAST.pulsar.topic, @appMsgProps.pulsar.baseReg.tenant, @appMsgProps.pulsar.baseReg.namespace)}"},
-        subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).ROLE_CHANGE_BROADCAST.name() + '-' + T(java.util.UUID).randomUUID()}",
+        subscriptionName = "#{T(com.walter.starry.security.base.common.enums.MessageTopicEnum).ROLE_CHANGE_BROADCAST.name() + '-' + T(com.walter.starry.common.util.IdUtil).getUUID()}",
         subscriptionType = SubscriptionType.Exclusive
     )
     public void onRoleChange(Message<String> message){
