@@ -4,7 +4,6 @@ import com.walter.starry.common.constant.MqConstant;
 import com.walter.starry.common.util.JsonUtil;
 import com.walter.starry.common.util.MdcUtil;
 import com.walter.starry.security.base.common.enums.MessageTopicEnum;
-import com.walter.starry.security.base.listener.rocketmq.InfraRocketMqBroadcastListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -28,7 +27,7 @@ public class InfraMessageRocketMqService extends AbstractInfraMessageService {
 
     @Override
     public <T> String sendBroadcastMessage(MessageTopicEnum messageTopicEnum, T msgObj) {
-        String topic = InfraRocketMqBroadcastListener.TOPIC;
+        String topic = MqConstant.RocketMq.TOPIC_INFRA_BROADCAST;
         String tags = messageTopicEnum.getRocketMq().getTags();
         String destination = String.format("%s:%s", topic, tags);
         String payload = JsonUtil.toJson(msgObj);

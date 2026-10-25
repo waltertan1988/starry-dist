@@ -25,14 +25,11 @@ import java.util.List;
 @Slf4j
 @Component
 @RocketMQMessageListener(
-    topic = InfraRocketMqBroadcastListener.TOPIC, namespace = "${rocketmq.producer.namespace}",
+    topic = MqConstant.RocketMq.TOPIC_INFRA_BROADCAST, namespace = "${rocketmq.producer.namespace}",
     consumerGroup = "${spring.application.name}", messageModel = MessageModel.BROADCASTING
 )
 @ConditionalOnProperty(name = MqConstant.RocketMq.CONDITIONAL_ON_PROP)
 public class InfraRocketMqBroadcastListener extends AbstractRocketMqMessageListener {
-
-    public static final String TOPIC = "INFRA_BROADCAST";
-
     @Autowired
     private RoleService roleService;
     @Autowired
