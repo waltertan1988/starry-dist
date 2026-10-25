@@ -81,9 +81,9 @@ public class AppMsgProps {
         public static class Cfg{
             private String bootstrapServers;
 
-            private Consumer consumer;
+            private Consumer consumer = new Consumer();
 
-            private Producer producer;
+            private Producer producer = new Producer();
 
             @Data
             public static class Consumer{

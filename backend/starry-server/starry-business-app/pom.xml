@@ -26,10 +26,16 @@
 
 		<!--消息队列方案-->
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-kafka</artifactId>
+		</dependency>
+		<!--
+		<dependency>
 			<groupId>org.apache.rocketmq</groupId>
 			<artifactId>rocketmq-spring-boot-starter</artifactId>
 			<version>${rocketmq-spring-boot-starter.version}</version>
 		</dependency>
+		-->
 
 		<!-- 集成单元测试功能 -->
 		<dependency>
@@ -49,20 +55,22 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
 		</dependency>
-		<!-- RAG的向量数据库 -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-elasticsearch-store</artifactId>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.ai</groupId>-->
-<!--			<artifactId>spring-ai-starter-vector-store-milvus</artifactId>-->
-<!--		</dependency>-->
 		<!-- jdbc聊天记忆 -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
 		</dependency>
+		<!-- RAG的向量数据库方案 -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-elasticsearch-store</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-milvus</artifactId>
+		</dependency>
+		-->
 
 		<!-- 集成外部系统的SDK和API -->
 		<dependency>
@@ -71,13 +79,14 @@
 		</dependency>
 
 		<!-- 临时性依赖，后续升级中间件后按需移除 -->
-		<!-- RocketMQ内置使用的okhttp-jvm（5.2.1）没有兼容到OpeanAI Starter内置的okhttp（4.12.0） -->
+		<!-- RocketMQ内置使用的okhttp-jvm（5.2.1）没有兼容到OpeanAI Starter内置的okhttp（4.12.0）
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>5.2.1</version>
 			<scope>compile</scope>
 		</dependency>
+		-->
 	</dependencies>
 
 	<build>

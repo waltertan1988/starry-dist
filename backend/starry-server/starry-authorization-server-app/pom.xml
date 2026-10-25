@@ -12,6 +12,26 @@
 	<name>starry-authorization-server-app</name>
 
 	<dependencies>
+		<!-- 集成OAuth2授权服务器功能 -->
+		<dependency>
+			<groupId>com.walter.starry</groupId>
+			<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
+		</dependency>
+
+		<!-- 消息队列方案 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-kafka</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.apache.rocketmq</groupId>
+			<artifactId>rocketmq-spring-boot-starter</artifactId>
+			<version>${rocketmq-spring-boot-starter.version}</version>
+		</dependency>
+		-->
+
+		<!-- 集成单元测试功能 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -21,18 +41,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.walter.starry</groupId>
-			<artifactId>starry-authorization-server-spring-boot-autoconfigure</artifactId>
-		</dependency>
-
-		<!--消息队列方案-->
-		<dependency>
-			<groupId>org.apache.rocketmq</groupId>
-			<artifactId>rocketmq-spring-boot-starter</artifactId>
-			<version>${rocketmq-spring-boot-starter.version}</version>
 		</dependency>
 	</dependencies>
 
