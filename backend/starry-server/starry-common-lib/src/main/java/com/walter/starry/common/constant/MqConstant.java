@@ -19,6 +19,6 @@ public interface MqConstant {
     interface Kafka{
         String CONDITIONAL_ON_PROP = "app.message.kafka.base-cluster-key";
         String HEADER_KEY_MSG_ID = "msgId";
-        String TOPIC_INFRA_BROADCAST = "%s.infra-broadcast";
+        String INFRA_BROADCAST_TOPIC = "%s.infra-broadcast";
     }
 }

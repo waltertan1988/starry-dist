@@ -5,7 +5,7 @@ app:
       run-duration: 2h
       clean-from-days-before: 30
 
-#  message:
+  message:
 #    redis:
 #      # 启用redis消息
 #      enabled: true
@@ -15,6 +15,11 @@ app:
 #      base-reg:
 #        tenant: starry
 #        namespace: ${spring.application.name}
+    kafka:
+      infra-cluster-key: infra
+      cluster:
+        infra:
+          bootstrap-servers: "${app.middleware-host}:9092"
 
   security:
     enable-front-back-seperated: true
@@ -32,14 +37,14 @@ mybatis:
   mapper-locations: classpath*:mapper/*.xml
 
 # RocketMQ配置
-rocketmq:
-  # 单机部署
-  # name-server: ${app.middleware-host}:9876
-  # 集群部署
-  name-server: ${app.middleware-host}:9876;${app.middleware-host}:9886;${app.middleware-host}:9896
-  producer:
-    group: ${spring.application.name}
-    namespace: ${spring.application.name}
+#rocketmq:
+#  # 单机部署
+#  name-server: ${app.middleware-host}:9876
+#  # 集群部署
+##  name-server: ${app.middleware-host}:9876;${app.middleware-host}:9886;${app.middleware-host}:9896
+#  producer:
+#    group: ${spring.application.name}
+#    namespace: ${spring.application.name}
 
 spring:
   # DataSource
@@ -65,8 +70,8 @@ spring:
       database: 0
       password: '123456'
       # 单机配置
-#      host: ${app.middleware-host}
-#      port: 6379
+      host: ${app.middleware-host}
+      port: 6379
 
       # sentinel配置
 #      sentinel:
@@ -77,9 +82,9 @@ spring:
 #          - ${app.middleware-host}:26381
 
       # 集群配置
-      cluster:
-        nodes: ${app.middleware-host}:6379,${app.middleware-host}:6380,${app.middleware-host}:6381,${app.middleware-host}:6382,${app.middleware-host}:6383,${app.middleware-host}:6384
-        max-redirects: 3
+#      cluster:
+#        nodes: ${app.middleware-host}:6379,${app.middleware-host}:6380,${app.middleware-host}:6381,${app.middleware-host}:6382,${app.middleware-host}:6383,${app.middleware-host}:6384
+#        max-redirects: 3
       lettuce:
         pool:
           max-active: 300

@@ -1,26 +1,26 @@
 ###########
 # 单机模式 #
 ###########
-#singleServerConfig:
-#  idleConnectionTimeout: 10000
-#  connectTimeout: 10000
-#  timeout: 3000
-#  retryAttempts: 3
-#  retryInterval: 1500
-#  password: "123456"
-#  subscriptionsPerConnection: 5
-#  clientName: null
-#  address: "redis://192.168.100.42:6379"
-#  subscriptionConnectionMinimumIdleSize: 1
-#  subscriptionConnectionPoolSize: 50
-#  connectionMinimumIdleSize: 24
-#  connectionPoolSize: 64
-#  database: 0
-#  dnsMonitoringInterval: 5000
-#threads: 16
-#nettyThreads: 32
-#codec: !<org.redisson.codec.JsonJacksonCodec> {}
-#transportMode: "NIO"
+singleServerConfig:
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+  password: "123456"
+  subscriptionsPerConnection: 5
+  clientName: null
+  address: "redis://192.168.100.42:6379"
+  subscriptionConnectionMinimumIdleSize: 1
+  subscriptionConnectionPoolSize: 50
+  connectionMinimumIdleSize: 24
+  connectionPoolSize: 64
+  database: 0
+  dnsMonitoringInterval: 5000
+threads: 16
+nettyThreads: 32
+codec: !<org.redisson.codec.JsonJacksonCodec> {}
+transportMode: "NIO"
 
 ###############
 # Sentinel模式 #
@@ -57,36 +57,36 @@
 ##############
 # Cluster模式 #
 ##############
-clusterServersConfig:
-  idleConnectionTimeout: 10000
-  connectTimeout: 10000
-  timeout: 10000
-  retryAttempts: 3
-  retryInterval: 1500
-  password: "123456"
-  failedSlaveReconnectionInterval: 3000
-  failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
-  subscriptionsPerConnection: 5
-  clientName: null
-  loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
-  subscriptionConnectionMinimumIdleSize: 1
-  subscriptionConnectionPoolSize: 50
-  slaveConnectionMinimumIdleSize: 24
-  slaveConnectionPoolSize: 64
-  masterConnectionMinimumIdleSize: 24
-  masterConnectionPoolSize: 64
-  readMode: "MASTER"
-  subscriptionMode: "MASTER"
-  nodeAddresses:
-    - "redis://192.168.100.42:6379"
-    - "redis://192.168.100.42:6380"
-    - "redis://192.168.100.42:6381"
-    - "redis://192.168.100.42:6382"
-    - "redis://192.168.100.42:6383"
-    - "redis://192.168.100.42:6384"
-  scanInterval: 1000
-  pingConnectionInterval: 30000
-threads: 16
-nettyThreads: 32
-codec: !<org.redisson.codec.JsonJacksonCodec> {}
-transportMode: "NIO"
+#clusterServersConfig:
+#  idleConnectionTimeout: 10000
+#  connectTimeout: 10000
+#  timeout: 10000
+#  retryAttempts: 3
+#  retryInterval: 1500
+#  password: "123456"
+#  failedSlaveReconnectionInterval: 3000
+#  failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
+#  subscriptionsPerConnection: 5
+#  clientName: null
+#  loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
+#  subscriptionConnectionMinimumIdleSize: 1
+#  subscriptionConnectionPoolSize: 50
+#  slaveConnectionMinimumIdleSize: 24
+#  slaveConnectionPoolSize: 64
+#  masterConnectionMinimumIdleSize: 24
+#  masterConnectionPoolSize: 64
+#  readMode: "MASTER"
+#  subscriptionMode: "MASTER"
+#  nodeAddresses:
+#    - "redis://192.168.100.42:6379"
+#    - "redis://192.168.100.42:6380"
+#    - "redis://192.168.100.42:6381"
+#    - "redis://192.168.100.42:6382"
+#    - "redis://192.168.100.42:6383"
+#    - "redis://192.168.100.42:6384"
+#  scanInterval: 1000
+#  pingConnectionInterval: 30000
+#threads: 16
+#nettyThreads: 32
+#codec: !<org.redisson.codec.JsonJacksonCodec> {}
+#transportMode: "NIO"
