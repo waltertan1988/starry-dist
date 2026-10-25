@@ -14,6 +14,8 @@ spring:
     import:
       - classpath:application-security.yml
       - classpath:application-kafka.yml
+#      - classpath:application-rocketmq.yml
+#      - classpath:application-pulsar.yml
       - classpath:application-ai.yml
 
   # 优雅停机的宽限期

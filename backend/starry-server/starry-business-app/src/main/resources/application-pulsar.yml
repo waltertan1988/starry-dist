@@ -1,0 +1,15 @@
+app:
+  message:
+    pulsar:
+      # 本应用所需的pulsar注册信息
+      base-reg:
+        tenant: starry
+        namespace: ${spring.application.name}
+
+spring:
+  # Pulsar配置
+  pulsar:
+    client:
+      service-url: pulsar://${app.middleware-host}:6650
+    admin:
+      service-url: http://${app.middleware-host}:8080
