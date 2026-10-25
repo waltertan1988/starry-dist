@@ -1,0 +1,4 @@
+spring:
+  # ES
+  elasticsearch:
+    uris: http://${app.middleware-host}:9200

@@ -1,0 +1,20 @@
+spring:
+  # DataSource
+  datasource:
+    username: root
+    password: ''
+    url: jdbc:mysql://${app.middleware-host}/authorization_server?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    hikari:
+      minimum-idle: 50
+      maximum-pool-size: 150
+      connection-test-query: SELECT 1
+
+  # JPA
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
