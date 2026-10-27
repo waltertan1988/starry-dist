@@ -20,5 +20,9 @@ public interface MqConstant {
         String CONDITIONAL_ON_PROP = "app.message.kafka.infra-cluster-key";
         String HEADER_KEY_MSG_ID = "msgId";
         String INFRA_BROADCAST_TOPIC = "%s.infra-broadcast";
+
+        String BEAN_NAME_INFRA_KAFKA_LISTENER_CONTAINER_FACTORY = "infraKafkaListenerContainerFactory";
+        String BEAN_NAME_INFRA_SHARE_KAFKA_LISTENER_CONTAINER_FACTORY = "infraShareKafkaListenerContainerFactory";
+        String BEAN_NAME_INFRA_KAFKA_TEMPLATE = "infraKafkaTemplate";
     }
 }

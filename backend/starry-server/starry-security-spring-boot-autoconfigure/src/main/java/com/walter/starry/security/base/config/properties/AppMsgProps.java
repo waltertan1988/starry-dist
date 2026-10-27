@@ -94,6 +94,7 @@ public class AppMsgProps {
                 private String autoCommitInterval = "100";
                 private String autoOffsetReset = "latest";
                 private String sessionTimeout = "20000";
+                private String shareAcknowledgementMode = "implicit";
             }
 
             @Data

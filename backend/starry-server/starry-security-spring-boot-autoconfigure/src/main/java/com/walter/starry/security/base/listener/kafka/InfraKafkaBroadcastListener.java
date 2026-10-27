@@ -34,9 +34,10 @@ public class InfraKafkaBroadcastListener {
     @KafkaListener(
             id = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted('${spring.application.name}') + '.' + T(com.walter.starry.common.util.IdUtil).getUUID()}",
             topics = "#{T(com.walter.starry.common.constant.MqConstant.Kafka).INFRA_BROADCAST_TOPIC.formatted('${spring.application.name}')}",
-            containerFactory = "infraKafkaListenerContainerFactory", concurrency = "1")
+            concurrency = "1",
+            containerFactory = MqConstant.Kafka.BEAN_NAME_INFRA_SHARE_KAFKA_LISTENER_CONTAINER_FACTORY)
     public void handle(ConsumerRecord<String, String> record) {
-        log.info("kafka message received. record: {}", record.toString());
+        log.info("kafka INFRA_BROADCAST_TOPIC message received. record: {}", record.toString());
 
         String message = record.value();
         List<String> msg = JsonUtil.toList(message, new TypeReference<>() {});

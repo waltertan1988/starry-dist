@@ -8,11 +8,13 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.ShareKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 
 import java.util.HashMap;
@@ -25,7 +27,12 @@ public class KafkaInfraClusterConfig {
     @Autowired
     private AppMsgProps appMsgProps;
 
-    @Bean("infraKafkaListenerContainerFactory")
+    /**
+     * 经典消费者组模式
+     * @return
+     */
+    @Bean(MqConstant.Kafka.BEAN_NAME_INFRA_KAFKA_LISTENER_CONTAINER_FACTORY)
+    @ConditionalOnMissingBean(name = MqConstant.Kafka.BEAN_NAME_INFRA_KAFKA_LISTENER_CONTAINER_FACTORY)
     public ConcurrentKafkaListenerContainerFactory<String, String> infraKafkaListenerContainerFactory() {
         AppMsgProps.Kafka.Cfg cfg = appMsgProps.getKafka().getInfraClusterCfg();
 
@@ -36,9 +43,29 @@ public class KafkaInfraClusterConfig {
         return factory;
     }
 
-    private ConsumerFactory<String, String> consumerFactory() {
+    /**
+     * Kafka队列（共享消费者）模式
+     * @return
+     */
+    @Bean(MqConstant.Kafka.BEAN_NAME_INFRA_SHARE_KAFKA_LISTENER_CONTAINER_FACTORY)
+    @ConditionalOnMissingBean(name = MqConstant.Kafka.BEAN_NAME_INFRA_SHARE_KAFKA_LISTENER_CONTAINER_FACTORY)
+    public ShareKafkaListenerContainerFactory<String, String> infraShareKafkaListenerContainerFactory() {
+        AppMsgProps.Kafka.Cfg cfg = appMsgProps.getKafka().getInfraClusterCfg();
+
+        ShareKafkaListenerContainerFactory<String, String> factory = new ShareKafkaListenerContainerFactory<>(this.shareConsumerFactory());
+        factory.setConcurrency(cfg.getConsumer().getConcurrency());
+        factory.getContainerProperties().setPollTimeout(cfg.getConsumer().getMaxPollTimeOut());
+        return factory;
+    }
+
+    public ConsumerFactory<String, String> consumerFactory() {
         AppMsgProps.Kafka.Cfg cfg = appMsgProps.getKafka().getInfraClusterCfg();
         return new DefaultKafkaConsumerFactory<>(this.consumerProps(cfg));
+    }
+
+    public ShareConsumerFactory<String, String> shareConsumerFactory() {
+        AppMsgProps.Kafka.Cfg cfg = appMsgProps.getKafka().getInfraClusterCfg();
+        return new DefaultShareConsumerFactory<>(this.shareConsumerProps(cfg));
     }
 
     private Map<String, Object> consumerProps(AppMsgProps.Kafka.Cfg cfg) {
@@ -55,6 +82,24 @@ public class KafkaInfraClusterConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, cfg.getConsumer().getAutoOffsetReset());
         //Session超时设置
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, cfg.getConsumer().getSessionTimeout());
+        //键的反序列化方式
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //值的反序列化方式
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        // ...
+        return props;
+    }
+
+    private Map<String, Object> shareConsumerProps(AppMsgProps.Kafka.Cfg cfg) {
+        Map<String, Object> props = new HashMap<>();
+        //连接地址
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, cfg.getBootstrapServers());
+        //每次拉取最大条数
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, cfg.getConsumer().getMaxPollRecords());
+        //提交模式
+        props.put(ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, cfg.getConsumer().getShareAcknowledgementMode());
+        //自动提交的频率
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, cfg.getConsumer().getAutoCommitInterval());
         //键的反序列化方式
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         //值的反序列化方式
@@ -86,7 +131,8 @@ public class KafkaInfraClusterConfig {
         return props;
     }
 
-    @Bean("infraKafkaTemplate")
+    @Bean(MqConstant.Kafka.BEAN_NAME_INFRA_KAFKA_TEMPLATE)
+    @ConditionalOnMissingBean(name = MqConstant.Kafka.BEAN_NAME_INFRA_KAFKA_TEMPLATE)
     public KafkaTemplate<String, String> infraKafkaTemplate(KafkaSendResultListener<String, String> kafkaSendResultListener) {
         KafkaTemplate<String, String> template = new KafkaTemplate<>(this.infraProducerFactory());
         template.setProducerListener(kafkaSendResultListener);
