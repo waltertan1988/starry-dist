@@ -745,7 +745,7 @@ java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-business-app.jar
 # 启动单点登录服务进程（授权服务器），如果业务应用需要单点登录时必须启动此进程
 java --add-opens java.base/sun.net=ALL-UNNAMED -jar starry-authorization-server-app.jar
 ```
-
+若使用JDK-21，在测试阶段建议加入`-Djdk.tracePinnedThreads=full`检测虚拟线程钉住在平台线程上（JDK-24+后已进行一定的修复）。
 
 ## 6. 其他
 ### 6.1 关于OAuth2的授权登录流程
