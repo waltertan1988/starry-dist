@@ -88,6 +88,13 @@ sudo mkdir -p ./data/redis/cluster/node6/conf ./data/redis/cluster/node6/data
 # Kafka相关目录
 # Kafka本地单实例部署模式
 sudo mkdir -p ./data/kafka/singlenode/config ./data/kafka/singlenode/kraft-combined-logs
+# Kafka KRaft isolate部署模式
+sudo mkdir -p ./data/kafka/cluster-isolated/controller1/config ./data/kafka/cluster-isolated/controller1/kraft-controller-logs
+sudo mkdir -p ./data/kafka/cluster-isolated/controller2/config ./data/kafka/cluster-isolated/controller2/kraft-controller-logs
+sudo mkdir -p ./data/kafka/cluster-isolated/controller3/config ./data/kafka/cluster-isolated/controller3/kraft-controller-logs
+sudo mkdir -p ./data/kafka/cluster-isolated/broker1/config ./data/kafka/cluster-isolated/broker1/kraft-broker-logs
+sudo mkdir -p ./data/kafka/cluster-isolated/broker2/config ./data/kafka/cluster-isolated/broker2/kraft-broker-logs
+sudo mkdir -p ./data/kafka/cluster-isolated/broker3/config ./data/kafka/cluster-isolated/broker3/kraft-broker-logs
 # RocketMQ相关目录
 # RocketMQ本地单实例部署模式
 sudo mkdir -p ./data/rocketmq/local/namesrv/logs
@@ -178,6 +185,7 @@ spring:
     import:
       - classpath:application-kafka.yml
 ```
+> 注：kafka支持单节点部署模式和KRaft-isolated高可用部署模式，具体配置可分别参看`compose-kafka-singlenode.yml`和`compose-kafka-cluster-isolated.yml`
 
 ### 3.3 启动中间件服务
 参考：

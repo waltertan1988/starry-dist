@@ -1,2 +1,5 @@
 include:
+  # 单节点部署模式
   - compose-kafka-singlenode.yml
+  # 多节点KRaft isolated部署模式
+#  - compose-kafka-cluster-isolated.yml
